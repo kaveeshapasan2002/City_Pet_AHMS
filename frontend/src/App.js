@@ -11,6 +11,7 @@ import OtpVerify from './pages/OtpVerify';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile'; 
 import AdminDashboard from './pages/AdminDashboard';
+import BookingPage from './pages/bookingPage';
 
 
 // Route guard component for admin routes
@@ -42,6 +43,7 @@ function App() {
               <Route path="/verify-otp" element={<OtpVerify />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path='/bookingPage' element={<BookingPage/>}/>
               <Route 
                 path="/admin" 
                 element={
