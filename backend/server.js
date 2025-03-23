@@ -4,6 +4,7 @@ const connectDB = require("./config/db");
 const colors = require("colors");
 const cors = require("cors");
 const path = require("path");
+const boardingRoutes = require('./routes/boardingRoutes'); // New boarding routes
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,9 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use('/api/boarding', require("./routes/boardingRoutes"));
+
+
 // Add other routes here as you build them
 // app.use("/api/appointments", require("./routes/appointmentRoutes"));
 // app.use("/api/medical-records", require("./routes/medicalRecordRoutes"));

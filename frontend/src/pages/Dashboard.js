@@ -1,6 +1,6 @@
 // src/pages/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
@@ -164,6 +164,14 @@ const Dashboard = () => {
                   >
                     Schedule Appointment
                   </button>
+                </div >
+                // In your dashboard component
+                <div className="dashboard-item">
+                  <h3>Pet Boarding</h3>
+                  <p>Book a comfortable stay for your pet</p>
+                  <Link to="/bookingPage" className="dashboard-button">
+                    Book Now
+                  </Link>
                 </div>
               </div>
             )}

@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
+import axios from 'axios'; // Or use fetch if you prefer
 
 const BookingPage = () => {
+  // Form state
   const [formData, setFormData] = useState({
+    petId: '', // Add this if you need to link to specific pets
     boardingType: '',
     checkIn: '',
     checkOut: '',
     specialNotes: '',
     additionalServices: '',
   });
+  
+  // UI state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const boardingOptions = [
     { id: 'standard', label: 'Standard' },
@@ -30,10 +38,46 @@ const BookingPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form data submitted:', formData);
-    // Here you would typically call an API to submit the booking
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Get JWT token from local storage (or wherever you store it)
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('You must be logged in to book a boarding');
+      }
+      
+      // Send booking data to backend
+      const response = await axios.post('/api/boarding/book', formData, {
+        headers: {
+          'Authorization': `Bearer {token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Show success message
+      setSuccess('Booking created successfully! Our staff will review your request.');
+      
+      // Reset form
+      setFormData({
+        petId: '',
+        boardingType: '',
+        checkIn: '',
+        checkOut: '',
+        specialNotes: '',
+        additionalServices: '',
+      });
+      
+    } catch (err) {
+      console.error('Error creating booking:', err);
+      setError(err.response?.data?.message || 'Error creating booking');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,7 +85,37 @@ const BookingPage = () => {
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Book Your Stay</h2>
         
+        {/* Show error message if any */}
+        {error && (
+          <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+        
+        {/* Show success message if booking was successful */}
+        {success && (
+          <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            {success}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Pet ID field - If needed */}
+          {/* <div>
+            <label htmlFor="petId" className="block text-sm font-medium text-gray-700 mb-1">
+              Pet ID
+            </label>
+            <input
+              type="text"
+              id="petId"
+              name="petId"
+              value={formData.petId}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded-md"
+              required
+            />
+          </div> */}
+          
           {/* Boarding Type Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -139,9 +213,10 @@ const BookingPage = () => {
           <div>
             <button
               type="submit"
-              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={loading}
+              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              Book Now
+              {loading ? 'Processing...' : 'Book Now'}
             </button>
           </div>
         </form>

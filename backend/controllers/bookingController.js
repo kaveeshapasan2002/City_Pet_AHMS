@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const Booking = require('../models/bookingModel');
+const Booking = require('../models/Booking');
 
 // @desc    Create a new booking
 // @route   POST /api/bookings
