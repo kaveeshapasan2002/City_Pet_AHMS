@@ -31,6 +31,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/inventory", require("./routes/inventoryRoutes")); // Add inventory routes
 // Add other routes here as you build them
 // app.use("/api/appointments", require("./routes/appointmentRoutes"));
 // app.use("/api/medical-records", require("./routes/medicalRecordRoutes"));
