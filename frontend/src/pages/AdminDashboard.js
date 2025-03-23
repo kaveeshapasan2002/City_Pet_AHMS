@@ -4,10 +4,16 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserManagement from '../components/admin/UserManagement';
 import AddUserForm from '../components/admin/AddUserForm';
+import SecurityLogs from '../components/admin/SecurityLogs';
+
+
+
 
 const AdminDashboard = () => {
   const { isAuth, user } = useAuth();
   const [refreshUserList, setRefreshUserList] = useState(false);
+  const [activeTab, setActiveTab] = useState('users'); // 'users' or 'security'
+  
 
   console.log("User data:", user); // Debug output
 
@@ -34,9 +40,27 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-bold mb-4">Admin Panel</h2>
             <nav className="space-y-2">
-              <a href="#" className="block px-4 py-2 bg-blue-100 text-blue-700 rounded-md font-medium">
+              <button 
+                onClick={() => setActiveTab('users')}
+                className={`block w-full text-left px-4 py-2 rounded-md font-medium ${
+                  activeTab === 'users' 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
                 User Management
-              </a>
+                </button>
+              <button 
+                onClick={() => setActiveTab('security')}
+                className={`block w-full text-left px-4 py-2 rounded-md font-medium ${
+                  activeTab === 'security' 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Security Logs
+              </button>
+              
               <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
                 Appointment Overview
               </a>
@@ -51,13 +75,29 @@ const AdminDashboard = () => {
           
           {/* Main Content */}
           <div className="md:col-span-3">
+          {activeTab === 'users' && (
+            <>
             <AddUserForm onUserAdded={handleUserAdded} />
             <UserManagement refreshTrigger={refreshUserList} /> 
            
+            </>
+            )}
+            
+            {activeTab === 'security' && (
+              <SecurityLogs />
+            )}
+          </div>
+
+
+
+
+
+
+
           </div>
         </div>
       </div>
-    </div>
+    
   );
 };
 

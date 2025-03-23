@@ -148,6 +148,46 @@ export const changeUserRole = async (userId, role, reason) => {
   };
 
  
+// src/api/admin.js - Add these functions
 
+// Get security logs
+export const getSecurityLogs = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+
+    const response = await axios.get(`${API_URL}/security-logs`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch security logs' };
+  }
+};
+
+// Unlock user account
+export const unlockUserAccount = async (userId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+
+    const response = await axios.put(`${API_URL}/users/${userId}/unlock`, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to unlock account' };
+  }
+};
 
   

@@ -98,7 +98,35 @@ createdAt:{
         default: Date.now
       }
     }
-  ]
+  ],
+
+ // Login security fields
+ failedLoginAttempts: {
+  type: Number,
+  default: 0
+},
+accountLocked: {
+  type: Boolean,
+  default: false
+},
+accountLockedUntil: {
+  type: Date,
+  default: null
+},
+lastLoginAttempt: {
+  type: Date,
+  
+},
+loginHistory: [
+  {
+    date: {
+      type: Date,
+      default: Date.now
+    },
+    status: String,
+  ipAddress: String,
+  userAgent: String
+}]
 
     },
     {timestamps:true} 
