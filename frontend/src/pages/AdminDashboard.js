@@ -9,6 +9,8 @@ const AdminDashboard = () => {
   const { isAuth, user } = useAuth();
   const [refreshUserList, setRefreshUserList] = useState(false);
 
+  console.log("User data:", user); // Debug output
+
   // Redirect if not authenticated or not an admin
   if (!isAuth) {
     return <Navigate to="/login" />;

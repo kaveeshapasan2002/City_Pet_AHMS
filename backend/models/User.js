@@ -23,7 +23,7 @@ password:{
 },
 
 role:{
-    type:[String],//assign for multiple role for one user
+    type:String,//assign for multiple role for one user
     enum: ["Admin", "Veterinarian", "Receptionist", "Pet Owner"],
     
     default:"Pet Owner" //is a user dosent specially mention his role asigned him to user...
