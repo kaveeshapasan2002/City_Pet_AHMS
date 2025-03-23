@@ -366,9 +366,57 @@ function getDefaultPermissions(role) {
   }
 }
 
+// @route   GET /api/admin/security-logs
+// @desc    Get security logs for users
+// @access  Private/Admin
+router.get("/security-logs", async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select('name email role failedLoginAttempts accountLocked accountLockedUntil lastLoginAttempt')
+      .sort({ failedLoginAttempts: -1, lastLoginAttempt: -1 });
+    
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 
-
+// @route   PUT /api/admin/users/:id/unlock
+// @desc    Unlock a user account
+// @access  Private/Admin
+router.put("/users/:id/unlock", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    // Reset security fields
+    user.failedLoginAttempts = 0;
+    user.accountLocked = false;
+    user.accountLockedUntil = null;
+    
+    await user.save();
+    
+    res.json({ 
+      message: "Account unlocked successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        failedLoginAttempts: user.failedLoginAttempts,
+        accountLocked: user.accountLocked
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 
 
