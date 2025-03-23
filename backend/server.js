@@ -18,7 +18,8 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }));
-
+// Add this to your server.js
+app.use("/api/boarding", require("./routes/boardingRoutes"));//chamithu fucntion
 
 // Set security headers
 app.use((req, res, next) => {
@@ -33,7 +34,9 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 // Add other routes here as you build them
 // app.use("/api/appointments", require("./routes/appointmentRoutes"));
-// app.use("/api/medical-records", require("./routes/medicalRecordRoutes"));
+// app.use("/api/medical-records", require("./routes/medicalRecordRoutes"))
+
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
