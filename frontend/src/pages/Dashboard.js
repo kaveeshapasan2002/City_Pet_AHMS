@@ -69,6 +69,31 @@ const Dashboard = () => {
               <li><strong>Role:</strong> {user?.role}</li>
             </ul>
           </div>
+          
+          {/* Veterinarian Buttons Section */}
+          {user?.role === "Veterinarian" && (
+            <div className="mt-6 flex flex-wrap gap-4">
+              <Link 
+                to="/add-pet"
+                className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition shadow-md flex items-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                Add Pet
+              </Link>
+              <Link 
+                to="/view-pets"
+                className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition shadow-md flex items-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                </svg>
+                View Pets
+              </Link>
+            </div>
+          )}
         </div>
       
         {user?.role === "Pet Owner" && (
