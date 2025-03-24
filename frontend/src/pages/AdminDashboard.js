@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import UserManagement from '../components/admin/UserManagement';
 import AddUserForm from '../components/admin/AddUserForm';
 import SecurityLogs from '../components/admin/SecurityLogs';
-
+import BoardingManagement from '../components/admin/BoardingManagement';
 
 
 
@@ -61,6 +61,24 @@ const AdminDashboard = () => {
                 Security Logs
               </button>
               
+              // Add to your sidebar navigation
+<button 
+  onClick={() => setActiveTab('boarding')}
+  className={`block w-full text-left px-4 py-2 rounded-md font-medium ${
+    activeTab === 'boarding' 
+      ? 'bg-blue-100 text-blue-700' 
+      : 'text-gray-700 hover:bg-gray-100'
+  }`}
+>
+  Pet Boarding
+</button>
+
+
+
+
+
+
+
               <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
                 Appointment Overview
               </a>
@@ -90,7 +108,10 @@ const AdminDashboard = () => {
 
 
 
-
+          // Add to your main content area
+{activeTab === 'boarding' && (
+  <BoardingManagement />
+)}
 
 
 
