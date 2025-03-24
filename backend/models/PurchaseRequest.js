@@ -30,6 +30,14 @@ const PurchaseRequestSchema = new mongoose.Schema({
     enum: ['Pending', 'Approved', 'Rejected', 'Completed'],
     default: 'Pending'
   },
+
+
+
+  paymentDetails: {
+    paymentMethod: String,
+    transactionId: String,
+    paymentDate: Date
+  },
   requestedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

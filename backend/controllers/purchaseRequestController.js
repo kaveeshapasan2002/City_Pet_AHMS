@@ -108,3 +108,40 @@ exports.deletePurchaseRequest = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Purchase request removed' });
 });
 
+// backend/controllers/purchaseRequestController.js
+exports.processPurchasePayment = asyncHandler(async (req, res) => {
+    const { 
+      purchaseRequestId, 
+      paymentMethod, 
+      transactionId 
+    } = req.body;
+  
+    // Find the purchase request
+    const purchaseRequest = await PurchaseRequest.findById(purchaseRequestId);
+  
+    if (!purchaseRequest) {
+      res.status(404);
+      throw new Error('Purchase request not found');
+    }
+  
+    // Update purchase request with payment details
+    purchaseRequest.status = 'Completed';
+    purchaseRequest.paymentDetails = {
+      paymentMethod,
+      transactionId,
+      paymentDate: new Date()
+    };
+  
+    // Update inventory
+    const inventoryItem = await Inventory.findById(purchaseRequest.item);
+    inventoryItem.quantity += purchaseRequest.quantity;
+    await inventoryItem.save();
+  
+    // Save purchase request
+    await purchaseRequest.save();
+  
+    res.status(200).json({
+      message: 'Purchase completed successfully',
+      purchaseRequest
+    });
+  });
