@@ -22,6 +22,16 @@ function Addpet() {
 
 
   });
+
+
+
+
+
+
+
+
+
+  
 const handleChange=(e)=>{
   setInputs((prevState)=>({
     ...prevState,
@@ -35,7 +45,7 @@ const handleSubmit=(e)=>{
   sendRequest().then(()=>history('/petdetails'))
 }
 const sendRequest=async()=>{
-  await axios.post("http://Localhost:5000/pets",{
+  await axios.post("http://Localhost:5001/pets",{
     id:String(inputs.id),
     name:String(inputs.name),
     age:Number(inputs.age),

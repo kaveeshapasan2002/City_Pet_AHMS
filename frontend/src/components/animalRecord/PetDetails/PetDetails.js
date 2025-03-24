@@ -4,7 +4,7 @@ import Pet from '../Pet/pet';
 
 
 
-const URL="http://Localhost:5000/pets";
+const URL="http://Localhost:5001/pets";
 
 const fetchHandler=async ()=>{
   return await axios.get(URL).then((res)=>res.data);

@@ -21,7 +21,7 @@ const {id} = useParams();
 useEffect(()=>{
     const fetchHandler=async()=>{
         await axios
-        .get(`http://Localhost:5000/pets/${id}`)
+        .get(`http://Localhost:5001/pets/${id}`)
         .then((res)=>res.data)
         .then((data)=>setInputs(data.pet));
        
@@ -30,7 +30,7 @@ useEffect(()=>{
 },[id]);
 
 const sendRequest=async()=>{
-    await axios.put(`http://Localhost:5000/pets/${id}`,{
+    await axios.put(`http://Localhost:5001/pets/${id}`,{
       name:String(inputs.name),
       age:Number(inputs.age),
       breed:String(inputs.breed),

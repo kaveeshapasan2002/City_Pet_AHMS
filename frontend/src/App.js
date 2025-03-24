@@ -16,7 +16,7 @@ import PetBoarding from './pages/PetBoarding';
 
 ////////////animalRecord
 import AnimalRecords from "./components/animalRecord/animalRecord/animalRecord"
-import AddPet from "./components/animalRecord/AddPet/AddMedi"
+import AddPet from "./components/animalRecord/AddPet/Addpet"
 import PetDetails from './components/animalRecord/PetDetails/PetDetails';
 import UpdatePet from './components/animalRecord/UpdatePet/UpdatePet';
 import MediRecord from './components/animalRecord/animalRecord/MediRecord';

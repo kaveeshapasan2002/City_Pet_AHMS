@@ -16,7 +16,7 @@ function Appointmentdetails() {
       useEffect(() => {
         const fetchRecords = async () => {
             await axios
-                .get(`http://localhost:5000/appointments`)
+                .get(`http://localhost:5001/appointments`)
                 .then((res) => setAppoinment(res.data.Appointments))  // Updated to match backend response
                 .catch((err) => console.log("Error fetching records:", err));
         };
@@ -25,7 +25,7 @@ function Appointmentdetails() {
 
     const deleteHandler = async (nic) => {
         await axios
-            .delete(`http://localhost:5000/appointments/${nic}`)
+            .delete(`http://localhost:5001/appointments/${nic}`)
             .then((res) => res.data)
             .then(() => {
                 setAppoinment((prevAppointments) => prevAppointments.filter((appointment) => appointment.nic !== nic));

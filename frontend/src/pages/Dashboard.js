@@ -74,7 +74,7 @@ const Dashboard = () => {
           {user?.role === "Veterinarian" && (
             <div className="mt-6 flex flex-wrap gap-4">
               <Link 
-                to="/add-pet"
+                to="/addpet"
                 className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition shadow-md flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -83,7 +83,7 @@ const Dashboard = () => {
                 Add Pet
               </Link>
               <Link 
-                to="/view-pets"
+                to="/petdetails"
                 className="px-6 py-3 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition shadow-md flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
