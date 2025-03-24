@@ -1,4 +1,4 @@
-const mongoose=require('mongoose');//mongoose is odm library
+/* const mongoose=require('mongoose');//mongoose is odm library
 const bcrypt=require("bcryptjs");// library is used to hash passwords ....that is enhancing secuirty by encryping passwords before saving them.this ensures that passwords not plain text
 
 const userSchema=new mongoose.Schema(  //define a schema...blueprint of users in mongodb database
@@ -122,4 +122,4 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   };
 
   module.exports=mongoose.model("User",userSchema); //creates a mongoose model from userSchema now it can allow other files
-  
+   */

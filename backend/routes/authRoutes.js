@@ -1,5 +1,6 @@
+//I comented
 
-const express = require("express");
+/* const express = require("express");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -227,8 +228,9 @@ router.get("/user", authMiddleware, async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = router; */
 
+//aleady coment
 
 /*
 const express = require("express");

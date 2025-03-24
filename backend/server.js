@@ -20,16 +20,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }));
 
 // Set security headers
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-XSS-Protection", "1; mode=block");
-  res.setHeader("X-Frame-Options", "SAMEORIGIN");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("X-Content-Type-Options", "nosniff");
+//   res.setHeader("X-XSS-Protection", "1; mode=block");
+//   res.setHeader("X-Frame-Options", "SAMEORIGIN");
+//   next();
+// });
 
 // Routes
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
+// app.use("/api/auth", require("./routes/authRoutes"));
+// app.use("/api/admin", require("./routes/adminRoutes"));
 // Add other routes here as you build them
 // app.use("/api/appointments", require("./routes/appointmentRoutes"));
 // app.use("/api/medical-records", require("./routes/medicalRecordRoutes"));
@@ -50,10 +50,16 @@ if (process.env.NODE_ENV === "production") {
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../", "frontend", "build", "index.html"));
   });
-}
+}//I STARTED FROM HERE
+
+// Add this to your server.js file where you set up routes
+const invoiceRoutes = require('./routes/invoiceRoutes');
+
+// Add this to where you define your API routes
+app.use('/api/invoices', invoiceRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`.yellow.bold);
+  console.log(`Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
 });

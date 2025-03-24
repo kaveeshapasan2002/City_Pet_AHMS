@@ -1,4 +1,4 @@
-const express = require("express");
+/* const express = require("express");
 const User = require("../models/User");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require("../middlewares/adminMiddleware");
@@ -384,4 +384,4 @@ module.exports = router;
 
 
   
-  
+   */
