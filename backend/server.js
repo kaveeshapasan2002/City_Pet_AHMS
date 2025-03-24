@@ -4,6 +4,11 @@ const connectDB = require("./config/db");
 const colors = require("colors");
 const cors = require("cors");
 const path = require("path");
+const mongoose=require("mongoose");
+
+const router1=require("./routes/PetRoute");
+const router2=require("./routes/MediRoute");
+const router=require("./routes/AppointmentRoute");
 
 // Load environment variables
 dotenv.config();
@@ -18,7 +23,9 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }));
-
+app.use("/pets",router1)
+app.use("/medies",router2)
+app.use("/appointments",router)
 
 // Set security headers
 app.use((req, res, next) => {
@@ -34,6 +41,8 @@ app.use("/api/admin", require("./routes/adminRoutes"));
 // Add other routes here as you build them
 // app.use("/api/appointments", require("./routes/appointmentRoutes"));
 // app.use("/api/medical-records", require("./routes/medicalRecordRoutes"));
+
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

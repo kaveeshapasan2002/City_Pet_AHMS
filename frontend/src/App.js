@@ -13,6 +13,21 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 
 
+
+////////////animalRecord
+import AnimalRecords from "./components/animalRecord/animalRecord/animalRecord"
+import AddPet from "./components/animalRecord/AddPet/AddMedi"
+import PetDetails from './components/animalRecord/PetDetails/PetDetails';
+import UpdatePet from './components/animalRecord/UpdatePet/UpdatePet';
+import MediRecord from './components/animalRecord/animalRecord/MediRecord';
+import AddMedi from './components/animalRecord/AddPet/AddMedi';
+import UpdateMedi from './components/animalRecord/UpdatePet/UpdateMedi';
+import Addappointment from './components/animalRecord/AddAppointment/Addappointment';
+import Appointmentdetails from './components/animalRecord/AppointmentDetails/Appointmentdetails';
+import UpdateAppointment from './components/animalRecord/UpdateAppointment/UpdateAppointment';
+
+
+
 // Route guard component for admin routes
 const AdminRoute = ({ children }) => {
   const { isAuth, user, loading } = useAuth();
@@ -49,13 +64,37 @@ function App() {
                     <AdminDashboard />
                   </AdminRoute>
                 } 
-              />
+              />        <Route path="/dashboard" element={<AnimalRecords />} />
+              <Route path="/addpet" element={<AddPet />} />
+              <Route path="/petdetails" element={<PetDetails />} />
+              <Route path="/petdetails/:id" element={<UpdatePet />} />
+            
+           
+            
+              
+              <Route path="/appointmentdetails" element={ <Appointmentdetails/>} />
+              <Route path="/addappointment" element={<Addappointment />} />
+              <Route path="/appointmentdetails/:nic" element={<UpdateAppointment />} />
+      
+             
+      
+                      <Route path="/petdetails/:id" element={<PetDetails />} />
+            
+            
+      
+                   
+            <Route path="/medicalrecords/:petid" element={<MediRecord />} />
+            <Route path="/addmedi/:id" element={<AddMedi />} />
+            <Route path="/updatemedi/:id/:index" element={<UpdateMedi />} />
             </Routes>
           </main>
           <Footer />
         </div>
+
       </Router>
     </AuthProvider>
+
+    
   );
 }
 
