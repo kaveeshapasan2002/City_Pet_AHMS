@@ -1,0 +1,118 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f9fc;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container1{
+    max-width: 1500px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #f3f3f3;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.allergy-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 350px; 
+  display: inline-block;
+}
+  
+  h1 {
+    color: #333;
+    font-size: 22px;
+    margin: 8px 0;
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
+    margin: 5px;
+   
+    border-radius: 5px;
+    border: none;
+   
+    font-weight: bold;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  
+  button.delete {
+    background-color: #dc3545;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  button.delete:hover {
+    background-color: #c82333;
+  }
+  
+  button.record {
+    background-color: #28a745;
+  }
+  
+  button.record:hover {
+    background-color: #218838;
+  }
+  
+  .link-button {
+    text-decoration: none;
+  }
+  .updatebtn {
+    background-color: #007BFF; /* Electric Blue */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .updatebtn:hover {
+    background-color: #0056b3; /* Darker shade of blue */
+    transform: scale(1.05);
+  }
+  
+  .updatebtn:active {
+    background-color: #004085; /* Even darker shade for click */
+  }
+  
+  @media (max-width: 600px) {
+    .container {
+      width: 90%;
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 18px;
+    }
+  
+    button {
+      font-size: 14px;
+      padding: 8px 16px;
+    }
+  }
+  
