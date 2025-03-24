@@ -25,7 +25,7 @@ const{petid}=useParams()
   useEffect(()=>{
     const fetchHandler=async()=>{
         await axios
-        .get(`http://localhost:5000/medies/index/${index}`)
+        .get(`http://localhost:5001/medies/index/${index}`)
         .then((res)=>res.data)
         .then((data)=>setInputs(data.Medies));
        
@@ -34,7 +34,7 @@ const{petid}=useParams()
 },[index]);
 
 const sendRequest=async()=>{
-    await axios.put(`http://localhost:5000/medies/${index}`,{
+    await axios.put(`http://localhost:5001/medies/${index}`,{
       index: Number(inputs.index),
       vaccinationState:String(inputs.vaccinationState),
       vaccinationDate: inputs.vaccinationState === "Yes" ? Date(inputs.vaccinationDate) : null, 

@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useState } from 'react';
 
 
-const URL = `http://localhost:5000/pets`;
+const URL = `http://localhost:5001/pets`;
 
 const fetchHandler = async () => {
   return await axios.get(URL).then((res) => res.data);
@@ -53,67 +53,7 @@ const AnimalRecord = (props) => {
 
       {/* Pet Details View */}
       <h2>Pet Details</h2>
-      
-      <table>
-        <tbody>
-          <tr>
-            <td>ID:</td>
-            <td>{pet.petid}</td>
-          </tr>
-          <tr>
-            <td>Name:</td>
-            <td>{pet.name}</td>
-          </tr>
-          <tr>
-            <td>Age:</td>
-            <td>{pet.age}</td>
-          </tr>
-          <tr>
-            <td>Breed:</td>
-            <td>{pet.breed}</td>
-          </tr>
-          <tr>
-            <td>Species:</td>
-            <td>{pet.species}</td>
-          </tr>
-          <tr>
-            <td>Gender:</td>
-            <td>{pet.gender}</td>
-          </tr>
-          <tr>
-            <td>Bloodgroup:</td>
-            <td>{pet.bloodgroup}</td>
-          </tr>
-          <tr>
-            <td>Allergies:</td>
-            <td>{pet.allergies}</td>
-          </tr>
-          <tr>
-            <td>Contact number of ownner:</td>
-            <td>{pet.contact}</td>
-          </tr>
-        
-          <td>
-    <button 
-        className="record" 
-        onClick={() => history(`/medicalrecordsAsowner/${pet.petid}`)}
-    >
-        Records
-    </button>
-</td>
-
-       
-<td>
-        <div className="button-group">
-              <Link to={`/petdetails/${pet.petid}`}>
-              <button className="updatebtn" onClick={handleUpdateClick}>        Update
-              </button>
-              </Link>
-              </div>
-
-              </td>
-        </tbody>
-      </table> 
+     
 
       {/* Navigation Links */}
       <div>

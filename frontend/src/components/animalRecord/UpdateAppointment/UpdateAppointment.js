@@ -18,7 +18,7 @@ function UpdateAppointment() {
     useEffect(()=>{
         const fetchHandler=async()=>{
             await axios
-            .get(`http://localhost:5000/appointments/${nic}`)
+            .get(`http://localhost:5001/appointments/${nic}`)
             .then((res)=>res.data)
             .then((data)=>setInputs(data.Appointments));
            
@@ -27,7 +27,7 @@ function UpdateAppointment() {
     },[nic]);  
 
     const sendRequest=async()=>{
-        await axios.put(`http://localhost:5000/appointments/${nic}`,{ 
+        await axios.put(`http://localhost:5001/appointments/${nic}`,{ 
         name:String(inputs.name),
         contact:Number(inputs.contact),
         gmail:String(inputs.gmail),

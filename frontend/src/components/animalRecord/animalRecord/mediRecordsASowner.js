@@ -36,7 +36,7 @@ function MedicalRecordAsOwner() {
     
         const fetchRecords = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/medies/${petid}`);
+                const res = await axios.get(`http://localhost:5001/medies/${petid}`);
                 console.log("Fetched Medies:", res.data); // Log the full response to see the structure
                 setMedies(res.data.Medies || res.data); // Adjust if needed
             } catch (err) {

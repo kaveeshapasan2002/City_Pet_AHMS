@@ -11,7 +11,7 @@ function Pet(props) {
 
 const deleteHandler = async () => {
     await axios
-        .delete(`http://localhost:5000/pets/${id}`)
+        .delete(`/pets/${id}`)
         .then((res) => res.data)
         .then(() => {
             history("/petdetails"); // Navigate to the pet details page
