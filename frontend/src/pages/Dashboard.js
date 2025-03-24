@@ -1,6 +1,6 @@
 // src/pages/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
@@ -49,10 +49,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
-    <div className="container mx-auto px-4">
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-        
+      <div className="container mx-auto px-4">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
           
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-4">Welcome, {user?.name}!</h2>
@@ -72,8 +71,7 @@ const Dashboard = () => {
           </div>
         </div>
       
-
- {user?.role === "Pet Owner" && (
+        {user?.role === "Pet Owner" && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-bold mb-4">Pet Medical History</h2>
 
@@ -157,25 +155,21 @@ const Dashboard = () => {
                   <p className="text-gray-500 italic">No medical records found for this pet.</p>
                 )}
                 
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-end space-x-4">
                   <button 
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     onClick={() => alert("Schedule a new appointment feature coming soon!")}
                   >
                     Schedule Appointment
                   </button>
-                </div>
-
-
-                <div className="mt-4 flex justify-end">
-                  <button 
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    onClick={() => alert("Schedule a new appointment feature coming soon!")}
+                  
+                  <Link 
+                    to="/pet-boarding"
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                   >
-                    Pet boarding Service
-                  </button>
+                    Pet Boarding Service
+                  </Link>
                 </div>
-
               </div>
             )}
           </div>
@@ -186,4 +180,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

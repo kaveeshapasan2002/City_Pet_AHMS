@@ -106,6 +106,8 @@ router.post("/verify-otp", async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
+        const MAX_FAILED_ATTEMPTS = 5;
+        const LOCK_TIME_MINUTES = 10;
 
         // Check if user exists
         let user = await User.findOne({ email });
@@ -113,22 +115,200 @@ router.post("/login", async (req, res) => {
             console.log("❌ User not found:", email);
             return res.status(400).json({ message: "Invalid credentials" });
         }
-        
-        if (!user.isVerified) {
-            return res.status(400).json({ message: "Please verify your email before logging in" });
-        }
+ // Compare passwords FIRST - this is the most likely point of failure
+ const isMatch = await user.comparePassword(password);
+ console.log("Password Match:", isMatch);
+ 
 
-        // Check if user account is active
-        if (!user.isActive) {
-            return res.status(403).json({ message: "Your account has been deactivated. Please contact an administrator." });
-        }
-       
-        // Compare passwords
-        const isMatch = await user.comparePassword(password);
-        console.log("Password Match:", isMatch);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
+ // Handle failed login
+ if (!isMatch) {
+    // Initialize properties if they don't exist
+    if (typeof user.failedLoginAttempts !== 'number') {
+        user.failedLoginAttempts = 0;
+    }
+    if (typeof user.accountLocked !== 'boolean') {
+        user.accountLocked = false;
+    }
+
+
+
+ // Increment failed attempts
+ user.failedLoginAttempts += 1;
+ user.lastLoginAttempt = new Date();
+
+ // Add to login history if it exists
+ if (Array.isArray(user.loginHistory)) {
+    user.loginHistory.push({
+        date: new Date(),
+        status: 'failed',
+        ipAddress: req.ip || "unknown"
+    });
+}
+ // Check if account should be locked
+ if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+    user.accountLocked = true;
+    user.accountLockedUntil = new Date(Date.now() + LOCK_TIME_MINUTES * 60 * 1000);
+}
+
+ // Save the user document
+ await user.save();
+            
+ // Return appropriate response
+ if (user.accountLocked) {
+     return res.status(403).json({
+         message: `Account locked due to multiple failed login attempts. Try again in ${LOCK_TIME_MINUTES} minutes.`
+     });
+ } else {
+     return res.status(400).json({ 
+         message: "Invalid credentials",
+         attemptsRemaining: MAX_FAILED_ATTEMPTS - user.failedLoginAttempts
+     });
+ }
+}
+
+// If we get here, login succeeded
+
+  // Check if account is locked
+  if (user.accountLocked && user.accountLockedUntil > new Date()) {
+    const remainingTime = Math.ceil((user.accountLockedUntil - new Date()) / (1000 * 60));
+    return res.status(403).json({
+        message: `Account locked due to multiple failed login attempts. Try again in ${remainingTime} minutes.`
+    });
+}
+
+ // Verify email is verified
+ if (!user.isVerified) {
+    return res.status(400).json({ message: "Please verify your email before logging in" });
+}
+
+// Check if user is active
+if (!user.isActive) {
+    return res.status(403).json({ message: "Your account has been deactivated. Please contact an administrator." });
+}
+
+// Reset failed attempts on successful login
+user.failedLoginAttempts = 0;
+user.accountLocked = false;
+user.accountLockedUntil = null;
+user.lastLoginAttempt = new Date();
+
+// Add to login history if it exists
+if (Array.isArray(user.loginHistory)) {
+    user.loginHistory.push({
+        date: new Date(),
+        status: 'success',
+        ipAddress: req.ip || "unknown"
+    });
+}
+
+await user.save();
+        
+        // Generate JWT Token
+        const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+            expiresIn: "1h",
+        });
+        
+        res.json({ token, user });
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+
+
+
+
+
+
+/*
+
+
+    
+// Check if account is locked
+if (user.accountLocked && user.accountLockedUntil > new Date()) {
+    const remainingTime = Math.ceil((user.accountLockedUntil - new Date()) / (1000 * 60));
+    return res.status(403).json({
+      message: `Account locked due to multiple failed login attempts. Try again in ${remainingTime} minutes.`
+    });
+  }
+   // If lock period has expired, unlock the account
+   if (user.accountLocked && user.accountLockedUntil <= new Date()) {
+    user.accountLocked = false;
+    user.failedLoginAttempts = 0;
+    user.accountLockedUntil = null;
+    await user.save();
+  }
+
+  if (!user.isVerified) {
+    return res.status(400).json({ message: "Please verify your email before logging in" });
+}
+
+// Check if user account is active
+if (!user.isActive) {
+    return res.status(403).json({ message: "Your account has been deactivated. Please contact an administrator." });
+}
+
+
+
+
+user.lastLoginAttempt = new Date();
+  user.loginHistory.push(loginAttempt);
+  
+
+ // Compare passwords
+ const isMatch = await user.comparePassword(password);
+ console.log("Password Match:", isMatch);
+ if (!isMatch) {
+     return res.status(400).json({ message: "Invalid credentials" });
+ }
+
+// Record login attempt
+const loginAttempt = {
+    date: new Date(),
+    status: isMatch ? 'success' : 'failed',
+    ipAddress: req.ip || req.connection.remoteAddress,
+    userAgent: req.headers['user-agent']
+  };
+  if (user.loginHistory) {
+    user.loginHistory.push(loginAttempt);
+} else {
+    user.loginHistory = [loginAttempt];
+}
+ 
+  
+  if (!isMatch) {
+    // Increment failed attempts
+    user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+    console.log(`Failed login attempt for ${user.email}. Count: ${user.failedLoginAttempts}`);
+    
+    
+    // Lock account if too many failed attempts
+    if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+      user.accountLocked = true;
+      user.accountLockedUntil = new Date(Date.now() + LOCK_TIME_MINUTES * 60 * 1000);
+      await user.save();
+      
+      return res.status(403).json({
+        message: `Account locked due to multiple failed login attempts. Try again in ${LOCK_TIME_MINUTES} minutes.`
+      });
+    }
+    
+    await user.save();
+    return res.status(400).json({ 
+      message: "Invalid credentials",
+      attemptsRemaining: MAX_FAILED_ATTEMPTS - user.failedLoginAttempts
+    });
+  }
+  
+  // Reset failed attempts on successful login
+  user.failedLoginAttempts = 0;
+  user.accountLocked = false;
+  user.accountLockedUntil = null;
+  await user.save();
+
+
+
 
         // Generate JWT Token
         const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
@@ -141,6 +321,10 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 });
+
+    
+
+    */
 
 // @route   PUT /api/auth/edit-profile
 // @desc    Edit user profile (Pet Owner & Veterinarian)

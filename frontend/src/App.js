@@ -11,7 +11,7 @@ import OtpVerify from './pages/OtpVerify';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile'; 
 import AdminDashboard from './pages/AdminDashboard';
-
+import PetBoarding from './pages/PetBoarding';
 
 
 ////////////animalRecord
@@ -57,6 +57,7 @@ function App() {
               <Route path="/verify-otp" element={<OtpVerify />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/pet-boarding" element={<PetBoarding />} />
               <Route 
                 path="/admin" 
                 element={
