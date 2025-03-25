@@ -75,21 +75,23 @@ function Addappointment() {
                 className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
         </div>
 
-        <div>
-            <label className="block text-gray-700 font-medium">Appointment Type:</label>
-            <div className="flex space-x-4">
-                <label className="flex items-center space-x-2">
-                    <input type="radio" name="appointmentType" value="Vaccination" onChange={handleChange} 
-                        checked={inputs.appointmentType === 'Vaccination'} required className="h-4 w-4 text-blue-600" />
-                    <span>Vaccination</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                    <input type="radio" name="appointmentType" value="Emergency" onChange={handleChange} 
-                        checked={inputs.appointmentType === 'Emergency'} required className="h-4 w-4 text-blue-600" />
-                    <span>Emergency</span>
-                </label>
-            </div>
-        </div>
+        <div className="mb-4">
+  <label className="block text-gray-700 font-medium">Appointment Type:</label>
+  <select
+    name="appointmentType"
+    onChange={handleChange}
+    value={inputs.appointmentType}
+    required
+    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+  >
+    <option value="" disabled>Select Appointment Type</option>
+    <option value="Vaccination">Vaccination</option>
+    <option value="Emergency">Emergency</option>
+    <option value="General Checkup">General Checkup</option>
+    <option value="Surgery">Surgery</option>
+    <option value="Dental Care">Dental Care</option>
+  </select>
+</div>
 
         <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition">
             Submit

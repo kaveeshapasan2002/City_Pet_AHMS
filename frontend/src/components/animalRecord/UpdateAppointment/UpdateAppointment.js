@@ -105,35 +105,23 @@ function UpdateAppointment() {
               />
             </div>
   
-            <div className="mb-6">
-              <label htmlFor="appointmentType" className="block text-sm font-medium text-gray-700">Appointment Type:</label>
-              <div className="flex items-center space-x-6">
-                <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="appointmentType" 
-                    value="Vaccination" 
-                    onChange={handleChange} 
-                    checked={inputs.appointmentType === 'Vaccination'}  
-                    required 
-                    className="mr-2"
-                  />
-                  Vaccination
-                </label>
-                <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="appointmentType" 
-                    value="Emergency" 
-                    onChange={handleChange} 
-                    checked={inputs.appointmentType === 'Emergency'}  
-                    required 
-                    className="mr-2"
-                  />
-                  Emergency
-                </label>
-              </div>
-            </div>
+            <div className="mb-4">
+  <label className="block text-gray-700 font-medium">Appointment Type:</label>
+  <select
+    name="appointmentType"
+    onChange={handleChange}
+    value={inputs.appointmentType}
+    required
+    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+  >
+    <option value="" disabled>Select Appointment Type</option>
+    <option value="Vaccination">Vaccination</option>
+    <option value="Emergency">Emergency</option>
+    <option value="General Checkup">General Checkup</option>
+    <option value="Surgery">Surgery</option>
+    <option value="Dental Care">Dental Care</option>
+  </select>
+</div>
   
             <div className="flex justify-center">
               <button 

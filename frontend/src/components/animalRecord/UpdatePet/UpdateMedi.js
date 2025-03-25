@@ -97,10 +97,26 @@ const sendRequest=async()=>{
       </div>
       
       
-      <div>
-        <label className="block text-gray-700 font-medium">Reason:</label>
-        <input type='text' name='reason' onChange={handleChange} value={inputs.reason} required className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
-      </div>
+      <div className="mb-4">
+  <label className="block text-gray-700 font-medium">Reason for Visit:</label>
+  <select
+    name="reason"
+    onChange={handleChange}
+    value={inputs.reason}
+    required
+    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+  >
+    <option value="" disabled>Select a reason</option>
+    <option value="Vaccination">Vaccination</option>
+    <option value="General Checkup">General Checkup</option>
+    <option value="Emergency Visit">Emergency Visit</option>
+    <option value="Dental Care">Dental Care</option>
+    <option value="Surgery">Surgery</option>
+    <option value="Deworming">Deworming</option>
+    <option value="Grooming">Grooming</option>
+  </select>
+</div>
+
       
       
       <div>
