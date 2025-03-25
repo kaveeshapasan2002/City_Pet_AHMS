@@ -16,17 +16,7 @@ function MedicalRecord() {
     const{petid}=useParams();
 
 
-    // Fetch medical records when the component mounts
-  /* useEffect(() => {
-        const fetchRecords = async () => {
-            await axios
-                .get(`http://localhost:5000/medies/${petid}`)
-                .then((res) => setMedies(res.data.medies))  // Updated to match backend response
-                .catch((err) => console.log("Error fetching records:", err));
-        };
-        fetchRecords();
-    }, [petid]);
-   */
+
 
     useEffect(() => {
         if (!petid) {
@@ -37,8 +27,8 @@ function MedicalRecord() {
         const fetchRecords = async () => {
             try {
                 const res = await axios.get(`http://localhost:5001/medies/${petid}`);
-                console.log("Fetched Medies:", res.data); // Log the full response to see the structure
-                setMedies(res.data.Medies || res.data); // Adjust if needed
+                console.log("Fetched Medies:", res.data); 
+                setMedies(res.data.Medies || res.data); 
             } catch (err) {
                 console.log("Error fetching records:", err);
             }
@@ -52,20 +42,10 @@ function MedicalRecord() {
             .then((res) => res.data)
             .then(() => {
                 setMedies((prevMedies) => prevMedies.filter((medi) => medi.index !== deleteIndex));
-                history(`/medicalrecords/${index}`); // Navigate to the main medical records page
+                history(`/medicalrecords/${index}`); 
             })
             .catch((err) => console.log("Error deleting record:", err));
     };
-/*
-const ComponentsRef = useRef();
-
-const handlePrint = useReactToPrint({
-    content: () => ComponentsRef.current, // Correctly return the ref
-    documentTitle: "Medical Report",
-    onAfterPrint: () => alert("Medical report successfully downloaded!")
-});
-*/
-
 
 const downloadPDF = () => {
     const doc = new jsPDF();
@@ -101,70 +81,82 @@ const downloadPDF = () => {
 
 
     return (
-        <div className="container">
-            <h1>Medical Records Of Pet ID: {petid}</h1>
-     
-            <div>
-            <Link to={`/addmedi/${petid}`} >
-            <button>Add new record</button>
-          </Link>
-          <button onClick={downloadPDF}>Download PDF Report</button>
-        
-            </div>
-         
-           <table style={{ width: "100%", border: "1px solid #ddd", borderCollapse: "collapse", marginTop: "20px" }}>
-    <thead>    
-        <tr>
-       
-            <th>Index</th>
-            <th>pet Id</th>
-            <th>Vaccination State</th>
-            <th>Vaccination Date</th>
-            <th>Visit Date</th>
-            <th>Reason</th>
-            <th>Prescription</th>
-            <th>Medical History</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>  
-        {Array.isArray(Medies) && Medies.length >  0 ? (
-            Medies.map((Medi) => (
-                <tr key={Medi.index}>
+        <div className="max-w-6xl mx-auto p-6 bg-gray-100 shadow-lg rounded-lg">
+        <h1 className="text-2xl font-semibold text-gray-800 text-center mb-4">
+            Medical Records of Pet ID: {petid}
+        </h1>
 
-                   <td>{Medi.index}</td> 
-                   <td>{Medi.petid}</td>
-                    <td>{Medi.vaccinationState}</td>
-                    <td>{Medi.vaccinationDate}</td>
-                    <td>{Medi.visitDate}</td>
-                    <td>{Medi.reason}</td>
-                    <td>{Medi.prescription}</td>
-                    <td>{Medi.mediHistory}</td>
-                    <td>
-                    <Link to={`/updatemedi/${petid}/${Medi.index}`}>
-    <button>Update</button>
-</Link>
-<button 
-  className="delete" 
-  onClick={() => {
-    if (window.confirm("Are you sure you want to delete this record?")) {
-      deleteHandler(Medi.index);
-    }
-  }}
->
-  Delete
-</button>
+        <div className="flex justify-center space-x-4 mb-4">
+            <Link to={`/addmedi/${petid}`}>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Add New Record
+                </button>
+            </Link>
+            <button 
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                onClick={downloadPDF}
+            >
+                Download PDF Report
+            </button>
+        </div>
 
-                    </td>
-                </tr>
-            ))
-        ) : (
-            <tr>
-                <td colSpan="7">No medical records available.</td>
-            </tr>
-        )}
-    </tbody>
-</table></div>
+        <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300">
+                <thead className="bg-blue-500 text-white">
+                    <tr>
+                        <th className="p-3 border border-gray-300">Index</th>
+                        <th className="p-3 border border-gray-300">Pet ID</th>
+                        <th className="p-3 border border-gray-300">Vaccination State</th>
+                        <th className="p-3 border border-gray-300">Vaccination Date</th>
+                        <th className="p-3 border border-gray-300">Visit Date</th>
+                        <th className="p-3 border border-gray-300">Reason</th>
+                        <th className="p-3 border border-gray-300">Prescription</th>
+                        <th className="p-3 border border-gray-300">Medical History</th>
+                        <th className="p-3 border border-gray-300">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Array.isArray(Medies) && Medies.length > 0 ? (
+                        Medies.map((Medi) => (
+                            <tr key={Medi.index} className="odd:bg-gray-100">
+                                <td className="p-3 border border-gray-300">{Medi.index}</td>
+                                <td className="p-3 border border-gray-300">{Medi.petid}</td>
+                                <td className="p-3 border border-gray-300">{Medi.vaccinationState}</td>
+                                <td className="p-3 border border-gray-300">{Medi.vaccinationDate}</td>
+                                <td className="p-3 border border-gray-300">{Medi.visitDate}</td>
+                                <td className="p-3 border border-gray-300">{Medi.reason}</td>
+                                <td className="p-3 border border-gray-300">{Medi.prescription}</td>
+                                <td className="p-3 border border-gray-300">{Medi.mediHistory}</td>
+                                <td className="p-3 border border-gray-300 flex space-x-2">
+                                    <Link to={`/updatemedi/${petid}/${Medi.index}`}>
+                                        <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                                            Update
+                                        </button>
+                                    </Link>
+                                    <button
+                                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                        onClick={() => {
+                                            if (window.confirm("Are you sure you want to delete this record?")) {
+                                                deleteHandler(Medi.index);
+                                            }
+                                        }}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="9" className="text-center p-4">
+                                No medical records available.
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 
       
