@@ -110,15 +110,6 @@ export const InventoryProvider = ({ children }) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   }, []);
 
-  // Refresh stats
-  const refreshStats = useCallback(async () => {
-    try {
-      const data = await inventoryService.getInventoryStats();
-      setStats(data);
-    } catch (err) {
-      setError(err.toString());
-    }
-  }, []);
 
   return (
     <InventoryContext.Provider
@@ -136,7 +127,7 @@ export const InventoryProvider = ({ children }) => {
         updateItem,
         deleteItem,
         updateFilters,
-        refreshStats
+       
       }}
     >
       {children}

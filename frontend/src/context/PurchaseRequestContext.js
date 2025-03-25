@@ -15,7 +15,6 @@ export const PurchaseRequestProvider = ({ children }) => {
     setError(null);
     try {
       const data = await purchaseRequestService.createPurchaseRequest(requestData);
-      setPurchaseRequests(prev => [data, ...prev]);
       setLoading(false);
       return data;
     } catch (err) {
@@ -74,6 +73,52 @@ export const PurchaseRequestProvider = ({ children }) => {
     }
   }, []);
 
+  // Process purchase payment
+  const processPurchasePayment = useCallback(async (requestId, paymentDetails) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await purchaseRequestService.processPurchasePayment(
+        requestId, 
+        paymentDetails
+      );
+      
+      // Remove the completed request from the list
+      setPurchaseRequests(prev => 
+        prev.filter(request => request._id !== requestId)
+      );
+
+      setLoading(false);
+      return response;
+    } catch (error) {
+      setError(error.toString());
+      setLoading(false);
+      console.error('Payment processing failed', error);
+      throw error;
+    }
+  }, []);
+
+  // Approve purchase request - add this function
+  const approvePurchaseRequest = useCallback(async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await purchaseRequestService.approvePurchaseRequest(id);
+      
+      // Update the request in the current list
+      setPurchaseRequests(prev => 
+        prev.map(request => request._id === id ? data : request)
+      );
+      
+      setLoading(false);
+      return data;
+    } catch (err) {
+      setError(err.toString());
+      setLoading(false);
+      throw err;
+    }
+  }, []);
+
   return (
     <PurchaseRequestContext.Provider
       value={{
@@ -83,7 +128,9 @@ export const PurchaseRequestProvider = ({ children }) => {
         createPurchaseRequest,
         fetchPurchaseRequests,
         updatePurchaseRequestStatus,
-        deletePurchaseRequest
+        deletePurchaseRequest,
+        processPurchasePayment,
+        approvePurchaseRequest // Make sure to include this in the provided value
       }}
     >
       {children}

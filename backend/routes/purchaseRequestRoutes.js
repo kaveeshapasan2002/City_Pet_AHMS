@@ -1,16 +1,14 @@
 // backend/routes/purchaseRequestRoutes.js
 
-
-//Purchase Request Routes:
-
-
 const express = require('express');
 const router = express.Router();
 const {
   createPurchaseRequest,
   getPurchaseRequests,
   updatePurchaseRequestStatus,
-  deletePurchaseRequest
+  deletePurchaseRequest,
+  approvePurchaseRequest,
+  processPurchasePayment
 } = require('../controllers/purchaseRequestController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
@@ -24,5 +22,12 @@ router.route('/')
 router.route('/:id')
   .patch(updatePurchaseRequestStatus)
   .delete(deletePurchaseRequest);
+
+// Add routes for approval and payment
+router.route('/approve/:id')
+  .patch(approvePurchaseRequest);
+
+router.route('/payment/:id')
+  .patch(processPurchasePayment);
 
 module.exports = router;

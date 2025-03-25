@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { usePurchaseRequest } from '../../context/PurchaseRequestContext';
 import Spinner from '../common/Spinner';
+import { toast } from 'react-toastify';
 
-const PurchaseRequestTable = ({ purchaseRequests, loading }) => {
-  const { updatePurchaseRequestStatus, deletePurchaseRequest } = usePurchaseRequest();
-  const [selectedRequest, setSelectedRequest] = useState(null);
+const PurchaseRequestTable = ({ purchaseRequests, loading, onStatusUpdate }) => {
+  const { updatePurchaseRequestStatus, approvePurchaseRequest, deletePurchaseRequest } = usePurchaseRequest();
+  const [processingRequest, setProcessingRequest] = useState(null);
 
   // Status color mapping
   const getStatusColor = (status) => {
@@ -25,19 +26,52 @@ const PurchaseRequestTable = ({ purchaseRequests, loading }) => {
   // Handle status update
   const handleStatusUpdate = async (id, status) => {
     try {
-      await updatePurchaseRequestStatus(id, { status });
-      setSelectedRequest(null);
+      setProcessingRequest(id);
+      console.log(`Updating request ${id} to status ${status}`);
+      
+      let updated;
+      
+      // Use approvePurchaseRequest for approvals to avoid automatic completion
+      if (status === 'Approved') {
+        updated = await approvePurchaseRequest(id);
+        console.log('Request approved:', updated);
+      } else {
+        updated = await updatePurchaseRequestStatus(id, { status });
+        console.log('Request status updated:', updated);
+      }
+      
+      toast.success(`Request status updated to ${status}`);
+      
+      // Call the callback if provided
+      if (onStatusUpdate) {
+        onStatusUpdate(updated);
+      }
+      
     } catch (error) {
       console.error('Failed to update status', error);
+      toast.error(`Failed to update status: ${error.toString()}`);
+    } finally {
+      setProcessingRequest(null);
     }
   };
 
   // Handle delete
   const handleDelete = async (id) => {
     try {
+      setProcessingRequest(id);
       await deletePurchaseRequest(id);
+      toast.success('Purchase request deleted');
+      
+      // Call the callback if provided
+      if (onStatusUpdate) {
+        onStatusUpdate();
+      }
+      
     } catch (error) {
       console.error('Failed to delete purchase request', error);
+      toast.error(`Failed to delete request: ${error.toString()}`);
+    } finally {
+      setProcessingRequest(null);
     }
   };
 
@@ -105,24 +139,32 @@ const PurchaseRequestTable = ({ purchaseRequests, loading }) => {
                       <>
                         <button
                           onClick={() => handleStatusUpdate(request._id, 'Approved')}
-                          className="text-green-600 hover:text-green-900"
+                          disabled={processingRequest === request._id}
+                          className={`text-green-600 hover:text-green-900 ${processingRequest === request._id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          Approve
+                          {processingRequest === request._id ? 'Processing...' : 'Approve'}
                         </button>
                         <button
                           onClick={() => handleStatusUpdate(request._id, 'Rejected')}
-                          className="text-red-600 hover:text-red-900"
+                          disabled={processingRequest === request._id}
+                          className={`text-red-600 hover:text-red-900 ${processingRequest === request._id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           Reject
                         </button>
                       </>
                     )}
+                    {request.status === 'Approved' && (
+                      <span className="text-blue-600">
+                        Awaiting Payment
+                      </span>
+                    )}
                     {(request.status === 'Rejected' || request.status === 'Completed') && (
                       <button
                         onClick={() => handleDelete(request._id)}
-                        className="text-red-600 hover:text-red-900"
+                        disabled={processingRequest === request._id}
+                        className={`text-red-600 hover:text-red-900 ${processingRequest === request._id ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        Delete
+                        {processingRequest === request._id ? 'Deleting...' : 'Delete'}
                       </button>
                     )}
                   </div>

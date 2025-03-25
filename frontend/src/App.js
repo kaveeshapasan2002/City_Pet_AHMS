@@ -15,6 +15,12 @@ import AdminDashboard from './pages/AdminDashboard';
 import Inventory from './pages/Inventory';
 import FinancialManagement from './pages/FinancialManagement';
 import PetBoarding from './pages/PetBoarding';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+
 
 // Animal Record Imports
 import AnimalRecords from "./components/animalRecord/animalRecord/animalRecord";
@@ -180,6 +186,16 @@ function App() {
                       <UpdateMedi />
                     </ProtectedRoute>
                   } />
+
+// In your routes section
+<Route 
+  path="/payment-success" 
+  element={
+    <ProtectedRoute>
+      <PaymentSuccessPage />
+    </ProtectedRoute>
+  } 
+/>
                 </Routes>
               </main>
               <Footer />

@@ -27,7 +27,14 @@ const PurchaseRequestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Approved', 'Rejected', 'Completed'],
+    enum: [
+        'Pending', 
+        'Approved', 
+        'Rejected', 
+        'Payment Pending', 
+        'Paid', 
+        'Completed'
+      ],
     default: 'Pending'
   },
 
