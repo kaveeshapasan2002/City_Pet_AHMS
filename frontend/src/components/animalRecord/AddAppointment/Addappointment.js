@@ -28,7 +28,7 @@ function Addappointment() {
       sendRequest().then(()=>history('/appointmentdetails'))
     }
     const sendRequest=async()=>{
-      await axios.post("http://localhost:5000/appointments",{
+      await axios.post("http://localhost:5001/appointments",{
        
         name:String(inputs.name),
         contact:Number(inputs.contact),
@@ -42,36 +42,60 @@ function Addappointment() {
 
 
   return (
-    <div>
-            <h1>this is appoinment add form</h1>
-            <form onSubmit={handleSubmit}>
+    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
+    <h1 className="text-2xl font-semibold text-center text-gray-800 mb-4">Add Appointment</h1>
+    <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+            <label className="block text-gray-700 font-medium">Name:</label>
+            <input type='text' name='name' onChange={handleChange} value={inputs.name} required 
+                className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
+        </div>
 
-            <label for="name"> Name:</label>
-    <input type='text' name='name' onChange={handleChange} value={inputs.name}  required></input> <br></br>
+        <div>
+            <label className="block text-gray-700 font-medium">Contact:</label>
+            <input type='text' name='contact' onChange={handleChange} value={inputs.contact} required 
+                className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
+        </div>
 
-    <label for="contact">contact:</label>
-    <input type='text' name='contact' onChange={handleChange} value={inputs.contact}  required></input> <br></br>
-    
-    <label for="nic">nic:</label>
-    <input type='text' name='nic' onChange={handleChange} value={inputs.nic}  required></input> <br></br>
-    
-    <label for="gmail">Gmail:</label>
-    <input type='text' name='gmail' onChange={handleChange} value={inputs.gmail}  required></input> <br></br>
-    
-    <label for="petID">Pet ID:</label>
-    <input type='text' name='petID' onChange={handleChange} value={inputs.petID}  required></input> <br></br>
-    
-    <label htmlFor="appointmentType">Appointment Type:</label>
-  <label>
-    <input type="radio" name="appointmentType" value="Vaccination" onChange={handleChange} checked={inputs.appointmentType === 'Vaccination'}  required /> Vaccination </label>
-  <label>
-    <input  type="radio"   name="appointmentType"   value="Emergency"   onChange={handleChange}   checked={inputs.appointmentType === 'Emergency'}  required  /> Emergency  </label>
-<br /><br/>
-<button>submit</button>
+        <div>
+            <label className="block text-gray-700 font-medium">NIC:</label>
+            <input type='text' name='nic' onChange={handleChange} value={inputs.nic} required 
+                className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
+        </div>
 
-              </form>
-              
-    </div>
+        <div>
+            <label className="block text-gray-700 font-medium">Gmail:</label>
+            <input type='text' name='gmail' onChange={handleChange} value={inputs.gmail} required 
+                className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
+        </div>
+
+        <div>
+            <label className="block text-gray-700 font-medium">Pet ID:</label>
+            <input type='text' name='petID' onChange={handleChange} value={inputs.petID} required 
+                className="w-full border rounded-md px-3 py-2 focus:ring focus:ring-blue-300" />
+        </div>
+
+        <div>
+            <label className="block text-gray-700 font-medium">Appointment Type:</label>
+            <div className="flex space-x-4">
+                <label className="flex items-center space-x-2">
+                    <input type="radio" name="appointmentType" value="Vaccination" onChange={handleChange} 
+                        checked={inputs.appointmentType === 'Vaccination'} required className="h-4 w-4 text-blue-600" />
+                    <span>Vaccination</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                    <input type="radio" name="appointmentType" value="Emergency" onChange={handleChange} 
+                        checked={inputs.appointmentType === 'Emergency'} required className="h-4 w-4 text-blue-600" />
+                    <span>Emergency</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition">
+            Submit
+        </button>
+    </form>
+</div>
   )
 }
 
