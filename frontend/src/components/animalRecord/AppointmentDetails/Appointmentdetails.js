@@ -34,55 +34,49 @@ function Appointmentdetails() {
     };
 
     return(
-      <div>
-      <h1>Appointments</h1>
-
-      <div>
- 
-   
+        <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
+        <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Appointments</h1>
+  
+        <div className="overflow-x-auto">
+          <table className="min-w-full border border-gray-300">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="py-2 px-4 border">Name</th>
+                <th className="py-2 px-4 border">Contact</th>
+                <th className="py-2 px-4 border">NIC</th>
+                <th className="py-2 px-4 border">Gmail</th>
+                <th className="py-2 px-4 border">Pet ID</th>
+                <th className="py-2 px-4 border">Appointment Type</th>
+                <th className="py-2 px-4 border">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(appoinment) && appoinment.length > 0 ? (
+                appoinment.map((Appointment) => (
+                  <tr key={Appointment.nic} className="text-center border">
+                    <td className="py-2 px-4 border">{Appointment.name}</td>
+                    <td className="py-2 px-4 border">{Appointment.contact}</td>
+                    <td className="py-2 px-4 border">{Appointment.nic}</td>
+                    <td className="py-2 px-4 border">{Appointment.gmail}</td>
+                    <td className="py-2 px-4 border">{Appointment.petID}</td>
+                    <td className="py-2 px-4 border">{Appointment.appointmentType}</td>
+                    <td className="py-2 px-4 border">
+                      <Link to={`/appointmentdetails/${Appointment.nic}`}>
+                        <button className='bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition'>Update</button>
+                      </Link>
+                      <button className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition ml-2" onClick={() => deleteHandler(Appointment.nic)}>Delete</button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="py-4 text-center text-gray-500">No medical records available.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-     <table style={{ width: "100%", border: "1px solid #ddd", borderCollapse: "collapse", marginTop: "20px" }}>
-<thead>
-  <tr>
-      <th>Name</th>
-      <th>Contact</th>
-      <th>NIC</th>
-      <th>Gmail</th>
-      <th>Pet ID </th>
-      <th>Appointment type</th>
-      <th>Actions</th>
-  </tr>
-</thead>
-<tbody>
-  {Array.isArray(appoinment) && appoinment.length >  0 ? (
-      appoinment.map((Appointment) => (
-          <tr key={Appointment.nic}>
-
-             <td>{Appointment.name}</td> 
-              <td>{Appointment.contact}</td>
-              <td>{Appointment.nic}</td>
-              <td>{Appointment.gmail}</td>
-              <td>{Appointment.petID}</td>
-              <td>{Appointment.appointmentType}</td>
-             
-              <td>
-              <Link to={`/appointmentdetails/${Appointment.nic}`}>
-<button className='updatebtn'>Update</button>
-</Link>
-<button className="delete"   onClick={() => deleteHandler(Appointment.nic)}>Delete</button>
-
-              </td>
-          </tr>
-      ))
-  ) : (
-      <tr>
-          <td colSpan="7">No medical records available.</td>
-      </tr>
-  )}
-</tbody>
-</table>
-    </div>
 );
 }
 

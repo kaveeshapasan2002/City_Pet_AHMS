@@ -181,12 +181,12 @@ const Dashboard = () => {
                 )}
                 
                 <div className="mt-4 flex justify-end space-x-4">
-                  <button 
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    onClick={() => alert("Schedule a new appointment feature coming soon!")}
-                  >
-                    Schedule Appointment
-                  </button>
+                <Link 
+  to="/addappointment" 
+  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-center"
+>
+  Schedule Appointment
+</Link>
                   
                   <Link 
                     to="/pet-boarding"
