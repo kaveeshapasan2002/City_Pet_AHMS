@@ -172,8 +172,7 @@ const sendRequest=async()=>{
   value={inputs.contact}
   required
   pattern="\d{10}"  // Ensures exactly 10 digits
-  maxLength="10"  // Prevents input beyond 10 digits
-  title="Please enter a 10-digit contact number" // Shows tooltip on invalid input
+  maxLength="10"  // Prevents input beyond 10 digits 
   className="p-2 border rounded-md"
   placeholder="Enter 10-digit contact number"
 />

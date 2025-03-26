@@ -12,11 +12,11 @@ const mediSchema=new Schema({
     },
     petid:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     vaccinationState:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     vaccinationDate:{
         type:Date,
@@ -25,19 +25,19 @@ const mediSchema=new Schema({
     },
     visitDate:{
         type:Date,
-        required:true ///validation part
+        required:true 
     },
     reason:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     prescription:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     mediHistory:{
         type:String,
-        required:true ///validation part
+        required:true 
     }
 
 

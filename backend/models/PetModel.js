@@ -5,35 +5,35 @@ const Schema=mongoose.Schema;
 const petSchema=new Schema({
     id:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     name:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     age:{
         type:Number,
-        required:true ///validation part
+        required:true 
     },
     breed:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     species:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     gender:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     bloodgroup:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     allergies:{
         type:String,
-        required:true ///validation part
+        required:true 
     },
     contact:{
         type:Number,
