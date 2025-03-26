@@ -31,6 +31,10 @@ app.use("/appointments", router);
 // Boarding routes
 app.use("/api/boarding", require("./routes/boardingRoutes"));
 
+
+// Add to existing routes
+app.use('/api/purchase-requests', require('./routes/purchaseRequestRoutes'));
+
 // Set security headers
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
