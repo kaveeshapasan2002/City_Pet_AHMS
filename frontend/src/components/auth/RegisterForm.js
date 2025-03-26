@@ -98,7 +98,7 @@ const RegisterForm = () => {
           >
             <option value="Pet Owner">Pet Owner</option>
             <option value="Veterinarian">Veterinarian</option>
-            <option value="Admin">Admin</option>
+            
           </select>
         </div>
         

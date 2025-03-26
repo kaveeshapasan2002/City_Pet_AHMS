@@ -11,7 +11,7 @@ const Header = () => {
     <header className="bg-blue-600 text-white shadow-md">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          <Link to="/" className="text-2xl font-bold">Pet Hospital</Link>
+          <Link to="/" className="text-2xl font-bold">CityPet</Link>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
