@@ -164,6 +164,68 @@ router.delete('/:id', async (req, res) => {
 });
 
 
+// In routes/boardingRoutes.js - Add this route
+
+// @route   PUT /api/boarding/:id/status
+// @desc    Update booking status (Admin only)
+// @access  Private/Admin
+router.put('/:id/status', async (req, res) => {
+    try {
+      const { status } = req.body;
+      
+      // Validate status
+      const validStatuses = ['Pending', 'Confirmed', 'Checked-in', 'Checked-out', 'Cancelled'];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+      }
+      
+      const booking = await Boarding.findById(req.params.id);
+      
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+      
+      // Only admins can change status (you can modify this based on your requirements)
+      if (req.user.role !== 'Admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+      
+      booking.status = status;
+      await booking.save();
+      
+      res.json({ message: `Booking status updated to ${status}`, booking });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  });
+
+
+// Add this to boardingRoutes.js
+
+// @route   GET /api/admin/bookings
+// @desc    Get all bookings (Admin only)
+// @access  Private/Admin
+router.get('/admin/bookings', async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user.role !== 'Admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+      
+      // Get all bookings and populate with user information
+      const bookings = await Boarding.find()
+        .populate('user', 'name email')
+        .sort({ createdAt: -1 });
+      
+      res.json(bookings);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  });
+
+
 
 
 

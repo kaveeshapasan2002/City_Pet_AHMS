@@ -3,7 +3,7 @@ import axios from "axios";
 import Medi from '../Pet/medi';
 
 
-const URL="http://localhost:5000/medies";
+const URL="http://localhost:5001/medies";
 
 const fetchHandler=async ()=>{
   return await axios.get(URL).then((res)=>res.data);

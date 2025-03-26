@@ -190,4 +190,62 @@ export const unlockUserAccount = async (userId) => {
   }
 };
 
+
+// In src/api/admin.js - Add this function
+
+// Get all bookings (admin only)
+export const getBookings = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+
+    const response = await axios.get(`${API_URL}/bookings`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch bookings' };
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+// In src/api/admin.js - Add this function
+
+// Update booking status
+export const updateBookingStatus = async (bookingId, status) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+
+    const response = await axios.put(`${API_URL}/bookings/${bookingId}/status`, 
+      { status },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to update booking status' };
+  }
+};
   

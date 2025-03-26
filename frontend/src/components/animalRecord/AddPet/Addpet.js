@@ -22,6 +22,7 @@ function Addpet() {
 
 
   });
+  
 const handleChange=(e)=>{
   setInputs((prevState)=>({
     ...prevState,
@@ -35,7 +36,7 @@ const handleSubmit=(e)=>{
   sendRequest().then(()=>history('/petdetails'))
 }
 const sendRequest=async()=>{
-  await axios.post("http://Localhost:5000/pets",{
+  await axios.post("http://Localhost:5001/pets",{
     id:String(inputs.id),
     name:String(inputs.name),
     age:Number(inputs.age),
@@ -51,161 +52,138 @@ const sendRequest=async()=>{
 
 
 
-  return ( /*
-    <div>
-      <h1>Add pet details</h1>
-      <form onSubmit={handleSubmit}>
-      <label for="id">Pet ID:</label>
-    <input type='text' name='id' onChange={handleChange} value={inputs.id} required></input> <br></br>
-   
-    <label for="name">Pet Name:</label>
-    <input type='text' name='name' onChange={handleChange} value={inputs.name}  required></input> <br></br>
-    
-    <label for="age">Age:</label>
-    <input type='text' name='age' onChange={handleChange}  value={inputs.age} required></input> <br></br>
-    
-    <label for="breed">Breed:</label>
-    <input type='text' name='breed' onChange={handleChange}  value={inputs.breed} required></input> <br></br>
+  return  (
+    <div className="max-w-2xl mx-auto p-6 bg-gray-100 shadow-md rounded-lg">
+      <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
+        Add Pet Details
+      </h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <label className="font-semibold text-gray-700">Pet ID:</label>
+        <input
+          type="text"
+          name="id"
+          onChange={handleChange}
+          value={inputs.id}
+          required
+          className="p-2 border rounded-md"
+        />
 
-    <label for="species">Species :</label>
-    <input type='text' name='species' onChange={handleChange} value={inputs.species} required></input> <br></br>
+        <label className="font-semibold text-gray-700">Pet Name:</label>
+        <input
+          type="text"
+          name="name"
+          onChange={handleChange}
+          value={inputs.name}
+          required
+          className="p-2 border rounded-md"
+        />
 
-    <label htmlFor="gender">Gender:</label>
-  <label>
-    <input type="radio" name="gender" value="Male" onChange={handleChange} checked={inputs.gender === 'Male'}  required /> Male </label>
-  <label>
-    <input  type="radio"   name="gender"   value="Female"   onChange={handleChange}   checked={inputs.gender === 'Female'}  required  /> Femal  </label>
-<br />
+        <label className="font-semibold text-gray-700">Age:</label>
+        <input
+          type="text"
+          name="age"
+          onChange={handleChange}
+          value={inputs.age}
+          required
+          className="p-2 border rounded-md"
+        />
 
-    <label htmlFor="bloodgroup">Blood Group: </label>
-<select   name="bloodgroup"   onChange={handleChange}   value={inputs.bloodgroup}   required
->
-    <option value="">Select Blood Group</option>
-    <option value="A+">A+</option>
-    <option value="A-">A-</option>
-    <option value="B+">B+</option>
-    <option value="B-">B-</option>
-    <option value="O+">O+</option>
-    <option value="O-">O-</option>
-    <option value="AB+">AB+</option>
-    <option value="AB-">AB-</option>
-</select>
-<br />
-<label for="contact">Allergies :</label>
-    <input type='text' name='allergies' onChange={handleChange} value={inputs.allergies} required></input> <br></br>
-    
-    <label for="contact">Contact number of owner :</label>
-    <input type='text' name='contact' onChange={handleChange} value={inputs.contact} required></input> <br></br>
+        <label className="font-semibold text-gray-700">Breed:</label>
+        <input
+          type="text"
+          name="breed"
+          onChange={handleChange}
+          value={inputs.breed}
+          required
+          className="p-2 border rounded-md"
+        />
 
-    <button>submit</button>
+        <label className="font-semibold text-gray-700">Species:</label>
+        <input
+          type="text"
+          name="species"
+          onChange={handleChange}
+          value={inputs.species}
+          required
+          className="p-2 border rounded-md"
+        />
+
+        <label className="font-semibold text-gray-700">Gender:</label>
+        <div className="flex gap-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="gender"
+              value="Male"
+              onChange={handleChange}
+              checked={inputs.gender === 'Male'}
+              required
+              className="mr-2"
+            />
+            Male
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="gender"
+              value="Female"
+              onChange={handleChange}
+              checked={inputs.gender === 'Female'}
+              required
+              className="mr-2"
+            />
+            Female
+          </label>
+        </div>
+
+        <label className="font-semibold text-gray-700">Blood Group:</label>
+        <select
+          name="bloodgroup"
+          onChange={handleChange}
+          value={inputs.bloodgroup}
+          required
+          className="p-2 border rounded-md"
+        >
+          <option value="">Select Blood Group</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+        </select>
+
+        <label className="font-semibold text-gray-700">Allergies:</label>
+        <input
+          type="text"
+          name="allergies"
+          onChange={handleChange}
+          value={inputs.allergies}
+          required
+          className="p-2 border rounded-md"
+        />
+<label className="font-semibold text-gray-700">Contact Number of Owner:</label>
+<input
+  type="text"
+  name="contact"
+  onChange={handleChange}
+  value={inputs.contact}
+  required
+  pattern="\d{10}"  // Ensures exactly 10 digits
+  maxLength="10"  // Prevents input beyond 10 digits
+  title="Please enter a 10-digit contact number" // Shows tooltip on invalid input
+  className="p-2 border rounded-md"
+  placeholder="Enter 10-digit contact number"
+/>
+
+        <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+          Submit
+        </button>
       </form>
     </div>
-
-  )
-};
-
-export default Addpet;*/
-<div style={styles.container}>
-<h1 style={styles.heading}>Add Pet Details</h1>
-<form onSubmit={handleSubmit} style={styles.form}>
-  <label htmlFor="id" style={styles.label}>Pet ID:</label>
-  <input type='text' name='id' onChange={handleChange} value={inputs.id} required style={styles.input} />
-
-  <label htmlFor="name" style={styles.label}>Pet Name:</label>
-  <input type='text' name='name' onChange={handleChange} value={inputs.name} required style={styles.input} />
-
-  <label htmlFor="age" style={styles.label}>Age:</label>
-  <input type='text' name='age' onChange={handleChange} value={inputs.age} required style={styles.input} />
-
-  <label htmlFor="breed" style={styles.label}>Breed:</label>
-  <input type='text' name='breed' onChange={handleChange} value={inputs.breed} required style={styles.input} />
-
-  <label htmlFor="species" style={styles.label}>Species:</label>
-  <input type='text' name='species' onChange={handleChange} value={inputs.species} required style={styles.input} />
-
-  <label htmlFor="gender" style={styles.label}>Gender:</label>
-  <div style={styles.radioContainer}>
-    <label>
-      <input type="radio" name="gender" value="Male" onChange={handleChange} checked={inputs.gender === 'Male'} required />
-      Male
-    </label>
-    <label>
-      <input type="radio" name="gender" value="Female" onChange={handleChange} checked={inputs.gender === 'Female'} required />
-      Female
-    </label>
-  </div>
-
-  <label htmlFor="bloodgroup" style={styles.label}>Blood Group:</label>
-  <select name="bloodgroup" onChange={handleChange} value={inputs.bloodgroup} required style={styles.input}>
-    <option value="">Select Blood Group</option>
-    <option value="A+">A+</option>
-    <option value="A-">A-</option>
-    <option value="B+">B+</option>
-    <option value="B-">B-</option>
-    <option value="O+">O+</option>
-    <option value="O-">O-</option>
-    <option value="AB+">AB+</option>
-    <option value="AB-">AB-</option>
-  </select>
-
-  <label htmlFor="allergies" style={styles.label}>Allergies:</label>
-  <input type='text' name='allergies' onChange={handleChange} value={inputs.allergies} required style={styles.input} />
-
-  <label htmlFor="contact" style={styles.label}>Contact Number:</label>
-  <input type='text' name='contact' onChange={handleChange} value={inputs.contact} required style={styles.input} />
-
-  <button style={styles.button}>Submit</button>
-</form>
-</div>
 )
-};
-
-const styles = {
-container: {
-width: '50%',
-margin: '20px auto',
-padding: '20px',
-borderRadius: '8px',
-boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-backgroundColor: '#f7f7f7',
-},
-heading: {
-textAlign: 'center',
-marginBottom: '20px',
-fontSize: '28px',
-color: '#333',
-},
-form: {
-display: 'flex',
-flexDirection: 'column',
-gap: '12px',
-},
-label: {
-fontWeight: 'bold',
-marginBottom: '5px',
-color: '#555',
-},
-input: {
-padding: '8px',
-borderRadius: '4px',
-border: '1px solid #ccc',
-marginBottom: '10px',
-outline: 'none',
-},
-radioContainer: {
-display: 'flex',
-gap: '20px',
-marginBottom: '10px',
-},
-button: {
-padding: '10px',
-borderRadius: '4px',
-backgroundColor: '#007bff',
-color: '#fff',
-border: 'none',
-cursor: 'pointer',
-marginTop: '10px',
-}
 };
 
 export default Addpet;
