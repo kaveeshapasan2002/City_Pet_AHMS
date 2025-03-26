@@ -1,10 +1,12 @@
-// src/pages/AdminDashboard.js
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserManagement from '../components/admin/UserManagement';
 import AddUserForm from '../components/admin/AddUserForm';
 import SecurityLogs from '../components/admin/SecurityLogs';
+import BoardingManagement from '../components/admin/BoardingManagement';
+import PaymentList from '../components/admin/PaymentList'; // Import PaymentList
+
 
 
 
@@ -12,8 +14,7 @@ import SecurityLogs from '../components/admin/SecurityLogs';
 const AdminDashboard = () => {
   const { isAuth, user } = useAuth();
   const [refreshUserList, setRefreshUserList] = useState(false);
-  const [activeTab, setActiveTab] = useState('users'); // 'users' or 'security'
-  
+  const [activeTab, setActiveTab] = useState('users'); // 'users', 'security', 'boarding', 'payment-list'
 
   console.log("User data:", user); // Debug output
 
@@ -49,7 +50,7 @@ const AdminDashboard = () => {
                 }`}
               >
                 User Management
-                </button>
+              </button>
               <button 
                 onClick={() => setActiveTab('security')}
                 className={`block w-full text-left px-4 py-2 rounded-md font-medium ${
@@ -60,6 +61,30 @@ const AdminDashboard = () => {
               >
                 Security Logs
               </button>
+              <button 
+                onClick={() => setActiveTab('boarding')}
+                className={`block w-full text-left px-4 py-2 rounded-md font-medium ${
+                  activeTab === 'boarding' 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Pet Boarding
+              </button>
+              
+              {/* New Management Links */}
+              <Link 
+                to="/inventory"
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              >
+                Inventory Management
+              </Link>
+              <Link 
+                to="/financial-management"
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+              >
+                Financial Management
+              </Link>
               
               <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
                 Appointment Overview
@@ -70,36 +95,46 @@ const AdminDashboard = () => {
               <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
                 Report Generation
               </a>
+              {/* Add Payment List link */}
+              <button 
+                onClick={() => setActiveTab('payment-list')}
+                className={`block w-full text-left px-4 py-2 rounded-md font-medium ${
+                  activeTab === 'payment-list' 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Payment List
+              </button>
             </nav>
           </div>
           
           {/* Main Content */}
           <div className="md:col-span-3">
-          {activeTab === 'users' && (
-            <>
-            <AddUserForm onUserAdded={handleUserAdded} />
-            <UserManagement refreshTrigger={refreshUserList} /> 
-           
-            </>
+            {activeTab === 'users' && (
+              <div>
+                <AddUserForm onUserAdded={handleUserAdded} />
+                <UserManagement refreshTrigger={refreshUserList} />
+              </div>
             )}
             
             {activeTab === 'security' && (
               <SecurityLogs />
             )}
-          </div>
 
+            {activeTab === 'boarding' && (
+              <BoardingManagement />
+            )}
 
-
-
-
-
-
+            {/* Render Payment List when selected */}
+            {activeTab === 'payment-list' && (
+              <PaymentList />
+            )}
           </div>
         </div>
       </div>
-    
+    </div>
   );
 };
 
 export default AdminDashboard;
-//fix that bug inhere(user add button not display)

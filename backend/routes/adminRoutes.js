@@ -419,7 +419,72 @@ router.put("/users/:id/unlock", async (req, res) => {
 });
 
 
+// @route   GET /api/admin/bookings
+// @desc    Get all boarding bookings (Admin only)
+// @access  Private/Admin
+router.get("/bookings", async (req, res) => {
+  try {
+    // Require the Boarding model - make sure the path is correct for your project
+    const Boarding = require("../models/Boarding");
+    
+    // Get all bookings with user information
+    const bookings = await Boarding.find()
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 });
+    
+    res.json(bookings);
+  } catch (error) {
+    console.error("Error fetching boarding bookings:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
+// @route   PUT /api/admin/bookings/:id/status
+// @desc    Update booking status
+// @access  Private/Admin
+router.put("/bookings/:id/status", async (req, res) => {
+  try {
+    const { status } = req.body;
+    const Boarding = require("../models/Boarding");
+    
+    // Validate status
+    const validStatuses = ['Pending', 'Confirmed', 'Checked-in', 'Checked-out', 'Cancelled'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+    
+    const booking = await Boarding.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    
+    booking.status = status;
+    await booking.save();
+    
+    // Optional: Notify user about status change
+    const user = await User.findById(booking.user);
+    if (user && status === 'Confirmed') {
+      try {
+        const subject = "Your Pet Boarding Booking Has Been Confirmed";
+        const text = `Hello ${user.name},\n\nYour pet boarding booking for ${booking.petName} from ${new Date(booking.checkInDate).toLocaleDateString()} to ${new Date(booking.checkOutDate).toLocaleDateString()} has been confirmed.\n\nThank you for choosing our services.\n\nRegards,\nPet Hospital Team`;
+        
+        if (typeof emailService.sendEmail === 'function') {
+          await emailService.sendEmail(user.email, subject, text);
+        }
+      } catch (emailError) {
+        console.error("Failed to send booking confirmation email:", emailError);
+      }
+    }
+    
+    res.json({ 
+      message: `Booking status updated to ${status}`,
+      booking
+    });
+  } catch (error) {
+    console.error("Error updating booking status:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 
 
@@ -432,4 +497,4 @@ module.exports = router;
 
 
   
-  
+  //

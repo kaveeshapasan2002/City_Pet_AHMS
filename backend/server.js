@@ -4,6 +4,10 @@ const connectDB = require("./config/db");
 const colors = require("colors");
 const cors = require("cors");
 const path = require("path");
+const mongoose = require("mongoose");
+const router1 = require("./routes/PetRoute");
+const router2 = require("./routes/MediRoute");
+const router = require("./routes/AppointmentRoute");
 
 // Load environment variables
 dotenv.config();
@@ -18,8 +22,18 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }));
-// Add this to your server.js
-app.use("/api/boarding", require("./routes/boardingRoutes"));//chamithu fucntion
+
+// Animal Record routes
+app.use("/pets", router1);
+app.use("/medies", router2);
+app.use("/appointments", router);
+
+// Boarding routes
+app.use("/api/boarding", require("./routes/boardingRoutes"));
+
+
+// Add to existing routes
+app.use('/api/purchase-requests', require('./routes/purchaseRequestRoutes'));
 
 // Set security headers
 app.use((req, res, next) => {
@@ -29,14 +43,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// API Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/inventory", require("./routes/inventoryRoutes"));
+
 // Add other routes here as you build them
 // app.use("/api/appointments", require("./routes/appointmentRoutes"));
-// app.use("/api/medical-records", require("./routes/medicalRecordRoutes"))
-
-
+// app.use("/api/medical-records", require("./routes/medicalRecordRoutes"));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -50,7 +64,6 @@ app.use((err, req, res, next) => {
 if (process.env.NODE_ENV === "production") {
   // Set static folder
   app.use(express.static("../frontend/build"));
-
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../", "frontend", "build", "index.html"));
   });
