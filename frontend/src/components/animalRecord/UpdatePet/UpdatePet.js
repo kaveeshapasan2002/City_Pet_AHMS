@@ -30,7 +30,7 @@ useEffect(()=>{
 },[id]);
 
 const sendRequest=async()=>{
-    await axios.put(`http://Localhost:5001/pets/${id}`,{
+    await axios.put(`http://localhost:5001/pets/${id}`,{
       name:String(inputs.name),
       age:Number(inputs.age),
       breed:String(inputs.breed),
@@ -58,54 +58,162 @@ const handleChange=(e)=>{
 
 
   return (
-    <div>
-      <h1>Update user</h1>
-      <form onSubmit={handleSubmit}>
-      <label for="id">Pet ID:</label>
-    <input type='text' name='id' onChange={handleChange} value={inputs.id} required></input> <br></br>
-   
-    <label for="name">Pet Name:</label>
-    <input type='text' name='name' onChange={handleChange} value={inputs.name}  required></input> <br></br>
+    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+    <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Update Pet</h1>
+
+    <form onSubmit={handleSubmit} className="space-y-4">
     
-    <label for="age">Age:</label>
-    <input type='text' name='age' onChange={handleChange}  value={inputs.age} required></input> <br></br>
+      <div>
+        <label className="block font-medium text-gray-700">Pet ID:</label>
+        <input
+          type="text"
+          name="id"
+          value={inputs.id}
+          readOnly
+          className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+        />
+      </div>
+
+
+      <div>
+        <label className="block font-medium text-gray-700">Pet Name:</label>
+        <input
+          type="text"
+          name="name"
+          onChange={handleChange}
+          value={inputs.name}
+          required
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+        />
+      </div>
+
+  
+      <div>
+        <label className="block font-medium text-gray-700">Age:</label>
+        <input
+          type="number"
+          name="age"
+          onChange={handleChange}
+          value={inputs.age}
+          required
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+        />
+      </div>
+
+     
+      <div>
+        <label className="block font-medium text-gray-700">Breed:</label>
+        <input
+          type="text"
+          name="breed"
+          onChange={handleChange}
+          value={inputs.breed}
+          required
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+        />
+      </div>
+
+
+      <div>
+        <label className="block font-medium text-gray-700">Species:</label>
+        <input
+          type="text"
+          name="species"
+          onChange={handleChange}
+          value={inputs.species}
+          required
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+        />
+      </div>
+
     
-    <label for="breed">Breed:</label>
-    <input type='text' name='breed' onChange={handleChange}  value={inputs.breed} required></input> <br></br>
+      <div>
+        <label className="block font-medium text-gray-700">Gender:</label>
+        <div className="flex gap-4 mt-1">
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="gender"
+              value="Male"
+              onChange={handleChange}
+              checked={inputs.gender === 'Male'}
+              required
+              className="accent-blue-500"
+            />
+            Male
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="gender"
+              value="Female"
+              onChange={handleChange}
+              checked={inputs.gender === 'Female'}
+              required
+              className="accent-pink-500"
+            />
+            Female
+          </label>
+        </div>
+      </div>
 
-    <label for="species">Species :</label>
-    <input type='text' name='species' onChange={handleChange} value={inputs.species} required></input> <br></br>
+    
+      <div>
+        <label className="block font-medium text-gray-700">Blood Group:</label>
+        <select
+          name="bloodgroup"
+          onChange={handleChange}
+          value={inputs.bloodgroup}
+          required
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+        >
+          <option value="">Select Blood Group</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+        </select>
+      </div>
 
-    <label htmlFor="gender">Gender:</label>
-  <label>
-    <input type="radio" name="gender" value="Male" onChange={handleChange} checked={inputs.gender === 'Male'}  required /> Male </label>
-  <label>
-    <input  type="radio"   name="gender"   value="Female"   onChange={handleChange}   checked={inputs.gender === 'Female'}  required  /> Femal  </label>
-<br />
+     
+      <div>
+        <label className="block font-medium text-gray-700">Allergies:</label>
+        <input
+          type="text"
+          name="allergies"
+          onChange={handleChange}
+          value={inputs.allergies}
+          required
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+        />
+      </div>
 
-    <label htmlFor="bloodgroup">Blood Group: </label>
-<select   name="bloodgroup"   onChange={handleChange}   value={inputs.bloodgroup}   required
->
-    <option value="">Select Blood Group</option>
-    <option value="A+">A+</option>
-    <option value="A-">A-</option>
-    <option value="B+">B+</option>
-    <option value="B-">B-</option>
-    <option value="O+">O+</option>
-    <option value="O-">O-</option>
-    <option value="AB+">AB+</option>
-    <option value="AB-">AB-</option>
-</select>
-<br />
-<label for="allergies">Allergies :</label>
-    <input type='text' name='allergies' onChange={handleChange} value={inputs.allergies} required></input> <br></br>
+    
+      <div>
+        <label className="block font-medium text-gray-700">Contact Number:</label>
+        <input
+          type="text"
+          name="contact"
+          onChange={handleChange}
+          value={inputs.contact}
+          required
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+        />
+      </div>
 
-    <label for="contact">Contact number of owner :</label>
-    <input type='text' name='contact' onChange={handleChange} value={inputs.contact} required></input> <br></br>
-
-    <button>submit</button>
-      </form>
-    </div>
+     
+      <button
+        type="submit"
+        className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition duration-200"
+      >
+        Update Pet
+      </button>
+    </form>
+  </div>
   )
 }
 
