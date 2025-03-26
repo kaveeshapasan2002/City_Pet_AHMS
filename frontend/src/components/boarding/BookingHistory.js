@@ -4,8 +4,8 @@ import { getUserBookings, cancelBooking } from '../../api/boarding';
 import Alert from '../common/Alert';
 
 const BookingHistory = ({ refresh }) => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState([]);  
+  const [loading, setLoading] = useState(true);   //const[variable, function]= useState(initial value)
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   

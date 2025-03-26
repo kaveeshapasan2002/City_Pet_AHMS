@@ -6,8 +6,8 @@ import BookingForm from '../components/boarding/BookingForm';
 import BookingHistory from '../components/boarding/BookingHistory';
 
 const PetBoarding = () => {
-  const { isAuth, user } = useAuth();
-  const [activeTab, setActiveTab] = useState('history'); // 'history' or 'booking'
+  const { isAuth, user } = useAuth();                              
+  const [activeTab, setActiveTab] = useState('history'); // 'history' or 'booking'  using States useState
   const [refreshHistory, setRefreshHistory] = useState(false);
   
   // Redirect if not authenticated
@@ -39,7 +39,7 @@ const PetBoarding = () => {
                     ? 'border-b-2 border-blue-500 text-blue-600 font-medium'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
-                onClick={() => setActiveTab('history')}
+                onClick={() => setActiveTab('history')}   //goes to the function that work with state
               >
                 Your Bookings
               </button>
@@ -57,9 +57,9 @@ const PetBoarding = () => {
           </div>
           
           {activeTab === 'history' ? (
-            <BookingHistory refresh={refreshHistory} />
+            <BookingHistory refresh={refreshHistory} />    //using props , passing data to child componet(BookingHistory)
           ) : (
-            <BookingForm onSuccess={handleSuccessfulBooking} />
+            <BookingForm onSuccess={handleSuccessfulBooking} />  //using props , passing data to child componet(BookingForm)
           )}
           
           {/* Information section */}

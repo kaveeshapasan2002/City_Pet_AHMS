@@ -6,7 +6,7 @@ import Button from '../common/Button';
 import Alert from '../common/Alert';
 
 const BookingForm = ({ onSuccess }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);            //using useState
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   
