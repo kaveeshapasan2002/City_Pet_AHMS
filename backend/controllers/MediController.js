@@ -118,6 +118,7 @@ exports.addMedies=addMedies;
 exports.getById=getById;
 exports.updateMedies=updateMedies;
 exports.deleteMedies=deleteMedies;*/
+
 const Medi = require("../models/MediModel");
 
 // Display all medical records

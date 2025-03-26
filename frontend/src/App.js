@@ -28,6 +28,7 @@ import UpdateAppointment from './components/animalRecord/UpdateAppointment/Updat
 
 
 
+
 // Route guard component for admin routes
 const AdminRoute = ({ children }) => {
   const { isAuth, user, loading } = useAuth();
@@ -58,6 +59,8 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/pet-boarding" element={<PetBoarding />} />
+
+              <Route path="/finacial-dashbord" element={<Dashboard />} />
               <Route 
                 path="/admin" 
                 element={
