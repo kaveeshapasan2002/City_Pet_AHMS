@@ -1,7 +1,3 @@
-
-
-User.js(model)
-
 const mongoose=require('mongoose');//mongoose is odm library
 const bcrypt=require("bcryptjs");// library is used to hash passwords ....that is enhancing secuirty by encryping passwords before saving them.this ensures that passwords not plain text
 
