@@ -1,126 +1,7 @@
-/*const Medi=require("../Model/MediModel");
 
-
-///Display part
-const getAllMedi=async(req,res,next)=>{
-    
-    let Medies;
-
-    try{
-        Medies=await Medi.find();
-    }catch(err){
-        console.log(err);
-    }
-    //notfound
-    if(!Medies){
-        return res.status(404).json({message:"User not found"});
-
-    }
-    //Display all users
-    return res.status(200).json({Medies});
-
-};
-const getId=async(req,res,next)=>{
-    const id=req.params.id;
-
-    let medies;
-    try{
-        medies = await Medi.find({ id: id }); ////editing
-    }catch(err){
-        console.log(err);
-    }
-        //when user is not availale
-        if(!medies){
-            return res.status(404).send({message:"unable to find users"});
-        }
-        return res.status(200).json({medies});
-}
-///data insert
-const addMedies=async(req,res,next)=>{
-    const {id,vaccinationState,vaccinationDate,visitDate,reason,prescription,mediHistory}=req.body;
-    let Medies;
-
-    try{
-        const lastMedi = await Medi.findOne().sort({ index: -1 });
-        const newIndex = lastMedi ? lastMedi.index + 1 : 1; 
-        Medies=new Medi({index: newIndex,id,vaccinationState,vaccinationDate,visitDate,reason,prescription,mediHistory});
-        await Medies.save();
-    }catch(err){
-        console.log(err);
-    }
-    //when data is not inserting
-    if(!Medies){
-        return res.status(404).send({message:"unable to add Medi"});
-    }
-    return res.status(200).json({Medies});
-
-};
-///Get by Index
-
-const getById=async(req,res,next)=>{
-    const index =req.params.id;
-
-    let Medies;
-    try{
-        Medies = await Medi.find({ index: index  });
-    }catch(err){
-        console.log(err);
-    }
-        //when user is not availale
-        if(!Medies){
-            return res.status(404).send({message:"unable to find users"});
-        }
-        return res.status(200).json({Medies});
-}
-
-
-//update details
-const updateMedies=async(req,res,next)=>{
-    const index = req.params.index; 
-    const {vaccinationState,vaccinationDate,visitDate,reason,prescription,mediHistory}=req.body;
-
-    let Medies;
-
-    try{
-        Medies=await Medi.updateOne({ index: index  },
-            {vaccinationState:vaccinationState,vaccinationDate:vaccinationDate,visitDate:visitDate,reason:reason,prescription:prescription,mediHistory:mediHistory});
-            Medies=await Medies.save(); 
-    }catch(err){
-        console.log(err);
-    }
-        //when user is not update
-        if(!Medies){
-            return res.status(404).send({message:"unable to Update users"});
-        }
-        return res.status(200).json({Medies});
-
-};
-///delete detsils
-const deleteMedies=async(req,res,next)=>{
-    const index = req.params.index;
-
-    let Medies;
-    try{
-        Medies=await Medi.deleteOne({ index: index })
-    }catch(err){
-        console.log(err);
-    }
-        //when user is not delete
-        if(!Medies){
-            return res.status(404).send({message:"unable to Delete users"});
-        }
-        return res.status(200).json({Medies});
-}
-
-exports.getAllMedi=getAllMedi;
-exports.getId=getId;
-exports.addMedies=addMedies;
-exports.getById=getById;
-exports.updateMedies=updateMedies;
-exports.deleteMedies=deleteMedies;*/
 const Medi = require("../models/MediModel");
 
-// Display all medical records
+/// display all medical records
 const getAllMedi = async (req, res, next) => {
     let Medies;
     try {
@@ -128,32 +9,32 @@ const getAllMedi = async (req, res, next) => {
     } catch (err) {
         console.log(err);
     }
-    // Not found
+    /// Not found
     if (!Medies) {
         return res.status(404).json({ message: "Medical records not found" });
     }
-    // Display all records
+    
     return res.status(200).json({ Medies });
 };
 
-// Get medical records by Pet ID
+// get medical record by Pet ID
 const getByPetId = async (req, res, next) => {
     const petid = req.params.petid;
 
     let Medies;
     try {
-        Medies = await Medi.find({ petid: petid }); // Filter by pet ID
+        Medies = await Medi.find({ petid: petid }); 
     } catch (err) {
         console.log(err);
     }
-    // When no records are found
+    // when no records found
     if (!Medies || Medies.length === 0) {
         return res.status(404).json({ message: "No medical records found for this pet" });
     }
     return res.status(200).json({ Medies });
 };
 
-// Add a medical record for a specific pet
+// add medical record for pet
 const addMedies = async (req, res, next) => {
     const { petid, vaccinationState, vaccinationDate, visitDate, reason, prescription, mediHistory } = req.body;
     let Medies;
@@ -166,14 +47,14 @@ const addMedies = async (req, res, next) => {
     } catch (err) {
         console.log(err);
     }
-    // When data is not inserting
+    // when data not insert
     if (!Medies) {
         return res.status(404).send({ message: "Unable to add medical record" });
     }
     return res.status(200).json({ Medies });
 };
 
-// Get medical record by Index
+///get medical record by index
 const getByIndex = async (req, res, next) => {
     const index = req.params.index;
 
@@ -183,14 +64,14 @@ const getByIndex = async (req, res, next) => {
     } catch (err) {
         console.log(err);
     }
-    // When record is not available
+    ///when record not available
     if (!Medies) {
         return res.status(404).send({ message: "Unable to find medical record" });
     }
     return res.status(200).json({ Medies });
 };
 
-// Update medical record by Index
+// update medical record
 const updateMedies = async (req, res, next) => {
     const index = req.params.index;
     const { vaccinationState, vaccinationDate, visitDate, reason, prescription, mediHistory } = req.body;
@@ -200,19 +81,19 @@ const updateMedies = async (req, res, next) => {
         Medies = await Medi.findOneAndUpdate(
             { index: index },
             { vaccinationState, vaccinationDate, visitDate, reason, prescription, mediHistory },
-            { new: true } // Return the updated document
+            { new: true } // return the updated document
         );
     } catch (err) {
         console.log(err);
     }
-    // When record is not updated
+    /// record  not update
     if (!Medies) {
         return res.status(404).send({ message: "Unable to update medical record" });
     }
     return res.status(200).json({ Medies });
 };
 
-// Delete medical record by Index
+/// delete medical record
 const deleteMedies = async (req, res, next) => {
     const index = req.params.index;
 
@@ -222,7 +103,7 @@ const deleteMedies = async (req, res, next) => {
     } catch (err) {
         console.log(err);
     }
-    // When record is not deleted
+    /// record not delete
     if (!Medies) {
         return res.status(404).send({ message: "Unable to delete medical record" });
     }

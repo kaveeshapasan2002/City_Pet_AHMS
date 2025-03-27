@@ -47,8 +47,8 @@ function UpdateAppointment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(inputs);
-    await sendRequest(); // Wait for the request to complete
-    history("/appointmentdetails"); // Navigate after successful form submission
+    await sendRequest(); 
+    history("/appointmentdetails"); 
   };
   return (
     

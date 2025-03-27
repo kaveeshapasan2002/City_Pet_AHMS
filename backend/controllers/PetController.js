@@ -1,6 +1,6 @@
 const Pet= require("../models/PetModel");
 
-///Display part
+///display all pets
 const getAllPets=async(req,res,next)=>{
     
     let Pets;
@@ -15,7 +15,7 @@ const getAllPets=async(req,res,next)=>{
         return res.status(404).json({message:"User not found"});
 
     }
-    //Display all users
+    //postman eke console eka check kranna hari nm 200 kiyl thiynw
     return res.status(200).json({pets});
 
 };
@@ -37,18 +37,18 @@ const addPets=async(req,res,next)=>{
     return res.status(200).json({pets});
 
 };
-///Get by Id
+///get by Id
 
 const getById=async(req,res,next)=>{
     const id=req.params.id;
 
     let pet;
     try{
-        pet = await Pet.findOne({ id: id }); ////editing
+        pet = await Pet.findOne({ id: id }); ////editing 
     }catch(err){
         console.log(err);
     }
-        //when user is not availale
+        ///when user is not availale
         if(!pet){
             return res.status(404).send({message:"unable to find users"});
         }
@@ -56,7 +56,7 @@ const getById=async(req,res,next)=>{
 }
 
 
-//update details
+///update details
 const updatePets=async(req,res,next)=>{
     const id=req.params.id;
     const {name,age,breed,species,gender,bloodgroup,allergies,contact}=req.body;
@@ -70,7 +70,7 @@ const updatePets=async(req,res,next)=>{
     }catch(err){
         console.log(err);
     }
-        //when user is not update
+        ///when user is not update
         if(!pets){
             return res.status(404).send({message:"unable to Update users"});
         }
@@ -87,7 +87,7 @@ const deletePets=async(req,res,next)=>{
     }catch(err){
         console.log(err);
     }
-        //when user is not delete
+        ///when user is not delete
         if(!pet){
             return res.status(404).send({message:"unable to Delete users"});
         }

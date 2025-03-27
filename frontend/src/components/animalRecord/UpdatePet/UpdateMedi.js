@@ -57,8 +57,8 @@ const sendRequest=async()=>{
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(inputs);
-    await sendRequest(); // Wait for the request to complete
-    navigate(`/medicalrecords/${inputs.petid}`) // Navigate after successful form submission
+    await sendRequest(); 
+    navigate(`/medicalrecords/${inputs.petid}`) 
   };
 
 

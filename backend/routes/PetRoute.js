@@ -1,11 +1,11 @@
 const express=require("express");
 const router=express.Router();
 
-//Insert Model
+//insert Model
 const Pet=require("../models/PetModel");
 
 
-//Insert user controller
+//insert user controller
 const PetController=require("../controllers/PetController");
 
 

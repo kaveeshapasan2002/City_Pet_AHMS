@@ -15,7 +15,7 @@ const getAllAppointment=async(req,res,next)=>{
         return res.status(404).json({message:"Appointments not found"});
 
     }
-    //Display all Appointments
+
     return res.status(200).json({Appointments});
 
 };
