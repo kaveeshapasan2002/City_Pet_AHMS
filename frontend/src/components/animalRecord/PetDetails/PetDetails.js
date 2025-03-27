@@ -40,7 +40,7 @@ const handleSearch=()=>{
     <div className="max-w-4xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
     <h1 className="text-3xl font-bold text-gray-800 mb-4 text-center">Pet Records</h1>
 
-    {/* Search Bar */}
+    {/* Searchbar */}
     <div className="flex items-center gap-2 mb-6">
       <input
         onChange={(e) => setSearchQuery(e.target.value)}
@@ -57,7 +57,7 @@ const handleSearch=()=>{
       </button>
     </div>
 
-    {/* No Pets Found */}
+    {/* when not any pet found this is trigger */}
     {noResult && (
       <p className="text-red-500 text-center font-semibold">No pets found.</p>
     )}

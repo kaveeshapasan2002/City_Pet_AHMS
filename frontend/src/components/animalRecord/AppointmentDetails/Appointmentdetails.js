@@ -64,7 +64,16 @@ function Appointmentdetails() {
                       <Link to={`/appointmentdetails/${Appointment.nic}`}>
                         <button className='bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition'>Update</button>
                       </Link>
-                      <button className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition ml-2" onClick={() => deleteHandler(Appointment.nic)}>Delete</button>
+                      <button
+                         className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition ml-2"
+                         onClick={() => {
+                          if (window.confirm("Are you sure you want to delete this appointment?")) {
+                             deleteHandler(Appointment.nic);
+                            }
+                              }}
+                            >
+                              Delete
+                            </button>
                     </td>
                   </tr>
                 ))

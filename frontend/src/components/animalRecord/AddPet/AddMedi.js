@@ -61,7 +61,7 @@ function AddMedi() {
         
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Pet ID */}
+         
           <div>
             <label className="block text-gray-700 font-medium">Pet ID:</label>
             <input
@@ -74,7 +74,7 @@ function AddMedi() {
             />
           </div>
   
-          {/* Vaccination State */}
+       
           <div>
             <label className="block text-gray-700 font-medium">Vaccination State:</label>
             <div className="flex space-x-4">
@@ -105,7 +105,6 @@ function AddMedi() {
             </div>
           </div>
   
-          {/* Vaccination Date (only if 'Yes' is selected) */}
           {inputs.vaccinationState === 'Yes' && (
             <div>
               <label className="block text-gray-700 font-medium">Last Vaccination Date:</label>
@@ -121,7 +120,6 @@ function AddMedi() {
             </div>
           )}
   
-          {/* Visit Date */}
           <div>
             <label className="block text-gray-700 font-medium">Visit Date:</label>
             <input
@@ -135,7 +133,7 @@ function AddMedi() {
             />
           </div>
   
-          {/* Reason for visit */}
+          
           <div className="mb-4">
   <label className="block text-gray-700 font-medium">Reason for Visit:</label>
   <select
@@ -159,7 +157,7 @@ function AddMedi() {
 </div>
 
   
-          {/* Prescription */}
+        
           <div>
             <label className="block text-gray-700 font-medium">Prescription:</label>
             <input
@@ -172,7 +170,7 @@ function AddMedi() {
             />
           </div>
   
-          {/* Medical History */}
+         
           <div>
             <label className="block text-gray-700 font-medium">Medical History:</label>
             <textarea
@@ -186,7 +184,7 @@ function AddMedi() {
             ></textarea>
           </div>
   
-          {/* Submit Button */}
+         
           <button
             type="submit"
             className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
