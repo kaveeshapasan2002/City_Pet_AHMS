@@ -65,3 +65,4 @@ export const cancelBooking = async (bookingId) => {
     throw error.response?.data || { message: 'Failed to cancel booking' };
   }
 };
+
