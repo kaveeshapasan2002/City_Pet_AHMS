@@ -1,3 +1,4 @@
+// frontend/src/components/financial/PurchaseRequestTable.js
 import React, { useState } from 'react';
 import { usePurchaseRequest } from '../../context/PurchaseRequestContext';
 import Spinner from '../common/Spinner';
