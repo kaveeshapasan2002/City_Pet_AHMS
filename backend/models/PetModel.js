@@ -9,11 +9,14 @@ const petSchema=new Schema({
     },
     name:{
         type:String,
-        required:true 
+        required:true,
+        minlength: 2,
+        maxlength: 50,
     },
     age:{
         type:Number,
-        required:true 
+        required:true,
+        min: 0,
     },
     breed:{
         type:String,
@@ -25,11 +28,13 @@ const petSchema=new Schema({
     },
     gender:{
         type:String,
-        required:true 
+        required:true ,
+        enum: ["Male", "Female", "Other"],
     },
     bloodgroup:{
         type:String,
-        required:true 
+        required:true ,
+         match: /^[A|B|AB|O][+-]$/
     },
     allergies:{
         type:String,
@@ -37,7 +42,8 @@ const petSchema=new Schema({
     },
     contact:{
         type:Number,
-        required:true
+        required:true,
+        match: /^[0-9]{10}$/,
     }
 
 
