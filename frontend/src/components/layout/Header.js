@@ -1,6 +1,8 @@
+// Update to src/components/layout/Header.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import NotificationBadge from '../messaging/NotificationBadge';
 
 const Header = () => {
   const { isAuth, user, logoutUser } = useAuth();
@@ -45,10 +47,24 @@ const Header = () => {
                   Dashboard
                   <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
                 </Link>
+                
+                {/* Messages Link with optional notification count */}
+                <Link
+                  to="/messages"
+                  className="relative text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300 animate-fade-in group"
+                  style={{ animationDelay: '900ms' }}
+                >
+                  Messages
+                  <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+                
+                {/* Notification Badge */}
+                <NotificationBadge />
+                
                 <Link
                   to="/profile"
                   className="relative text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300 animate-fade-in group"
-                  style={{ animationDelay: '900ms' }}
+                  style={{ animationDelay: '1050ms' }}
                 >
                   Profile
                   <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
@@ -57,7 +73,7 @@ const Header = () => {
                   <Link
                     to="/admin"
                     className="relative text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300 animate-fade-in group"
-                    style={{ animationDelay: '1050ms' }}
+                    style={{ animationDelay: '1200ms' }}
                   >
                     Admin Panel
                     <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
@@ -65,7 +81,7 @@ const Header = () => {
                 )}
                 <button
                   onClick={logoutUser}
-                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 animate-bounce delay-1200"
+                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 animate-bounce delay-1350"
                 >
                   Logout
                 </button>
@@ -127,6 +143,12 @@ const Header = () => {
                   className="block py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
                 >
                   Dashboard
+                </Link>
+                <Link
+                  to="/messages"
+                  className="block py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
+                >
+                  Messages
                 </Link>
                 <Link
                   to="/profile"
