@@ -5,7 +5,7 @@ import { formatDistanceToNow, format } from 'date-fns';
 import { FaPaperPlane, FaPaperclip, FaEllipsisV } from 'react-icons/fa';
 import { getCurrentUser } from '../../api/auth';
 
-const ConversationView = ({ conversation }) => {
+const ConversationView = ({ conversation, messageInputRef }) => {
   const { 
     messages, 
     loadMessages, 
@@ -22,7 +22,15 @@ const ConversationView = ({ conversation }) => {
   const [typingTimeout, setTypingTimeout] = useState(null);
   const messagesEndRef = useRef(null);
   const messageListRef = useRef(null);
+  const inputRef = useRef(null);
   const currentUser = getCurrentUser();
+  
+  // Expose input ref if callback is provided
+  useEffect(() => {
+    if (messageInputRef && typeof messageInputRef === 'function') {
+      messageInputRef(inputRef);
+    }
+  }, [messageInputRef]);
   
   // Load messages when conversation changes
   useEffect(() => {
@@ -341,6 +349,7 @@ const ConversationView = ({ conversation }) => {
             onChange={handleInputChange}
             placeholder="Type a message..."
             className="flex-1 py-2 px-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ref={inputRef}
           />
           <button
             type="submit"
@@ -360,5 +369,3 @@ const ConversationView = ({ conversation }) => {
 };
 
 export default ConversationView;
-
-//create conversation view component
