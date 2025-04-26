@@ -70,3 +70,6 @@ const EnhancedConversationView = ({ conversation }) => {
 };
 
 export default EnhancedConversationView;
+
+
+//create enhanced conversation
