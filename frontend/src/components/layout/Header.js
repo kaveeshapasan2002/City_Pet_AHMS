@@ -1,4 +1,3 @@
-// src/components/layout/Header.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -8,45 +7,82 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-blue-600 text-white shadow-md">
+    <header className="bg-white/80 backdrop-blur-lg shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          <Link to="/" className="text-2xl font-bold">Pet Hospital</Link>
-          
+          {/* Logo */}
+          <Link to="/" className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 animate-fade-in">
+            CityPet
+          </Link>
+
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="hover:text-blue-200">Home</Link>
-            
+          <nav className="hidden md:flex items-center space-x-8">
+            {[
+              { to: '/', label: 'Home' },
+              { to: '/about', label: 'About' },
+              { to: '/staff', label: 'Our Staff' },
+              { to: '/services', label: 'Services' },
+              { to: '/contact', label: 'Contact' },
+            ].map((item, index) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                className="relative text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300 animate-fade-in group"
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
+                {item.label}
+                <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            ))}
+
             {isAuth ? (
               <>
-                <Link to="/dashboard" className="hover:text-blue-200">Dashboard</Link>
-                <Link to="/profile" className="hover:text-blue-200">Profile</Link>
+                <Link
+                  to="/dashboard"
+                  className="relative text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300 animate-fade-in group"
+                  style={{ animationDelay: '750ms' }}
+                >
+                  Dashboard
+                  <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+                <Link
+                  to="/profile"
+                  className="relative text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300 animate-fade-in group"
+                  style={{ animationDelay: '900ms' }}
+                >
+                  Profile
+                  <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
                 {user && user.role === 'Admin' && (
-                  <Link to="/admin" className="hover:text-blue-200">Admin Panel</Link>
+                  <Link
+                    to="/admin"
+                    className="relative text-gray-700 font-medium hover:text-blue-600 transition-colors duration-300 animate-fade-in group"
+                    style={{ animationDelay: '1050ms' }}
+                  >
+                    Admin Panel
+                    <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
                 )}
                 <button
                   onClick={logoutUser}
-                  className="px-4 py-2 bg-blue-500 rounded hover:bg-blue-400"
+                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 animate-bounce delay-1200"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <>
-                <Link to="/login" className="hover:text-blue-200">Login</Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 bg-blue-500 rounded hover:bg-blue-400"
-                >
-                  Register
-                </Link>
-              </>
+              <Link
+                to="/login"
+                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 animate-bounce delay-750"
+              >
+                Log In
+              </Link>
             )}
           </nav>
-          
-          {/* Mobile menu button */}
+
+          {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white focus:outline-none"
+            className="md:hidden text-gray-600 focus:outline-none"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24">
@@ -65,31 +101,61 @@ const Header = () => {
             </svg>
           </button>
         </div>
-        
+
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-blue-500">
-            <Link to="/" className="block py-2 hover:text-blue-200">Home</Link>
-            
+          <nav className="md:hidden py-4 bg-white/90 backdrop-blur-lg border-t border-gray-200 animate-slide-down">
+            {[
+              { to: '/', label: 'Home' },
+              { to: '/about', label: 'About' },
+              { to: '/staff', label: 'Our Staff' },
+              { to: '/services', label: 'Services' },
+              { to: '/contact', label: 'Contact' },
+            ].map((item, index) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                className="block py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
+              >
+                {item.label}
+              </Link>
+            ))}
             {isAuth ? (
               <>
-                <Link to="/dashboard" className="block py-2 hover:text-blue-200">Dashboard</Link>
-                <Link to="/profile" className="block py-2 hover:text-blue-200">Profile</Link>
+                <Link
+                  to="/dashboard"
+                  className="block py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/profile"
+                  className="block py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
+                >
+                  Profile
+                </Link>
                 {user && user.role === 'Admin' && (
-                  <Link to="/admin" className="block py-2 hover:text-blue-200">Admin Panel</Link>
+                  <Link
+                    to="/admin"
+                    className="block py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
+                  >
+                    Admin Panel
+                  </Link>
                 )}
                 <button
                   onClick={logoutUser}
-                  className="block w-full text-left py-2 hover:text-blue-200"
+                  className="block w-full text-left py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <>
-                <Link to="/login" className="block py-2 hover:text-blue-200">Login</Link>
-                <Link to="/register" className="block py-2 hover:text-blue-200">Register</Link>
-              </>
+              <Link
+                to="/login"
+                className="block py-3 px-4 text-gray-700 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-300"
+              >
+                Log In
+              </Link>
             )}
           </nav>
         )}

@@ -1,4 +1,3 @@
-
 const express = require("express");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
@@ -115,99 +114,97 @@ router.post("/login", async (req, res) => {
             console.log("❌ User not found:", email);
             return res.status(400).json({ message: "Invalid credentials" });
         }
- // Compare passwords FIRST - this is the most likely point of failure
- const isMatch = await user.comparePassword(password);
- console.log("Password Match:", isMatch);
- 
+        // Compare passwords FIRST - this is the most likely point of failure
+        const isMatch = await user.comparePassword(password);
+        console.log("Password Match:", isMatch);
+        
 
- // Handle failed login
- if (!isMatch) {
-    // Initialize properties if they don't exist
-    if (typeof user.failedLoginAttempts !== 'number') {
+        // Handle failed login
+        if (!isMatch) {
+            // Initialize properties if they don't exist
+            if (typeof user.failedLoginAttempts !== 'number') {
+                user.failedLoginAttempts = 0;
+            }
+            if (typeof user.accountLocked !== 'boolean') {
+                user.accountLocked = false;
+            }
+
+            // Increment failed attempts
+            user.failedLoginAttempts += 1;
+            user.lastLoginAttempt = new Date();
+
+            // Add to login history if it exists
+            if (Array.isArray(user.loginHistory)) {
+                user.loginHistory.push({
+                    date: new Date(),
+                    status: 'failed',
+                    ipAddress: req.ip || "unknown"
+                });
+            }
+            // Check if account should be locked
+            if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+                user.accountLocked = true;
+                user.accountLockedUntil = new Date(Date.now() + LOCK_TIME_MINUTES * 60 * 1000);
+            }
+
+            // Save the user document
+            await user.save();
+                    
+            // Return appropriate response
+            if (user.accountLocked) {
+                return res.status(403).json({
+                    message: `Account locked due to multiple failed login attempts. Try again in ${LOCK_TIME_MINUTES} minutes.`
+                });
+            } else {
+                return res.status(400).json({ 
+                    message: "Invalid credentials",
+                    attemptsRemaining: MAX_FAILED_ATTEMPTS - user.failedLoginAttempts
+                });
+            }
+        }
+
+        // If we get here, login succeeded
+
+        // Check if account is locked
+        if (user.accountLocked && user.accountLockedUntil > new Date()) {
+            const remainingTime = Math.ceil((user.accountLockedUntil - new Date()) / (1000 * 60));
+            return res.status(403).json({
+                message: `Account locked due to multiple failed login attempts. Try again in ${remainingTime} minutes.`
+            });
+        }
+
+        // Verify email is verified
+        if (!user.isVerified) {
+            return res.status(400).json({ message: "Please verify your email before logging in" });
+        }
+
+        // Check if user is active
+        if (!user.isActive) {
+            return res.status(403).json({ message: "Your account has been deactivated. Please contact an administrator." });
+        }
+
+        // Reset failed attempts on successful login
         user.failedLoginAttempts = 0;
-    }
-    if (typeof user.accountLocked !== 'boolean') {
         user.accountLocked = false;
-    }
+        user.accountLockedUntil = null;
+        user.lastLoginAttempt = new Date();
 
+        // Add to login history if it exists
+        if (Array.isArray(user.loginHistory)) {
+            user.loginHistory.push({
+                date: new Date(),
+                status: 'success',
+                ipAddress: req.ip || "unknown"
+            });
+        }
 
-
- // Increment failed attempts
- user.failedLoginAttempts += 1;
- user.lastLoginAttempt = new Date();
-
- // Add to login history if it exists
- if (Array.isArray(user.loginHistory)) {
-    user.loginHistory.push({
-        date: new Date(),
-        status: 'failed',
-        ipAddress: req.ip || "unknown"
-    });
-}
- // Check if account should be locked
- if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
-    user.accountLocked = true;
-    user.accountLockedUntil = new Date(Date.now() + LOCK_TIME_MINUTES * 60 * 1000);
-}
-
- // Save the user document
- await user.save();
-            
- // Return appropriate response
- if (user.accountLocked) {
-     return res.status(403).json({
-         message: `Account locked due to multiple failed login attempts. Try again in ${LOCK_TIME_MINUTES} minutes.`
-     });
- } else {
-     return res.status(400).json({ 
-         message: "Invalid credentials",
-         attemptsRemaining: MAX_FAILED_ATTEMPTS - user.failedLoginAttempts
-     });
- }
-}
-
-// If we get here, login succeeded
-
-  // Check if account is locked
-  if (user.accountLocked && user.accountLockedUntil > new Date()) {
-    const remainingTime = Math.ceil((user.accountLockedUntil - new Date()) / (1000 * 60));
-    return res.status(403).json({
-        message: `Account locked due to multiple failed login attempts. Try again in ${remainingTime} minutes.`
-    });
-}
-
- // Verify email is verified
- if (!user.isVerified) {
-    return res.status(400).json({ message: "Please verify your email before logging in" });
-}
-
-// Check if user is active
-if (!user.isActive) {
-    return res.status(403).json({ message: "Your account has been deactivated. Please contact an administrator." });
-}
-
-// Reset failed attempts on successful login
-user.failedLoginAttempts = 0;
-user.accountLocked = false;
-user.accountLockedUntil = null;
-user.lastLoginAttempt = new Date();
-
-// Add to login history if it exists
-if (Array.isArray(user.loginHistory)) {
-    user.loginHistory.push({
-        date: new Date(),
-        status: 'success',
-        ipAddress: req.ip || "unknown"
-    });
-}
-
-await user.save();
-        
+        await user.save();
+                
         // Generate JWT Token
         const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
-        
+                
         res.json({ token, user });
     } catch (error) {
         console.error("Server Error:", error);
@@ -215,116 +212,122 @@ await user.save();
     }
 });
 
+// @route   POST /api/auth/forgot-password
+// @desc    Send password reset email with OTP
+// @access  Public
+router.post("/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
 
+        // Validate request body
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
 
+        // Check if user exists
+        let user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 mins
 
+        // Save OTP to user
+        user.otp = otp;
+        user.otpExpires = otpExpires;
+        await user.save();
 
-
-/*
-
-
-    
-// Check if account is locked
-if (user.accountLocked && user.accountLockedUntil > new Date()) {
-    const remainingTime = Math.ceil((user.accountLockedUntil - new Date()) / (1000 * 60));
-    return res.status(403).json({
-      message: `Account locked due to multiple failed login attempts. Try again in ${remainingTime} minutes.`
-    });
-  }
-   // If lock period has expired, unlock the account
-   if (user.accountLocked && user.accountLockedUntil <= new Date()) {
-    user.accountLocked = false;
-    user.failedLoginAttempts = 0;
-    user.accountLockedUntil = null;
-    await user.save();
-  }
-
-  if (!user.isVerified) {
-    return res.status(400).json({ message: "Please verify your email before logging in" });
-}
-
-// Check if user account is active
-if (!user.isActive) {
-    return res.status(403).json({ message: "Your account has been deactivated. Please contact an administrator." });
-}
-
-
-
-
-user.lastLoginAttempt = new Date();
-  user.loginHistory.push(loginAttempt);
-  
-
- // Compare passwords
- const isMatch = await user.comparePassword(password);
- console.log("Password Match:", isMatch);
- if (!isMatch) {
-     return res.status(400).json({ message: "Invalid credentials" });
- }
-
-// Record login attempt
-const loginAttempt = {
-    date: new Date(),
-    status: isMatch ? 'success' : 'failed',
-    ipAddress: req.ip || req.connection.remoteAddress,
-    userAgent: req.headers['user-agent']
-  };
-  if (user.loginHistory) {
-    user.loginHistory.push(loginAttempt);
-} else {
-    user.loginHistory = [loginAttempt];
-}
- 
-  
-  if (!isMatch) {
-    // Increment failed attempts
-    user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
-    console.log(`Failed login attempt for ${user.email}. Count: ${user.failedLoginAttempts}`);
-    
-    
-    // Lock account if too many failed attempts
-    if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
-      user.accountLocked = true;
-      user.accountLockedUntil = new Date(Date.now() + LOCK_TIME_MINUTES * 60 * 1000);
-      await user.save();
-      
-      return res.status(403).json({
-        message: `Account locked due to multiple failed login attempts. Try again in ${LOCK_TIME_MINUTES} minutes.`
-      });
-    }
-    
-    await user.save();
-    return res.status(400).json({ 
-      message: "Invalid credentials",
-      attemptsRemaining: MAX_FAILED_ATTEMPTS - user.failedLoginAttempts
-    });
-  }
-  
-  // Reset failed attempts on successful login
-  user.failedLoginAttempts = 0;
-  user.accountLocked = false;
-  user.accountLockedUntil = null;
-  await user.save();
-
-
-
-
-        // Generate JWT Token
-        const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-            expiresIn: "1h",
-        });
-
-        res.json({ token, user });
+        // Send OTP via email
+        try {
+            await sendOtpEmail(email, otp, user.name, "Password Reset");
+            res.status(200).json({ message: "Password reset OTP sent to your email" });
+        } catch (emailError) {
+            console.error("Email sending error:", emailError);
+            res.status(500).json({ message: "Failed to send reset email" });
+        }
     } catch (error) {
-        console.error("Server Error:", error);
+        console.error(error);
         res.status(500).json({ message: "Server Error" });
     }
 });
 
-    
+// @route   POST /api/auth/verify-reset-otp
+// @desc    Verify OTP for password reset
+// @access  Public
+router.post("/verify-reset-otp", async (req, res) => {
+    try {
+        const { email, otp } = req.body;
 
-    */
+        // Validate request body
+        if (!email || !otp) {
+            return res.status(400).json({ message: "Email and OTP are required" });
+        }
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.otp !== otp || user.otpExpires < new Date()) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        // Generate a temporary token for password reset
+        const resetToken = jwt.sign({ id: user.id, purpose: 'reset' }, process.env.JWT_SECRET, {
+            expiresIn: "15m", // Short expiration time for security
+        });
+
+        res.status(200).json({ message: "OTP verified successfully", resetToken });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset user password
+// @access  Public (with reset token)
+router.post("/reset-password", async (req, res) => {
+    try {
+        const { resetToken, newPassword } = req.body;
+
+        // Validate request body
+        if (!resetToken || !newPassword) {
+            return res.status(400).json({ message: "Reset token and new password are required" });
+        }
+
+        // Verify token
+        const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
+        
+        // Check if token is for password reset
+        if (decoded.purpose !== 'reset') {
+            return res.status(401).json({ message: "Invalid reset token" });
+        }
+
+        // Find user
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update password - will be hashed by pre-save hook
+        user.password = newPassword;
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successful" });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid or expired token" });
+        }
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
 
 // @route   PUT /api/auth/edit-profile
 // @desc    Edit user profile (Pet Owner & Veterinarian)
@@ -412,246 +415,3 @@ router.get("/user", authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
-
-
-/*
-const express = require("express");
-const User = require("../models/User"); // Make sure User model exists
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
-const sendEmail = require("../utils/emailService");
-const authMiddleware = require("../middlewares/authMiddleware");
-
-
-
-const router = express.Router();
-
-// @route   POST /api/auth/register
-// @desc    Register new user
-// @access  Public
-router.post("/register", async (req, res) => {
-    try {
-        const { name, email, password ,phonenumber, role} = req.body;
-
-   // Validate request body
-   if (!name || !email || !password || !phonenumber || !role) {
-    return res.status(400).json({ message: "All fields are required" });
-}
-
-// Validate role
-const validRoles = ["Pet Owner", "Admin", "Veterinarian"];
-if (!validRoles.includes(role)) {
-    return res.status(400).json({ message: "Invalid role value" });
-}
-
-        // Check if user exists
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: "User already exists" });
-        }
-
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        console.log("🔐 Hashed Password Before Saving:", hashedPassword);
-
-
-// Generate OTP
-const otp = Math.floor(100000 + Math.random() * 900000).toString();
-const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 mins
-
-
-        // Create new user
-        user = new User({
-            name,
-            email,
-            password,
-            phonenumber,
-            role,
-            otp,
-            otpExpires,
-            isVerified: false
-        });
-
-        await user.save();
-
-     
-        // Send OTP via email
-        await sendEmail(email, "Your OTP for Verification", `Your OTP is: ${otp}`);
-
-        res.status(201).json({ message: "OTP sent to email. Please verify your account." });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
-    }
-});
-
-// @route   POST /api/auth/verify-otp
-// @desc    Verify user OTP & activate account
-router.post("/verify-otp", async (req, res) => {
-    try {
-        const { email, otp } = req.body;
-
-        let user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(400).json({ message: "User not found" });
-        }
-
-        if (user.isVerified) {
-            return res.status(400).json({ message: "User already verified" });
-        }
-
-        if (user.otp !== otp || user.otpExpires < new Date()) {
-            return res.status(400).json({ message: "Invalid or expired OTP" });
-        }
-
-        // Verify the user
-        user.isVerified = true;
-        user.otp = undefined; // Remove OTP
-        user.otpExpires = undefined;
-        await user.save();
-
-        res.json({ message: "Account verified successfully!" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
-    }
-
-
-        // Generate JWT Token
-        const token = jwt.sign({ id:user.id ,role: user.role}, process.env.JWT_SECRET, {
-            expiresIn: "1h",
-        });
-
-        try{res.json({ message: "Account verified successfully!", token });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
-    }
-});
-
-// @route   POST /api/auth/login
-// @desc    Authenticate user & get token
-// @access  Public
-router.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        // Check if user exists
-        let user = await User.findOne({ email });
-        if (!user) {
-            console.log("❌ User not found:", email);
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-        console.log("✅ User found:", user.email);
-        console.log("Stored Hash Password:", user.password);
-        console.log("Entered Password:", password);
-
-
-        if (!user.isVerified) {
-            return res.status(400).json({ message: "Please verify your email before logging in" });
-        }
-
-        // Check if user account is active
-        if (!user.isActive) {
-            return res.status(403).json({ message: "Your account has been deactivated. Please contact an administrator." });
-        }
-
-        // Compare passwords
-        const isMatch = await user.comparePassword(password);
-        console.log("Password Match:", isMatch);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        // Generate JWT Token
-        const token = jwt.sign({ id: user.id ,role: user.role}, process.env.JWT_SECRET, {
-            expiresIn: "1h",
-        });
-
-        res.json({ token, user });
-    } catch (error) {
-        console.error("Server Error:", error);
-        res.status(500).json({ message: "Server Error" });
-    }
-});
-
-
-// @route   PUT /api/auth/edit-profile
-// @desc    Edit user profile (Pet Owner & Veterinarian)
-// @access  Private
-router.put("/edit-profile", authMiddleware, async (req, res) => {
-    try {
-        const { name, phonenumber, profilePicture, specialization, licenseNumber } = req.body;
-        const user = await User.findById(req.user.id);
-
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        user.name = name || user.name;
-        user.phonenumber = phonenumber || user.phonenumber;
-        user.profilePicture = profilePicture || user.profilePicture;
-
-        if (user.role === "Veterinarian") {
-            user.specialization = specialization || user.specialization;
-            user.licenseNumber = licenseNumber || user.licenseNumber;
-        }
-
-        await user.save();
-        res.json({ message: "Profile updated successfully", user });
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-// @route   PUT /api/auth/change-password
-// @desc    Change user password
-// @access  Private
-router.put("/change-password", authMiddleware, async (req, res) => {
-    try {
-        const { oldPassword, newPassword } = req.body;
-        const user = await User.findById(req.user.id);
-
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) return res.status(400).json({ message: "Incorrect old password" });
-
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
-        await user.save();
-
-        res.json({ message: "Password updated successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-// @route   POST /api/auth/add-pet
-// @desc    Add pet details (Only Pet Owners)
-// @access  Private
-router.post("/add-pet", authMiddleware, async (req, res) => {
-    try {
-        const { name, species, breed, age, medicalHistory } = req.body;
-        const user = await User.findById(req.user.id);
-
-        if (!user || user.role !== "Pet Owner") {
-            return res.status(403).json({ message: "Not authorized" });
-        }
-
-        user.pets.push({ name, species, breed, age, medicalHistory });
-        await user.save();
-
-        res.json({ message: "Pet added successfully", user });
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-
-
-module.exports = router;
-
-
-*/

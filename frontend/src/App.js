@@ -19,7 +19,9 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
+import ForgotPassword from './pages/ForgotPassword';
+import VerifyResetOtp from './pages/VerifyResetOtp';
+import ResetPassword from './pages/ResetPassword';
 
 
 // Animal Record Imports
@@ -33,6 +35,12 @@ import UpdateMedi from './components/animalRecord/UpdatePet/UpdateMedi';
 import Addappointment from './components/animalRecord/AddAppointment/Addappointment';
 import Appointmentdetails from './components/animalRecord/AppointmentDetails/Appointmentdetails';
 import UpdateAppointment from './components/animalRecord/UpdateAppointment/UpdateAppointment';
+
+
+
+
+
+
 
 // Route guard component for protected routes
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -83,7 +91,9 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/verify-otp" element={<OtpVerify />} />
-                  
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
+<Route path="/reset-password" element={<ResetPassword />} />
                   {/* Protected Routes */}
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
@@ -196,6 +206,14 @@ function App() {
     </ProtectedRoute>
   } 
 />
+
+
+
+
+
+
+
+
                 </Routes>
               </main>
               <Footer />
@@ -204,6 +222,14 @@ function App() {
         </PurchaseRequestProvider>
       </InventoryProvider>
     </AuthProvider>
+
+
+
+
+
+
+
+
   );
 }
 
