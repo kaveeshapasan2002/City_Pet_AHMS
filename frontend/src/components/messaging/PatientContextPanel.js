@@ -13,7 +13,7 @@ const PatientContextPanel = ({ petOwnerId, onInsertTemplate }) => {
   const [appointments, setAppointments] = useState([]);
   const [medicalRecords, setMedicalRecords] = useState([]);
   const [activeTab, setActiveTab] = useState('info');
-  const [messageTemplates, setMessageTemplates] = useState([
+  const [messageTemplates] = useState([
     {
       id: 1,
       title: 'Appointment Reminder',
@@ -36,10 +36,41 @@ const PatientContextPanel = ({ petOwnerId, onInsertTemplate }) => {
     }
   ]);
 
-  // Only allow veterinarians to access this component
-  if (user.role !== 'Veterinarian') {
-    return null;
-  }
+  // Format date
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric'
+    });
+  };
+
+  // Handle pet selection
+  const handlePetSelect = (pet) => {
+    setSelectedPet(pet);
+  };
+
+  // Handle template insertion
+  const handleInsertTemplate = (template) => {
+    if (!onInsertTemplate || !selectedPet) return;
+    
+    // Replace placeholders with actual values
+    let text = template.text;
+    text = text.replace('[pet_name]', selectedPet.name);
+    
+    // If there's an upcoming appointment, use its date
+    if (appointments.length > 0) {
+      const upcomingAppointment = appointments.find(
+        apt => new Date(apt.date) > new Date()
+      );
+      
+      if (upcomingAppointment) {
+        text = text.replace('[date]', formatDate(upcomingAppointment.date));
+      }
+    }
+    
+    onInsertTemplate(text);
+  };
 
   // Load pets for the pet owner
   useEffect(() => {
@@ -103,41 +134,10 @@ const PatientContextPanel = ({ petOwnerId, onInsertTemplate }) => {
     loadPetDetails();
   }, [selectedPet]);
 
-  // Format date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric'
-    });
-  };
-
-  // Handle pet selection
-  const handlePetSelect = (pet) => {
-    setSelectedPet(pet);
-  };
-
-  // Handle template insertion
-  const handleInsertTemplate = (template) => {
-    if (!onInsertTemplate || !selectedPet) return;
-    
-    // Replace placeholders with actual values
-    let text = template.text;
-    text = text.replace('[pet_name]', selectedPet.name);
-    
-    // If there's an upcoming appointment, use its date
-    if (appointments.length > 0) {
-      const upcomingAppointment = appointments.find(
-        apt => new Date(apt.date) > new Date()
-      );
-      
-      if (upcomingAppointment) {
-        text = text.replace('[date]', formatDate(upcomingAppointment.date));
-      }
-    }
-    
-    onInsertTemplate(text);
-  };
+  // Only render if user is a veterinarian
+  if (user.role !== 'Veterinarian') {
+    return null;
+  }
 
   if (loading && !selectedPet) {
     return (
@@ -365,5 +365,3 @@ const PatientContextPanel = ({ petOwnerId, onInsertTemplate }) => {
 };
 
 export default PatientContextPanel;
-
-//create patientcontextpanle
