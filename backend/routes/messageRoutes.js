@@ -22,3 +22,6 @@ router.get('/notifications', messageController.getNotifications);
 router.put('/notifications/:id/read', messageController.markNotificationAsRead);
 
 module.exports = router;
+
+
+
