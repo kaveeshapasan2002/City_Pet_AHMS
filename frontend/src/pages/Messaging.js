@@ -1,17 +1,19 @@
 // src/pages/Messaging.js
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { MessagingProvider, useMessaging } from '../context/MessagingContext';
 import ConversationList from '../components/messaging/ConversationList';
 import EnhancedConversationView from '../components/messaging/EnhancedConversationView';
 import UserDirectory from '../components/messaging/UserDirectory';
-import { FaPlus, FaBell } from 'react-icons/fa';
+import ConversationLoader from '../components/messaging/ConversationLoader';
+import { FaPlus } from 'react-icons/fa';
 
 // Inner component that uses the messaging context
 const MessagingContent = () => {
   const { loadConversation, activeConversation, clearActiveConversation } = useMessaging();
   const [showUserDirectory, setShowUserDirectory] = useState(false);
+  const { id } = useParams(); // Get conversation ID from URL if present
   
   // Handle conversation selection
   const handleSelectConversation = (conversation) => {
@@ -26,6 +28,9 @@ const MessagingContent = () => {
   
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Automatically load conversation from URL parameter */}
+      {id && <ConversationLoader />}
+      
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
         <div className="flex space-x-2">
@@ -82,5 +87,3 @@ const Messaging = () => {
 };
 
 export default Messaging;
-
-//updated 
