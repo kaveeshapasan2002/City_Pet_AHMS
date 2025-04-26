@@ -360,3 +360,5 @@ const ConversationView = ({ conversation }) => {
 };
 
 export default ConversationView;
+
+//create conversation view component
