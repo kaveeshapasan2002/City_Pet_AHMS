@@ -190,3 +190,5 @@ const NotificationBadge = () => {
 };
 
 export default NotificationBadge;
+
+//added
