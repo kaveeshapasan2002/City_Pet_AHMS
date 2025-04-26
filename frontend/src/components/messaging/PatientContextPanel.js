@@ -365,3 +365,5 @@ const PatientContextPanel = ({ petOwnerId, onInsertTemplate }) => {
 };
 
 export default PatientContextPanel;
+
+//create patientcontextpanle
