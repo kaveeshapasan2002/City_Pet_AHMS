@@ -34,9 +34,7 @@ const AdminDashboard = () => {
   const staticLinks = [
     { to: '/inventory', label: 'Inventory Management', icon: <FaBox className="mr-2" /> },
     { to: '/financial-management', label: 'Financial Management', icon: <FaDollarSign className="mr-2" /> },
-    { to: '#', label: 'Appointment Overview', icon: <FaCalendarAlt className="mr-2" /> },
-    { to: '#', label: 'System Settings', icon: <FaCog className="mr-2" /> },
-    { to: '#', label: 'Report Generation', icon: <FaChartBar className="mr-2" /> },
+   
   ];
 
   return (
@@ -107,10 +105,7 @@ const AdminDashboard = () => {
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: 'Total Users', value: '2,543', color: 'bg-blue-100 text-blue-800' },
-                  { label: 'Active Boardings', value: '136', color: 'bg-green-100 text-green-800' },
-                  { label: 'Pending Payments', value: '13,078', color: 'bg-yellow-100 text-yellow-800' },
-                  { label: 'Completed Services', value: '2,736', color: 'bg-purple-100 text-purple-800' },
+                 
                 ].map(stat => (
                   <div
                     key={stat.label}

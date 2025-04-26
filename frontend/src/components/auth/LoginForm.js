@@ -47,10 +47,6 @@ const LoginForm = () => {
     } finally {
       setLoading(false);
     }
-
-   
-
-
   };
 
   return (
@@ -80,6 +76,12 @@ const LoginForm = () => {
           required
         />
         
+        <div className="mb-4 text-right">
+          <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            Forgot password?
+          </a>
+        </div>
+        
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </Button>
@@ -98,4 +100,3 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
-
