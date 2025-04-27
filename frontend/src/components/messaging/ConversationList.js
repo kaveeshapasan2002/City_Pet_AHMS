@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useMessaging } from '../../context/MessagingContext';
 import { formatDistanceToNow } from 'date-fns';
 import { FaSearch, FaCircle } from 'react-icons/fa';
+// Add this import at the top with your other imports
+import { getCurrentUser } from '../../api/auth';
 
 const ConversationList = ({ onSelectConversation }) => {
   const { 
@@ -53,12 +55,17 @@ const ConversationList = ({ onSelectConversation }) => {
   };
 
   // Get other participant's name (assumes 2 participants)
-  const getOtherParticipantName = (conversation) => {
+  // Get other participant's name (assumes 2 participants)
+const getOtherParticipantName = (conversation) => {
     if (!conversation || !conversation.participants) return 'Unknown';
+    
+    // Get current user ID
+    const currentUser = getCurrentUser();
+    const currentUserId = currentUser ? currentUser._id : '';
     
     // Find participant that is not the current user
     const otherParticipant = conversation.participants.find(
-      p => p._id !== localStorage.getItem('userId')
+      p => p._id !== currentUserId
     );
     
     return otherParticipant ? otherParticipant.name : 'Unknown';
@@ -209,3 +216,5 @@ const ConversationList = ({ onSelectConversation }) => {
 export default ConversationList;
 
 //create conversationlist component
+
+//update

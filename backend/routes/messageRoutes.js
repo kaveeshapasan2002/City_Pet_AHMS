@@ -7,6 +7,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 // Apply auth middleware to all routes
 router.use(authMiddleware);
 
+// We'll handle all message-related routes in one place
 // Conversation routes
 router.get('/conversations', messageController.getConversations);
 router.get('/conversations/:id', messageController.getConversation);
@@ -22,6 +23,3 @@ router.get('/notifications', messageController.getNotifications);
 router.put('/notifications/:id/read', messageController.markNotificationAsRead);
 
 module.exports = router;
-
-
-
