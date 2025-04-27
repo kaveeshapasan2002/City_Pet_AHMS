@@ -1,8 +1,9 @@
+// Update to src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { InventoryProvider } from './context/InventoryContext';
-import { PurchaseRequestProvider } from './context/PurchaseRequestContext'; // Add this import
+import { PurchaseRequestProvider } from './context/PurchaseRequestContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -16,13 +17,13 @@ import Inventory from './pages/Inventory';
 import FinancialManagement from './pages/FinancialManagement';
 import PetBoarding from './pages/PetBoarding';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import Messaging from './pages/Messaging';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import ForgotPassword from './pages/ForgotPassword';
 import VerifyResetOtp from './pages/VerifyResetOtp';
 import ResetPassword from './pages/ResetPassword';
-
 
 // Animal Record Imports
 import AnimalRecords from "./components/animalRecord/animalRecord/animalRecord";
@@ -35,12 +36,6 @@ import UpdateMedi from './components/animalRecord/UpdatePet/UpdateMedi';
 import Addappointment from './components/animalRecord/AddAppointment/Addappointment';
 import Appointmentdetails from './components/animalRecord/AppointmentDetails/Appointmentdetails';
 import UpdateAppointment from './components/animalRecord/UpdateAppointment/UpdateAppointment';
-
-
-
-
-
-
 
 // Route guard component for protected routes
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -80,7 +75,7 @@ function App() {
   return (
     <AuthProvider>
       <InventoryProvider>
-        <PurchaseRequestProvider> {/* Add PurchaseRequestProvider */}
+        <PurchaseRequestProvider>
           <Router>
             <div className="flex flex-col min-h-screen">
               <Header />
@@ -92,8 +87,9 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/verify-otp" element={<OtpVerify />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-<Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
-<Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  
                   {/* Protected Routes */}
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
@@ -108,6 +104,18 @@ function App() {
                   <Route path="/pet-boarding" element={
                     <ProtectedRoute>
                       <PetBoarding />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Messaging Routes */}
+                  <Route path="/messages" element={
+                    <ProtectedRoute>
+                      <Messaging />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/messages/conversation/:id" element={
+                    <ProtectedRoute>
+                      <Messaging />
                     </ProtectedRoute>
                   } />
                   
@@ -197,39 +205,25 @@ function App() {
                     </ProtectedRoute>
                   } />
 
-// In your routes section
-<Route 
-  path="/payment-success" 
-  element={
-    <ProtectedRoute>
-      <PaymentSuccessPage />
-    </ProtectedRoute>
-  } 
-/>
-
-
-
-
-
-
-
+                  {/* Payment Success Route */}
+                  <Route 
+                    path="/payment-success" 
+                    element={
+                      <ProtectedRoute>
+                        <PaymentSuccessPage />
+                      </ProtectedRoute>
+                    } 
+                  />
 
                 </Routes>
               </main>
               <Footer />
+              <ToastContainer position="bottom-right" />
             </div>
           </Router>
         </PurchaseRequestProvider>
       </InventoryProvider>
     </AuthProvider>
-
-
-
-
-
-
-
-
   );
 }
 
