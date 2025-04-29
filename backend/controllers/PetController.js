@@ -98,12 +98,18 @@ const deletePets=async(req,res,next)=>{
 
 
 
+
+
+
+
+
+
+
+
 exports.getAllPets=getAllPets;
 exports.addPets=addPets;
 exports.getById=getById;
 exports.updatePets=updatePets;
 exports.deletePets=deletePets;
-
-
 
 

@@ -137,6 +137,9 @@ const getAllMedi = async (req, res, next) => {
     return res.status(200).json({ Medies });
 };
 
+
+
+
 // Get medical records by Pet ID
 const getByPetId = async (req, res, next) => {
     const petid = req.params.petid;
