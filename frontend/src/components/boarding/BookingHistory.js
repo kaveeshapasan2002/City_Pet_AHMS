@@ -1,13 +1,17 @@
 // src/components/boarding/BookingHistory.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getUserBookings, cancelBooking } from '../../api/boarding';
 import Alert from '../common/Alert';
 
 const BookingHistory = ({ refresh }) => {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);  
   const [loading, setLoading] = useState(true);   //const[variable, function]= useState(initial value)
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+
+
   
   useEffect(() => {
     fetchBookings();
@@ -39,6 +43,11 @@ const BookingHistory = ({ refresh }) => {
       setMessageType('error');
     }
   };
+
+  //navigate to update booking page
+  const handleUpdateBooking = (bookingId) => {
+    navigate(`/update-booking/${bookingId}`);
+  };
   
   // Format date for display
   const formatDate = (dateString) => {
@@ -63,6 +72,7 @@ const BookingHistory = ({ refresh }) => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
   
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -133,11 +143,18 @@ const BookingHistory = ({ refresh }) => {
                 {booking.status === 'Pending' && (
                   <div className="mt-4 flex justify-end">
                     <button
+                      onClick={() =>  handleUpdateBooking(booking._id)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      Update Booking
+                    </button>
+
+                    <button
                       onClick={() => handleCancelBooking(booking._id)}
                       className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                     >
                       Cancel Booking
-                    </button>
+                      </button>
                   </div>
                 )}
               </div>
@@ -148,5 +165,7 @@ const BookingHistory = ({ refresh }) => {
     </div>
   );
 };
+       
+
 
 export default BookingHistory;

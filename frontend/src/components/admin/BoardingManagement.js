@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getBookings, updateBookingStatus, deleteBooking } from '../../api/admin'; // Add deleteBooking import
 import Alert from '../common/Alert';
+/**/import { useNavigate } from 'react-router-dom';
 
 const BoardingManagement = () => {
   const [bookings, setBookings] = useState([]);
@@ -17,6 +18,13 @@ const BoardingManagement = () => {
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  const navigate = useNavigate();
+/**/
+  const handleDailyRecords = (bookingId) => {
+    navigate(`/admin/boarding/${bookingId}/daily-records`);
+  };
+/**/
   
   const fetchBookings = async () => {
     setLoading(true);
@@ -177,6 +185,17 @@ const BoardingManagement = () => {
                         🗑
                       </button>
                     </div>
+
+    {/* ✅ Daily Records button (only if Confirmed) */}
+    {booking.status === 'Confirmed' && (
+      <button
+        onClick={() => handleDailyRecords(booking._id)}
+        className="mt-2 px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+      >
+        Daily Records
+      </button>
+    )}
+
                   </td>
                 </tr>
               ))}

@@ -16,6 +16,7 @@ import Inventory from './pages/Inventory';
 import FinancialManagement from './pages/FinancialManagement';
 import PetBoarding from './pages/PetBoarding';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import UpdateBookingForm from './components/boarding/UpdateBookingForm';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -100,6 +101,13 @@ function App() {
                       <PetBoarding />
                     </ProtectedRoute>
                   } />
+
+                  <Route path="/update-booking/:bookingId" element={
+                    <ProtectedRoute>
+                    <UpdateBookingForm />
+                    </ProtectedRoute>
+                    } />
+
                   
                   {/* Admin Routes */}
                   <Route 
@@ -186,6 +194,8 @@ function App() {
                       <UpdateMedi />
                     </ProtectedRoute>
                   } />
+
+
 
 // In your routes section
 <Route 
