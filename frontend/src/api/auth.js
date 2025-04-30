@@ -102,4 +102,37 @@ export const updateProfile = async (profileData) => {
       throw error.response?.data || { message: 'Failed to change password' };
     }
   };
-  
+
+
+  //today
+  // Add these functions to your existing src/api/auth.js file
+
+// Request password reset
+export const forgotPassword = async (email) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Server error' };
+  }
+};
+
+// Verify password reset OTP
+export const verifyResetOtp = async (verificationData) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/verify-reset-otp`, verificationData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Server error' };
+  }
+};
+
+// Reset password with token
+export const resetPassword = async (resetData) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/reset-password`, resetData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Server error' };
+  }
+};

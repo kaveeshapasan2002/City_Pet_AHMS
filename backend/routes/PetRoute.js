@@ -1,6 +1,8 @@
 const express=require("express");
 const router=express.Router();
 
+
+
 //Insert Model
 const Pet=require("../models/PetModel");
 
@@ -14,6 +16,7 @@ router.get("/",PetController.getAllPets);
 router.post("/",PetController.addPets);
 router.get("/:id",PetController.getById);
 router.put("/:id",PetController.updatePets);
+
 router.delete("/:id",PetController.deletePets);
 
 

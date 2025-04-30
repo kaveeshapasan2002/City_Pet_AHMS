@@ -1,8 +1,9 @@
+// Update to src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { InventoryProvider } from './context/InventoryContext';
-import { PurchaseRequestProvider } from './context/PurchaseRequestContext'; // Add this import
+import { PurchaseRequestProvider } from './context/PurchaseRequestContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -17,11 +18,13 @@ import FinancialManagement from './pages/FinancialManagement';
 import PetBoarding from './pages/PetBoarding';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import UpdateBookingForm from './components/boarding/UpdateBookingForm';
+import Messaging from './pages/Messaging';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
-
+import ForgotPassword from './pages/ForgotPassword';
+import VerifyResetOtp from './pages/VerifyResetOtp';
+import ResetPassword from './pages/ResetPassword';
 
 // Animal Record Imports
 import AnimalRecords from "./components/animalRecord/animalRecord/animalRecord";
@@ -73,7 +76,7 @@ function App() {
   return (
     <AuthProvider>
       <InventoryProvider>
-        <PurchaseRequestProvider> {/* Add PurchaseRequestProvider */}
+        <PurchaseRequestProvider>
           <Router>
             <div className="flex flex-col min-h-screen">
               <Header />
@@ -84,6 +87,9 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/verify-otp" element={<OtpVerify />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   
                   {/* Protected Routes */}
                   <Route path="/dashboard" element={
@@ -108,6 +114,18 @@ function App() {
                     </ProtectedRoute>
                     } />
 
+                  
+                  {/* Messaging Routes */}
+                  <Route path="/messages" element={
+                    <ProtectedRoute>
+                      <Messaging />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/messages/conversation/:id" element={
+                    <ProtectedRoute>
+                      <Messaging />
+                    </ProtectedRoute>
+                  } />
                   
                   {/* Admin Routes */}
                   <Route 
@@ -195,20 +213,19 @@ function App() {
                     </ProtectedRoute>
                   } />
 
-
-
-// In your routes section
-<Route 
-  path="/payment-success" 
-  element={
-    <ProtectedRoute>
-      <PaymentSuccessPage />
-    </ProtectedRoute>
-  } 
-/>
+                  {/* Payment Success Route */}
+                  <Route 
+                    path="/payment-success" 
+                    element={
+                      <ProtectedRoute>
+                        <PaymentSuccessPage />
+                      </ProtectedRoute>
+                    } 
+                  />
                 </Routes>
               </main>
               <Footer />
+              <ToastContainer position="bottom-right" />
             </div>
           </Router>
         </PurchaseRequestProvider>
