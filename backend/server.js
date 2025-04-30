@@ -128,7 +128,10 @@ app.use("/appointments", router);
 // Boarding routes
 app.use("/api/boarding", require("./routes/boardingRoutes"));
 
-// Add to existing routes
+// Supplier routes - added from the second file
+app.use("/api/suppliers", require("./routes/supplierRoutes"));
+
+// Purchase request routes
 app.use('/api/purchase-requests', require('./routes/purchaseRequestRoutes'));
 
 // Set security headers
@@ -146,11 +149,10 @@ app.use("/api/inventory", require("./routes/inventoryRoutes"));
 
 // Messaging Routes - consolidated to use the same route file
 app.use("/api/conversations", require("./routes/messageRoutes"));
-// In server.js - change this line:
 app.use("/api", require("./routes/messageRoutes"));
 app.use("/api/notifications", require("./routes/messageRoutes"));
 
-// User directory routes for messaging - change to use the same route file
+// User directory routes for messaging
 app.use("/api/users", require("./routes/userDirectoryRoutes"));
 
 // Error handling middleware
