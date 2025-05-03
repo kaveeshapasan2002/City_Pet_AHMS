@@ -50,8 +50,6 @@ export const toggleUserStatus = async (userId) => {
 
 };
 
-// Add this function to your src/api/admin.js file
-
 // Delete a user
 export const deleteUser = async (userId) => {
     try {
@@ -72,8 +70,6 @@ export const deleteUser = async (userId) => {
     }
   };
 
-
-// Add this function to your src/api/admin.js file
 
 // Add a new user (admin only)
 export const addUser = async (userData) => {
@@ -96,8 +92,6 @@ export const addUser = async (userData) => {
     }
   };
 
-
-  // src/api/admin.js - Add these functions
 
 // Change user role
 export const changeUserRole = async (userId, role, reason) => {
@@ -123,32 +117,30 @@ export const changeUserRole = async (userId, role, reason) => {
     }
   };
   
-  // Update user permissions
-  export const updateUserPermissions = async (userId, permissions) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw { message: 'Authentication required' };
-      }
-  
-      const response = await axios.put(`${API_URL}/users/${userId}/permissions`, 
-        { permissions },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Failed to update permissions' };
+// Update user permissions
+export const updateUserPermissions = async (userId, permissions) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
     }
-  };
 
- 
-// src/api/admin.js - Add these functions
+    const response = await axios.put(`${API_URL}/users/${userId}/permissions`, 
+      { permissions },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to update permissions' };
+  }
+};
+
 
 // Get security logs
 export const getSecurityLogs = async () => {
@@ -191,8 +183,6 @@ export const unlockUserAccount = async (userId) => {
 };
 
 
-// In src/api/admin.js - Add this function
-
 // Get all bookings (admin only)
 export const getBookings = async () => {
   try {
@@ -212,18 +202,6 @@ export const getBookings = async () => {
     throw error.response?.data || { message: 'Failed to fetch bookings' };
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-// In src/api/admin.js - Add this function
 
 // Update booking status
 export const updateBookingStatus = async (bookingId, status) => {
@@ -248,10 +226,6 @@ export const updateBookingStatus = async (bookingId, status) => {
     throw error.response?.data || { message: 'Failed to update booking status' };
   }
 };
-  
-
-
-// In src/api/admin.js - Add this function
 
 // Get user statistics by role
 export const getUserStats = async () => {
@@ -270,5 +244,26 @@ export const getUserStats = async () => {
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Failed to fetch user statistics' };
+  }
+};
+
+// Delete booking
+export const deleteBooking = async (bookingId) => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
+    
+    const response = await axios.delete('/api/boarding/' + bookingId, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to delete booking');
   }
 };
