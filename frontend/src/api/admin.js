@@ -267,3 +267,4 @@ export const deleteBooking = async (bookingId) => {
     throw new Error(error.response?.data?.message || 'Failed to delete booking');
   }
 };
+
