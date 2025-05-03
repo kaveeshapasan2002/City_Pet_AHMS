@@ -249,3 +249,26 @@ export const updateBookingStatus = async (bookingId, status) => {
   }
 };
   
+
+
+// In src/api/admin.js - Add this function
+
+// Get user statistics by role
+export const getUserStats = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+
+    const response = await axios.get(`${API_URL}/user-stats`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch user statistics' };
+  }
+};

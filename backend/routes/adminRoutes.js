@@ -3,7 +3,7 @@ const User = require("../models/User");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require("../middlewares/adminMiddleware");
 const emailService = require("../utils/emailService");
-
+const adminController = require("../controllers/adminController");
 
 const router = express.Router();
 
@@ -487,8 +487,11 @@ router.put("/bookings/:id/status", async (req, res) => {
 });
 
 
+// Add the new stats route
+router.get("/user-stats", adminController.getUserStats);
 
-
+// Update your existing routes to use the controller functions
+router.get("/users", adminController.getUsers);
 
 
 

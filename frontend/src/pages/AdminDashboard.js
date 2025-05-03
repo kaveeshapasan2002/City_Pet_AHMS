@@ -6,6 +6,7 @@ import AddUserForm from '../components/admin/AddUserForm';
 import SecurityLogs from '../components/admin/SecurityLogs';
 import BoardingManagement from '../components/admin/BoardingManagement';
 import PaymentList from '../components/admin/PaymentList';
+import UserStatsSection from '../components/admin/UserStatsSection';
 
 // Import icons from react-icons
 import { 
@@ -34,7 +35,6 @@ const AdminDashboard = () => {
   const staticLinks = [
     { to: '/inventory', label: 'Inventory Management', icon: <FaBox className="mr-2" /> },
     { to: '/financial-management', label: 'Financial Management', icon: <FaDollarSign className="mr-2" /> },
-   
   ];
 
   return (
@@ -102,20 +102,8 @@ const AdminDashboard = () => {
           {/* Main Content */}
           <div className="flex-1">
             <div className="space-y-6">
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                 
-                ].map(stat => (
-                  <div
-                    key={stat.label}
-                    className={`p-4 rounded-xl shadow-sm ${stat.color} animate-slide-up`}
-                  >
-                    <p className="text-sm font-medium">{stat.label}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                  </div>
-                ))}
-              </div>
+              {/* User Statistics Section */}
+              <UserStatsSection />
 
               {/* Main Content Area */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-fade-in">
@@ -138,3 +126,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+//
