@@ -140,23 +140,23 @@ const BookingHistory = ({ refresh }) => {
                   </div>
                 )}
                 
-                {booking.status === 'Pending' && (
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      onClick={() =>  handleUpdateBooking(booking._id)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Update Booking
-                    </button>
+{booking.status === 'Pending' && (
+  <div className="mt-4 flex justify-end space-x-2"> {/* Add space-x-2 for spacing */}
+    <button
+      onClick={() => handleUpdateBooking(booking._id)}
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+    >
+      Update Booking
+    </button>
 
-                    <button
-                      onClick={() => handleCancelBooking(booking._id)}
-                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                    >
-                      Cancel Booking
-                      </button>
-                  </div>
-                )}
+    <button
+      onClick={() => handleCancelBooking(booking._id)}
+      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 ml-2" 
+    >
+      Cancel Booking
+    </button>
+  </div>
+)}
               </div>
             </div>
           ))}
