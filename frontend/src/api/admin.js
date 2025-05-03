@@ -248,4 +248,23 @@ export const updateBookingStatus = async (bookingId, status) => {
     throw error.response?.data || { message: 'Failed to update booking status' };
   }
 };
-  
+  // Delete booking
+export const deleteBooking = async (bookingId) => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
+    
+    const response = await axios.delete('/api/boarding/' + bookingId, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to delete booking');
+  }
+}

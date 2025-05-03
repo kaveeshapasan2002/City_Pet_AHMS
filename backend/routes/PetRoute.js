@@ -14,6 +14,7 @@ router.get("/",PetController.getAllPets);
 router.post("/",PetController.addPets);
 router.get("/:id",PetController.getById);
 router.put("/:id",PetController.updatePets);
+
 router.delete("/:id",PetController.deletePets);
 
 
