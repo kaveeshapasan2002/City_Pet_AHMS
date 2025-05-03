@@ -80,13 +80,16 @@ const sendRequest=async()=>{
 
         <label className="font-semibold text-gray-700">Age:</label>
         <input
-          type="text"
+          type="number"
           name="age"
           onChange={handleChange}
           value={inputs.age}
+          min="0"
+          max="100"
           required
           className="p-2 border rounded-md"
         />
+
 
         <label className="font-semibold text-gray-700">Breed:</label>
         <input
@@ -171,8 +174,8 @@ const sendRequest=async()=>{
   onChange={handleChange}
   value={inputs.contact}
   required
-  pattern="\d{10}"  // Ensures exactly 10 digits
-  maxLength="10"  // Prevents input beyond 10 digits 
+  pattern="\d{10}" 
+  maxLength="10" 
   className="p-2 border rounded-md"
   placeholder="Enter 10-digit contact number"
 />

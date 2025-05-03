@@ -1,29 +1,40 @@
-import axios from 'axios';
-import React, { useState } from 'react'
-import { useNavigate, } from 'react-router-dom';
-
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function AddMedi() {
-  const navigate=useNavigate();
+  const location = useLocation(); // Get the current location (URL)
+  const navigate = useNavigate();
+  
+  // Extract the petid from the query string in the URL
+  const queryParams = new URLSearchParams(location.search);
+  const petid = queryParams.get("petid");  // Extract petid from query string
 
- 
- 
+  // Initialize state
+  const [inputs, setInputs] = useState({
+    petid: petid || "",   // Set petid from query string if available
+    vaccinationState: "",
+    vaccinationDate: "",
+    visitDate: "",
+    reason: "",
+    prescription: "",
+    mediHistory: "",
+  });
 
-  const [inputs,setInputs]=useState({
-   
-    petid:"",
-    vaccinationState:"",
-    vaccinationDate:"",
-    visitDate:"",
-    reason:"",
-    prescription:"",
-    mediHistory:""
+  // Update petid in state when petid changes (when the URL changes)
+  useEffect(() => {
+    if (petid) {
+      setInputs((prev) => ({
+        ...prev,
+        petid: petid,  // Ensure petid is set correctly
+      }));
+    }
+  }, [petid]);
 
-  }); 
-  const handleChange=(e)=>{
-    setInputs((prevState)=>({
-      ...prevState,
-      [e.target.name]:e.target.value,
+  const handleChange = (e) => {
+    setInputs((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
     }));
   };
  
@@ -65,13 +76,13 @@ function AddMedi() {
           <div>
             <label className="block text-gray-700 font-medium">Pet ID:</label>
             <input
-              type="text"
-              name="petid"
-              onChange={handleChange}
-              value={inputs.petid}
-              required
-              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-            />
+                  type="text"
+                  name="petid"
+                  value={inputs.petid}
+                  disabled
+                  className="w-full border rounded-md px-3 py-2 bg-gray-100 cursor-not-allowed"
+                />
+
           </div>
   
        

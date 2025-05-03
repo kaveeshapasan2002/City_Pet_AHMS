@@ -8,17 +8,6 @@ import { useNavigate } from 'react-router-dom';
 function Pet(props) {
     const{id,name,age,breed,species,gender,bloodgroup,allergies,contact}=props.pet;
     const history = useNavigate();
-/*
-const deleteHandler = async () => {
-    await axios
-        .delete(`/pets/${id}`)
-        .then((res) => res.data)
-        .then(() => {
-            history("/petdetails"); // Navigate to the pet details page
-            window.location.reload(); // Refresh the page to reflect changes
-        })
-        .catch((err) => console.log("Error deleting record:", err));
-};*/
 
 const deleteHandler = async () => {
     try {
