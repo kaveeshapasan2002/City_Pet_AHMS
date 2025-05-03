@@ -126,4 +126,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-//
+//updated admin dashboard js with user counts
