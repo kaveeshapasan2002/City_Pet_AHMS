@@ -215,7 +215,7 @@ function App() {
                         <MediRecord />
                       </ProtectedRoute>
                     } />
-                    <Route path="/addmedi/:id" element={
+                    <Route path="/addmedi/:petid" element={
                       <ProtectedRoute>
                         <AddMedi />
                       </ProtectedRoute>

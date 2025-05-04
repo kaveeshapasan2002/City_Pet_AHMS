@@ -30,10 +30,11 @@ const mediSchema=new Schema({
         type:String,
         required:true 
     },
-    prescription:{
-        type:String,
-        required:true 
-    },
+    prescription: {
+        type: String,
+        required: true
+      },
+      
     mediHistory:{
         type:String,
         required:true 

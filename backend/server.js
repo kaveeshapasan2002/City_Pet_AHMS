@@ -121,9 +121,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }));
 
 // Animal Record routes
+
 app.use("/pets", router1);
 app.use("/medies", router2);
 app.use("/appointments", router);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Boarding routes
 app.use("/api/boarding", require("./routes/boardingRoutes"));

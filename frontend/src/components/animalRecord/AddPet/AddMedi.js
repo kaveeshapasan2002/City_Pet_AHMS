@@ -1,42 +1,66 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from 'axios';
+import React, { useState,useEffect } from 'react'
+import { useNavigate, useParams} from 'react-router-dom';
+
 
 function AddMedi() {
-  const location = useLocation(); // Get the current location (URL)
   const navigate = useNavigate();
-  
-  // Extract the petid from the query string in the URL
-  const queryParams = new URLSearchParams(location.search);
-  const petid = queryParams.get("petid");  // Extract petid from query string
+  const { petid } = useParams();  
+  const [prescriptionFile, setPrescriptionFile] = useState(null);
 
-  // Initialize state
+ 
+  useEffect(() => {
+    if (!petid) {
+        console.log("petid is undefined");
+        return;
+    }
+
+    const fetchRecords = async () => {
+        try {
+            const res = await axios.get(`http://localhost:5001/medies/${petid}`);
+            console.log("Fetched Medies:", res.data); 
+          
+        } catch (err) {
+            console.log("Error fetching records:", err);
+        }
+    };
+    fetchRecords();
+}, [petid]);
+ 
+
+  // const [inputs,setInputs]=useState({
+   
+  //   petid: petid || "", 
+  //   vaccinationState:"",
+  //   vaccinationDate:"",
+  //   visitDate:"",
+  //   reason:"",
+  //   prescription:"",
+  //   mediHistory:""
+
+  // }); 
   const [inputs, setInputs] = useState({
-    petid: petid || "",   // Set petid from query string if available
     vaccinationState: "",
     vaccinationDate: "",
     visitDate: "",
     reason: "",
     prescription: "",
-    mediHistory: "",
+    mediHistory: ""
   });
 
-  // Update petid in state when petid changes (when the URL changes)
-  useEffect(() => {
-    if (petid) {
-      setInputs((prev) => ({
-        ...prev,
-        petid: petid,  // Ensure petid is set correctly
-      }));
-    }
-  }, [petid]);
-
-  const handleChange = (e) => {
-    setInputs((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
+  
+  
+  const handleChange=(e)=>{
+    setInputs((prevState)=>({
+      ...prevState,
+      [e.target.name]:e.target.value,
     }));
   };
+
+
+
+  
+
  
 
     const handleSubmit = async (e) => {
@@ -45,45 +69,75 @@ function AddMedi() {
      
         await sendRequest();
   
-        navigate(`/medicalrecords/${inputs.petid}`);
+        navigate(`/medicalrecords/${petid}`);
       } catch (error) {
         console.log('Error submitting form:', error);
       }
     };
   
 
-  const sendRequest=async()=>{
-    await axios.post("http://localhost:5001/medies",{
-      petid:String(inputs.petid),
-      vaccinationState:String(inputs.vaccinationState),
-      vaccinationDate: inputs.vaccinationState === "Yes" ? String(inputs.vaccinationDate) : null, 
-      visitDate:String(inputs.visitDate),
-      reason:String(inputs.reason),
-      prescription:String(inputs.prescription),
-      mediHistory:String(inputs.mediHistory),
+  // const sendRequest=async()=>{
+  //   await axios.post("http://localhost:5001/medies",{
+  //     petid:String(inputs.petid),
+  //     vaccinationState:String(inputs.vaccinationState),
+  //     vaccinationDate: inputs.vaccinationState === "Yes" ? String(inputs.vaccinationDate) : null, 
+  //     visitDate:String(inputs.visitDate),
+  //     reason:String(inputs.reason),
+  //     prescription:String(inputs.prescription),
+  //     mediHistory:String(inputs.mediHistory),
      
   
-    }).then(res=>res.data.Medi);
+  //   }).then(res=>res.data.Medi);
+  // }
+
+
+  // const sendRequest = async () => {
+  //   await axios.post("http://localhost:5001/medies", {
+  //     petid: String(petid), 
+  //     vaccinationState: String(inputs.vaccinationState),
+  //     vaccinationDate: inputs.vaccinationState === "Yes" 
+  //       ? String(inputs.vaccinationDate) 
+  //       : null,
+  //     visitDate: String(inputs.visitDate),
+  //     reason: String(inputs.reason),
+  //     prescription: String(inputs.prescription),
+  //     mediHistory: String(inputs.mediHistory)
+  //   }).then(res => res.data.Medi);
+  // }
+  const sendRequest = async () => {
+  const formData = new FormData();
+  formData.append('petid', petid);
+  formData.append('vaccinationState', inputs.vaccinationState);
+  formData.append('vaccinationDate', inputs.vaccinationState === "Yes" ? inputs.vaccinationDate : '');
+  formData.append('visitDate', inputs.visitDate);
+  formData.append('reason', inputs.reason);
+  formData.append('prescription', inputs.prescription);
+  formData.append('mediHistory', inputs.mediHistory);
+  if (prescriptionFile) {
+    formData.append('prescriptionFile', prescriptionFile);
   }
+
+  await axios.post("http://localhost:5001/medies", formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+
   return (
     
       <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
-        <h1 className="text-2xl font-semibold text-center text-gray-800 mb-4">Add Medical Record</h1>
+        <h1 className="text-2xl font-semibold text-center text-gray-800 mb-4">Add Medical Record : {petid}</h1>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-         
-          <div>
+        <form onSubmit={handleSubmit}  encType="multipart/form-data" className="space-y-4">
+        <div>
             <label className="block text-gray-700 font-medium">Pet ID:</label>
             <input
-                  type="text"
-                  name="petid"
-                  value={inputs.petid}
-                  disabled
-                  className="w-full border rounded-md px-3 py-2 bg-gray-100 cursor-not-allowed"
-                />
-
+              type="text"
+              name="petid"
+              value={petid} 
+              readOnly
+              className="w-full border rounded-md px-3 py-2 bg-gray-100 cursor-not-allowed"            />
           </div>
+
   
        
           <div>
@@ -168,7 +222,7 @@ function AddMedi() {
 </div>
 
   
-        
+{/*         
           <div>
             <label className="block text-gray-700 font-medium">Prescription:</label>
             <input
@@ -179,7 +233,29 @@ function AddMedi() {
               required
               className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
             />
-          </div>
+          </div> */}
+<div>
+  <label className="block text-gray-700 font-medium">Prescription:</label>
+  <input
+    type="text"
+    name="prescription"
+    onChange={handleChange}
+    value={inputs.prescription}
+    required
+    className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+  />
+  <input
+    type="file"
+    accept=".pdf,.jpg,.jpeg,.png"
+    onChange={e => setPrescriptionFile(e.target.files[0])}
+    className="mt-2 block w-full text-sm text-gray-500"
+  />
+  <p className="text-xs text-gray-500 mt-1">
+    (Optional) Attach a prescription file (PDF, JPG, PNG)
+  </p>
+</div>
+
+
   
          
           <div>

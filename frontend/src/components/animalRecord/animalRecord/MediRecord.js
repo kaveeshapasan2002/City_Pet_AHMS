@@ -36,46 +36,167 @@ function MedicalRecord() {
         fetchRecords();
     }, [petid]);
     
+    // const deleteHandler = async (deleteIndex) => {
+    //     await axios
+    //         .delete(`http://localhost:5001/medies/${deleteIndex}`)
+    //         .then((res) => res.data)
+    //         .then(() => {
+    //             setMedies((prevMedies) => prevMedies.filter((medi) => medi.index !== deleteIndex));
+    //             history(`/medicalrecords/${index}`); 
+    //         })
+    //         .catch((err) => console.log("Error deleting record:", err));
+    // };
     const deleteHandler = async (deleteIndex) => {
         await axios
             .delete(`http://localhost:5001/medies/${deleteIndex}`)
             .then((res) => res.data)
             .then(() => {
                 setMedies((prevMedies) => prevMedies.filter((medi) => medi.index !== deleteIndex));
-                history(`/medicalrecords/${index}`); 
+              
             })
             .catch((err) => console.log("Error deleting record:", err));
     };
+    
+
+// const downloadPDF = () => {
+//     const doc = new jsPDF();
+    
+//     doc.setFont("helvetica");
+//     doc.setFontSize(16);
+//     doc.text("Medical Report", 10, 10);
+    
+//     doc.setFontSize(12);
+//     doc.text(`Pet ID: ${petid}`, 10, 20);
+
+//     let yPosition = 30;
+//     doc.text("Medical Records:", 10, yPosition);
+    
+//     Medies.forEach((medi, index) => {
+//         yPosition += 10;
+//         doc.text(`Index: ${medi.index}`, 10, yPosition);
+//         yPosition += 5;
+//         doc.text(`Visit Date: ${medi.visitDate}`, 10, yPosition);
+//         yPosition += 5;
+//         doc.text(`Reason: ${medi.reason}`, 10, yPosition);
+//         yPosition += 5;
+//         doc.text(`Prescription: ${medi.prescription}`, 10, yPosition);
+//         yPosition += 10;
+//         doc.text(`Medical History: ${medi.mediHistory}`, 10, yPosition);  
+//         yPosition += 10;
+//     });
+
+//     doc.save("Medical_Report.pdf");
+// };
+
+
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 
 const downloadPDF = () => {
-    const doc = new jsPDF();
+  const doc = new jsPDF();
+
+
+  const primaryBlue = [10, 70, 160];
+  const lightBlue = [220, 230, 250];
+
+ 
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(...primaryBlue);
+  doc.text("City Pet Care", 105, 18, { align: "center" });
+
+  doc.setFontSize(16);
+  doc.setTextColor(...primaryBlue);
+  doc.text("Medical Report", 105, 28, { align: "center" });
+
+
+  doc.setDrawColor(...primaryBlue);
+  doc.setLineWidth(0.8);
+  doc.line(30, 32, 180, 32);
+
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(15);
+  doc.setTextColor(0);
+  doc.text(`Pet ID: ${petid}`, 30, 40);
+
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...primaryBlue);
+  doc.text("Medical Records:", 30, 50);
+
+  let yPosition = 58;
+
+  Medies.forEach((medi, idx) => {
     
-    doc.setFont("helvetica");
-    doc.setFontSize(16);
-    doc.text("Medical Report", 10, 10);
+    const historyLabel = "• Medical History:";
+    const historyText = medi.mediHistory || "";
+    const wrappedHistory = doc.splitTextToSize(historyText, 135); 
+
     
+    const baseBoxHeight = 50; 
+    const lineHeight = 6;
+    const historyHeight = wrappedHistory.length * lineHeight;
+    const boxHeight = baseBoxHeight + historyHeight;
+
+    
+    doc.setFillColor(...lightBlue);
+    doc.roundedRect(25, yPosition - 5, 160, boxHeight, 4, 4, 'F');
+
+ 
+    doc.setTextColor(...primaryBlue);
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.text(`Pet ID: ${petid}`, 10, 20);
+    doc.text(`Record #${idx + 1}`, 30, yPosition + 3);
 
-    let yPosition = 30;
-    doc.text("Medical Records:", 10, yPosition);
+  
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(0);
+    let textY = yPosition + 10;
+    doc.text(`• Visit Date: ${formatDate(medi.visitDate)}`, 35, textY);
+    textY += lineHeight;
+    doc.text(`• Reason: ${medi.reason}`, 35, textY);
+    textY += lineHeight;
+    doc.text(`• Prescription: ${medi.prescription}`, 35, textY);
+    textY += lineHeight;
+
+   
+    doc.text(historyLabel, 35, textY);
+    textY += lineHeight;
+    doc.text(wrappedHistory, 40, textY);
+
+    yPosition += boxHeight + 8; 
+
     
-    Medies.forEach((medi, index) => {
-        yPosition += 10;
-        doc.text(`Index: ${medi.index}`, 10, yPosition);
-        yPosition += 5;
-        doc.text(`Visit Date: ${medi.visitDate}`, 10, yPosition);
-        yPosition += 5;
-        doc.text(`Reason: ${medi.reason}`, 10, yPosition);
-        yPosition += 5;
-        doc.text(`Prescription: ${medi.prescription}`, 10, yPosition);
-        yPosition += 10;
-        doc.text(`Medical History: ${medi.mediHistory}`, 10, yPosition);  
-        yPosition += 10;
-    });
+    if (yPosition > 260) {
+      doc.addPage();
+      yPosition = 20;
+    }
+  });
 
-    doc.save("Medical_Report.pdf");
+  
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text("Thank you for choosing City Pet Care!", 105, 285, { align: "center" });
+
+  doc.save("Medical_Report.pdf");
 };
+
+
+
+
+
 
 
 
@@ -87,10 +208,10 @@ const downloadPDF = () => {
         </h1>
 
         <div className="flex justify-center space-x-4 mb-4">
-            <Link to={`/addmedi/${petid}`}>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <Link to={`/addmedi/${petid}`} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+               
                     Add New Record
-                </button>
+               
             </Link>
             <button 
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"

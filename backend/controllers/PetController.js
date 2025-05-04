@@ -1,9 +1,11 @@
 const Pet= require("../models/PetModel");
 
+
+
 ///display all pets
 const getAllPets=async(req,res,next)=>{
     
-    let Pets;
+    let pets;
 
     try{
         pets=await Pet.find();
