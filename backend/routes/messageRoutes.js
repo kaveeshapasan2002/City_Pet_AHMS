@@ -1,4 +1,4 @@
-// routes/messageRoutes.js
+// routes/messageRoutes.js - Updated version with delete/update routes
 const express = require('express');
 const router = express.Router();
 const messageController = require('../controllers/messageController');
@@ -17,6 +17,9 @@ router.put('/conversations/:id/archive', messageController.archiveConversation);
 // Message routes
 router.get('/messages/:conversationId', messageController.getMessages);
 router.post('/messages', messageController.sendMessage);
+// New routes for update/delete
+router.put('/messages/:id', messageController.updateMessage);
+router.delete('/messages/:id', messageController.deleteMessage);
 
 // Notification routes
 router.get('/notifications', messageController.getNotifications);
