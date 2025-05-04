@@ -388,3 +388,132 @@ async function sendSMSNotification(recipient, senderName, messageContent) {
     console.error('Error sending SMS notification:', error);
   }
 }
+
+
+// Add these new functions to your messageController.js file
+
+// Delete a message
+exports.deleteMessage = asyncHandler(async (req, res) => {
+  const messageId = req.params.id;
+  
+  // Find the message
+  const message = await Message.findById(messageId);
+  
+  if (!message) {
+    return res.status(404).json({ message: 'Message not found' });
+  }
+  
+  // Verify the user is the sender of the message
+  if (message.sender.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'Not authorized to delete this message' });
+  }
+  
+  // Find the conversation to update last message info if needed
+  const conversation = await Conversation.findById(message.conversationId);
+  if (!conversation) {
+    return res.status(404).json({ message: 'Conversation not found' });
+  }
+  
+  // Check if this is the last message in the conversation
+  const isLastMessage = conversation.lastMessage === message.content;
+  
+  // Delete the message
+  await message.remove();
+  
+  // If this was the last message, update the conversation
+  if (isLastMessage) {
+    // Find the new last message
+    const newLastMessage = await Message.findOne({ 
+      conversationId: conversation._id 
+    }).sort({ createdAt: -1 });
+    
+    if (newLastMessage) {
+      conversation.lastMessage = newLastMessage.content;
+      conversation.lastMessageTime = newLastMessage.createdAt;
+    } else {
+      // No messages left
+      conversation.lastMessage = '';
+      conversation.lastMessageTime = conversation.createdAt;
+    }
+    
+    await conversation.save();
+  }
+  
+  // Get the socket io instance
+  const io = req.app.get('io');
+  
+  // Notify the conversation participants about the deletion
+  if (io) {
+    io.to(`conversation:${conversation._id}`).emit('message-deleted', {
+      messageId,
+      conversationId: conversation._id
+    });
+  }
+  
+  res.json({ message: 'Message deleted successfully' });
+});
+
+// Update a message
+exports.updateMessage = asyncHandler(async (req, res) => {
+  const messageId = req.params.id;
+  const { content } = req.body;
+  
+  if (!content || !content.trim()) {
+    return res.status(400).json({ message: 'Message content cannot be empty' });
+  }
+  
+  // Find the message
+  const message = await Message.findById(messageId);
+  
+  if (!message) {
+    return res.status(404).json({ message: 'Message not found' });
+  }
+  
+  // Verify the user is the sender of the message
+  if (message.sender.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'Not authorized to update this message' });
+  }
+  
+  // Update the message
+  message.content = content.trim();
+  message.isEdited = true;
+  message.editedAt = Date.now();
+  
+  await message.save();
+  
+  // Find the conversation to update last message info if needed
+  const conversation = await Conversation.findById(message.conversationId);
+  if (!conversation) {
+    return res.status(404).json({ message: 'Conversation not found' });
+  }
+  
+  // Check if this is the last message in the conversation
+  const isLastMessage = await Message.findOne({ 
+    conversationId: conversation._id 
+  }).sort({ createdAt: -1 });
+  
+  if (isLastMessage && isLastMessage._id.toString() === message._id.toString()) {
+    conversation.lastMessage = content.trim();
+    await conversation.save();
+  }
+  
+  // Get the socket io instance
+  const io = req.app.get('io');
+  
+  // Notify the conversation participants about the update
+  if (io) {
+    io.to(`conversation:${conversation._id}`).emit('message-updated', {
+      message: {
+        ...message.toObject(),
+        sender: req.user.id
+      },
+      conversationId: conversation._id
+    });
+  }
+  
+  // Populate sender info before responding
+  const populatedMessage = await Message.findById(message._id)
+    .populate('sender', 'name role profilePicture');
+  
+  res.json(populatedMessage);
+});

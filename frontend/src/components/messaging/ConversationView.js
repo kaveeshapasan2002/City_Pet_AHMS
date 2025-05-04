@@ -1,7 +1,7 @@
 // src/components/messaging/ConversationView.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useMessaging } from '../../context/MessagingContext';
-import { formatDistanceToNow, format } from 'date-fns';
+import { format } from 'date-fns';
 import { FaPaperPlane, FaPaperclip, FaEllipsisV } from 'react-icons/fa';
 import { getCurrentUser } from '../../api/auth';
 
@@ -20,6 +20,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
   const [messageInput, setMessageInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef(null);
   const messageListRef = useRef(null);
   const inputRef = useRef(null);
@@ -39,10 +40,45 @@ const ConversationView = ({ conversation, messageInputRef }) => {
     }
   }, [conversation, loadMessages]);
   
-  // Scroll to bottom when messages change
+  // Scroll to bottom when messages change, but only if already near bottom
   useEffect(() => {
-    scrollToBottom();
+    if (messages && messagesEndRef.current && messageListRef.current) {
+      const isScrolledToBottom = 
+        (messageListRef.current.scrollHeight - messageListRef.current.scrollTop <= 
+         messageListRef.current.clientHeight + 100);
+      
+      if (isScrolledToBottom) {
+        scrollToBottom();
+      }
+    }
   }, [messages]);
+
+  // Handle initial load of conversation - scroll to bottom
+  useEffect(() => {
+    if (conversation?._id && messageListRef.current) {
+      // Force immediate scroll to bottom on initial load
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+      
+      // Use a short timeout as fallback to ensure the DOM has updated
+      setTimeout(() => {
+        if (messageListRef.current) {
+          messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+        }
+      }, 100);
+    }
+  }, [conversation?._id, messages]);
+  
+  // Ensure proper scroll position after window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (messageListRef.current && messagesEndRef.current) {
+        messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Check if someone is typing in this conversation
   const isOtherUserTyping = conversation && typingUsers[conversation._id] && 
@@ -53,7 +89,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
     if (!conversation || !conversation.participants) return 'Unknown';
     
     const otherParticipant = conversation.participants.find(
-      p => p._id !== currentUser._id
+      p => p._id !== (currentUser?._id || '')
     );
     
     return otherParticipant ? otherParticipant.name : 'Unknown';
@@ -64,7 +100,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
     if (!conversation || !conversation.participants) return '';
     
     const otherParticipant = conversation.participants.find(
-      p => p._id !== currentUser._id
+      p => p._id !== (currentUser?._id || '')
     );
     
     return otherParticipant ? otherParticipant.role : '';
@@ -93,9 +129,28 @@ const ConversationView = ({ conversation, messageInputRef }) => {
     }
   };
   
+  // Handle scroll events to show/hide scroll button
+  const handleScroll = () => {
+    if (messageListRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
+      // Show button when scrolled up more than 200px from bottom
+      setShowScrollButton(scrollHeight - scrollTop - clientHeight > 200);
+    }
+  };
+  
+  // Scroll to bottom of message list
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+  
   // Handle message input change
   const handleInputChange = (e) => {
     setMessageInput(e.target.value);
+    
+    // Only send typing status if we have a valid conversation
+    if (!conversation?._id) return;
     
     // Handle typing indicator
     if (!isTyping && e.target.value.length > 0) {
@@ -123,7 +178,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!messageInput.trim()) return;
+    if (!messageInput.trim() || !conversation?._id) return;
     
     // Clear typing indicator
     if (isTyping) {
@@ -139,33 +194,38 @@ const ConversationView = ({ conversation, messageInputRef }) => {
     
     // Clear input
     setMessageInput('');
-  };
-  
-  // Scroll to bottom of message list
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+
+    // Force scroll to bottom when sending a message
+    setTimeout(() => {
+      if (messageListRef.current) {
+        messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+      }
+    }, 100);
   };
   
   // Load more messages (older)
   const loadMoreMessages = () => {
-    if (pagination.page < pagination.pages) {
+    if (conversation?._id && pagination && pagination.page < pagination.pages) {
       loadMessages(conversation._id, pagination.page + 1);
     }
   };
   
   // Check if a message is from the current user
   const isCurrentUserMessage = (message) => {
-    return message.sender._id === currentUser._id;
+    // Added null check for currentUser
+    return currentUser && message.sender && message.sender._id === currentUser._id;
   };
   
   // Group messages by date
   const groupMessagesByDate = () => {
+    if (!messages || !Array.isArray(messages)) return [];
+    
     const groups = [];
     let currentDate = null;
     
     messages.forEach(message => {
+      if (!message || !message.createdAt) return;
+
       const messageDate = new Date(message.createdAt).toDateString();
       
       if (messageDate !== currentDate) {
@@ -214,16 +274,22 @@ const ConversationView = ({ conversation, messageInputRef }) => {
   
   const messageGroups = groupMessagesByDate();
   
+  // Pre-compute name's first character to avoid error in rendering
+  const otherParticipantName = getOtherParticipantName();
+  const firstCharacter = otherParticipantName && typeof otherParticipantName === 'string' 
+    ? otherParticipantName.charAt(0).toUpperCase() 
+    : '?';
+  
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-md overflow-hidden">
       {/* Conversation header */}
-      <div className="p-4 border-b bg-white flex items-center justify-between">
+      <div className="p-4 border-b bg-white flex items-center justify-between flex-shrink-0">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-lg mr-3">
-            {getOtherParticipantName().charAt(0).toUpperCase()}
+            {firstCharacter}
           </div>
           <div>
-            <h2 className="font-semibold text-gray-900">{getOtherParticipantName()}</h2>
+            <h2 className="font-semibold text-gray-900">{otherParticipantName}</h2>
             {getOtherParticipantRole() && (
               <p className="text-xs text-gray-500">{getOtherParticipantRole()}</p>
             )}
@@ -234,13 +300,18 @@ const ConversationView = ({ conversation, messageInputRef }) => {
         </button>
       </div>
       
-      {/* Message list */}
+      {/* Message list - IMPORTANT: This div controls scrolling */}
       <div 
-        className="flex-1 p-4 overflow-y-auto bg-gray-50"
+        className="flex-1 p-4 overflow-y-auto bg-gray-50 min-h-0 max-h-[calc(100vh-250px)]"
         ref={messageListRef}
+        onScroll={handleScroll}
+        style={{ 
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch' // Improves scrolling on iOS
+        }}
       >
         {/* Load more button */}
-        {pagination.page < pagination.pages && (
+        {pagination && pagination.page < pagination.pages && (
           <div className="text-center mb-4">
             <button
               onClick={loadMoreMessages}
@@ -259,6 +330,24 @@ const ConversationView = ({ conversation, messageInputRef }) => {
           </div>
         )}
         
+        {/* Scroll to bottom button */}
+        {showScrollButton && (
+          <button
+            onClick={scrollToBottom}
+            className="fixed bottom-20 right-8 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-10"
+            aria-label="Scroll to bottom"
+          >
+            <svg 
+              className="w-5 h-5" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </button>
+        )}
+        
         {/* Messages grouped by date */}
         {messageGroups.map((group, groupIndex) => (
           <div key={groupIndex} className="mb-6">
@@ -271,18 +360,21 @@ const ConversationView = ({ conversation, messageInputRef }) => {
             
             {/* Messages */}
             {group.messages.map((message, messageIndex) => {
+              if (!message || !message.sender) return null;
+              
               const isCurrentUser = isCurrentUserMessage(message);
               const showSenderInfo = messageIndex === 0 || 
-                group.messages[messageIndex - 1].sender._id !== message.sender._id;
+                (group.messages[messageIndex - 1].sender && message.sender &&
+                 group.messages[messageIndex - 1].sender._id !== message.sender._id);
               
               return (
                 <div
-                  key={message._id}
+                  key={message._id || messageIndex}
                   className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}
                 >
                   <div className={`max-w-[75%]`}>
                     {/* Sender info */}
-                    {showSenderInfo && !isCurrentUser && (
+                    {showSenderInfo && !isCurrentUser && message.sender && (
                       <div className="text-xs text-gray-500 mb-1 ml-1">
                         {message.sender.name}
                       </div>
@@ -325,7 +417,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
               </div>
             </div>
             <div className="text-xs text-gray-500 ml-2">
-              {getOtherParticipantName()} is typing...
+              {otherParticipantName} is typing...
             </div>
           </div>
         )}
@@ -335,11 +427,12 @@ const ConversationView = ({ conversation, messageInputRef }) => {
       </div>
       
       {/* Message input */}
-      <div className="p-4 border-t bg-white">
+      <div className="p-4 border-t bg-white flex-shrink-0">
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
           <button
             type="button"
             className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+            aria-label="Attach file"
           >
             <FaPaperclip />
           </button>
@@ -353,12 +446,13 @@ const ConversationView = ({ conversation, messageInputRef }) => {
           />
           <button
             type="submit"
-            disabled={!messageInput.trim()}
+            disabled={!messageInput.trim() || !conversation?._id}
             className={`p-2 rounded-full ${
-              messageInput.trim()
+              messageInput.trim() && conversation?._id
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
+            aria-label="Send message"
           >
             <FaPaperPlane />
           </button>
