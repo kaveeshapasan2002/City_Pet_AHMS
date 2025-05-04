@@ -236,3 +236,52 @@ export const getPetOwners = async () => {
 };
 
 //create api
+// src/api/messaging.js - Add these functions to your API file
+
+// Delete a message
+export const deleteMessage = async (messageId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+
+    const response = await axios.delete(
+      `${API_URL}/messages/${messageId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to delete message' };
+  }
+};
+
+// Update a message
+export const updateMessage = async (messageId, content) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+
+    const response = await axios.put(
+      `${API_URL}/messages/${messageId}`,
+      { content },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to update message' };
+  }
+};
