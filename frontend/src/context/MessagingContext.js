@@ -6,7 +6,9 @@ import {
   getConversation,
   createConversation,
   sendMessage as apiSendMessage,
-  getMessages as apiGetMessages
+  getMessages as apiGetMessages,
+  deleteMessage as apiDeleteMessage,
+  updateMessage as apiUpdateMessage
 } from '../api/messaging';
 import socketService from '../services/socketService';
 
@@ -205,6 +207,150 @@ export const MessagingProvider = ({ children }) => {
     }
   }, [isAuth]);
 
+  // Delete a message
+  const deleteMessage = useCallback(async (messageId) => {
+    if (!isAuth) return null;
+    
+    setError(null);
+    
+    try {
+      console.log('Attempting to delete message with ID:', messageId);
+      // Make sure to wait for the API call to complete
+      const result = await apiDeleteMessage(messageId);
+      console.log('Delete API response:', result);
+      
+      // Find the message in current messages
+      const deletedMessage = messages.find(m => m._id === messageId);
+      
+      if (deletedMessage) {
+        console.log('Found message to delete in UI:', deletedMessage);
+        
+        // Remove from messages list
+        setMessages(prev => {
+          console.log('Removing message from UI, previous count:', prev.length);
+          const newMessages = prev.filter(m => m._id !== messageId);
+          console.log('New messages count after removal:', newMessages.length);
+          return newMessages;
+        });
+        
+        // If it was the last message, update conversation preview
+        if (activeConversation) {
+          console.log('Active conversation:', activeConversation);
+          console.log('Last message in conversation:', activeConversation.lastMessage);
+          console.log('Deleted message content:', deletedMessage.content);
+          
+          if (activeConversation.lastMessage === deletedMessage.content) {
+            console.log('Deleted message was the last message in conversation');
+            
+            // Find the new last message in our current list
+            const newLastMessages = messages
+              .filter(m => m._id !== messageId)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            const newLastMessage = newLastMessages.length > 0 ? newLastMessages[0] : null;
+            console.log('New last message:', newLastMessage);
+            
+            // Update active conversation
+            setActiveConversation(prev => {
+              const updated = {
+                ...prev,
+                lastMessage: newLastMessage ? newLastMessage.content : '',
+                lastMessageTime: newLastMessage ? newLastMessage.createdAt : prev.createdAt
+              };
+              console.log('Updated active conversation:', updated);
+              return updated;
+            });
+            
+            // Update in conversations list
+            setConversations(prev => {
+              console.log('Updating conversations list');
+              return prev.map(conv => {
+                if (conv._id === activeConversation._id) {
+                  return {
+                    ...conv,
+                    lastMessage: newLastMessage ? newLastMessage.content : '',
+                    lastMessageTime: newLastMessage ? newLastMessage.createdAt : conv.createdAt
+                  };
+                }
+                return conv;
+              });
+            });
+          }
+        }
+      } else {
+        console.log('Message not found in UI, might need to refresh conversations');
+      }
+      
+      return result;
+    } catch (err) {
+      console.error('Error deleting message:', err);
+      setError(err.message || 'Failed to delete message');
+      return null;
+    }
+  }, [isAuth, messages, activeConversation]);
+
+  // Update a message
+  const updateMessage = useCallback(async (messageId, content) => {
+    if (!isAuth || !content.trim()) return null;
+    
+    setError(null);
+    
+    try {
+      console.log('Attempting to update message with ID:', messageId);
+      const updatedMessage = await apiUpdateMessage(messageId, content);
+      console.log('Update API response:', updatedMessage);
+      
+      // Update in messages list
+      setMessages(prev => {
+        console.log('Updating message in UI');
+        return prev.map(message => {
+          if (message._id === messageId) {
+            return {
+              ...message,
+              content,
+              isEdited: true,
+              editedAt: updatedMessage.editedAt
+            };
+          }
+          return message;
+        });
+      });
+      
+      // If it was the last message, update conversation preview
+      if (activeConversation && activeConversation.lastMessage) {
+        const message = messages.find(m => m._id === messageId);
+        if (message && activeConversation.lastMessage === message.content) {
+          console.log('Updated message was the last message in conversation');
+          
+          // Update active conversation
+          setActiveConversation(prev => ({
+            ...prev,
+            lastMessage: content
+          }));
+          
+          // Update in conversations list
+          setConversations(prev => {
+            return prev.map(conv => {
+              if (conv._id === activeConversation._id) {
+                return {
+                  ...conv,
+                  lastMessage: content
+                };
+              }
+              return conv;
+            });
+          });
+        }
+      }
+      
+      return updatedMessage;
+    } catch (err) {
+      console.error('Error updating message:', err);
+      setError(err.message || 'Failed to update message');
+      return null;
+    }
+  }, [isAuth, messages, activeConversation]);
+
   // Set up socket event listeners
   useEffect(() => {
     if (!isAuth) return;
@@ -243,6 +389,120 @@ export const MessagingProvider = ({ children }) => {
         
         // If not in list, add it
         return [conversation, ...prevConversations];
+      });
+    };
+    
+    // Message deleted handler
+    const deletedHandler = ({ messageId, conversationId }) => {
+      console.log('Socket: Message deleted event received:', messageId, conversationId);
+      
+      // If in active conversation, remove the message
+      if (activeConversation && activeConversation._id === conversationId) {
+        setMessages(prev => {
+          console.log('Socket: Removing deleted message from UI');
+          return prev.filter(m => m._id !== messageId);
+        });
+        
+        // Find the new last message
+        const newLastMessages = messages
+          .filter(m => m._id !== messageId)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const newLastMessage = newLastMessages.length > 0 ? newLastMessages[0] : null;
+        
+        // Update active conversation if needed
+        setActiveConversation(prev => {
+          console.log('Socket: Updating active conversation after deletion');
+          return {
+            ...prev,
+            lastMessage: newLastMessage ? newLastMessage.content : '',
+            lastMessageTime: newLastMessage ? newLastMessage.createdAt : prev.createdAt
+          };
+        });
+      }
+      
+      // Update conversation in list
+      setConversations(prevConversations => {
+        console.log('Socket: Updating conversations list after deletion');
+        const conversation = prevConversations.find(c => c._id === conversationId);
+        
+        if (conversation) {
+          // Determine if we need to update the last message
+          // This is a best guess without fetching from server
+          const updatedConversations = prevConversations.map(conv => {
+            if (conv._id === conversationId) {
+              // If this is the active conversation and we have messages data
+              if (activeConversation && activeConversation._id === conversationId && messages.length > 0) {
+                const newLastMessages = messages
+                  .filter(m => m._id !== messageId)
+                  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                const newLastMessage = newLastMessages.length > 0 ? newLastMessages[0] : null;
+                
+                if (newLastMessage) {
+                  return {
+                    ...conv,
+                    lastMessage: newLastMessage.content,
+                    lastMessageTime: newLastMessage.createdAt
+                  };
+                }
+              }
+              
+              // Otherwise, leave as is for now - we'll need a refresh to get accurate data
+              return conv;
+            }
+            return conv;
+          });
+          
+          return updatedConversations;
+        }
+        
+        return prevConversations;
+      });
+    };
+    
+    // Message updated handler
+    const updatedHandler = ({ message, conversationId }) => {
+      console.log('Socket: Message updated event received:', message._id, conversationId);
+      
+      // If in active conversation, update the message
+      if (activeConversation && activeConversation._id === conversationId) {
+        setMessages(prev => {
+          console.log('Socket: Updating message in UI');
+          return prev.map(m => {
+            if (m._id === message._id) {
+              return {
+                ...m,
+                content: message.content,
+                isEdited: true,
+                editedAt: message.editedAt
+              };
+            }
+            return m;
+          });
+        });
+      }
+      
+      // Update conversation in list if it was the last message
+      setConversations(prevConversations => {
+        console.log('Socket: Checking if need to update conversation preview');
+        return prevConversations.map(conv => {
+          if (conv._id === conversationId) {
+            // If this message might have been the last one
+            const lastMessageTime = new Date(conv.lastMessageTime).getTime();
+            const messageTime = new Date(message.createdAt).getTime();
+            
+            // If this was the last message, update it
+            if (Math.abs(lastMessageTime - messageTime) < 1000) { // Within 1 second, likely the same
+              console.log('Socket: Updating conversation preview with edited message');
+              return {
+                ...conv,
+                lastMessage: message.content
+              };
+            }
+          }
+          return conv;
+        });
       });
     };
     
@@ -285,6 +545,8 @@ export const MessagingProvider = ({ children }) => {
     const removeNotificationListener = socketService.onMessageNotification(messageHandler);
     const removeTypingListener = socketService.onUserTyping(typingHandler);
     const removeReadListener = socketService.onMessagesRead(readHandler);
+    const removeDeletedListener = socketService.onMessageDeleted(deletedHandler);
+    const removeUpdatedListener = socketService.onMessageUpdated(updatedHandler);
     
     // Clean up listeners on unmount
     return () => {
@@ -292,8 +554,10 @@ export const MessagingProvider = ({ children }) => {
       removeNotificationListener();
       removeTypingListener();
       removeReadListener();
+      removeDeletedListener();
+      removeUpdatedListener();
     };
-  }, [isAuth, activeConversation, user]);
+  }, [isAuth, activeConversation, user, messages]);
   
   // Clean up typing indicators after a delay
   useEffect(() => {
@@ -356,6 +620,8 @@ export const MessagingProvider = ({ children }) => {
     startConversation,
     loadMessages,
     sendMessage,
+    deleteMessage,
+    updateMessage,
     sendTypingStatus,
     clearActiveConversation
   };
@@ -371,5 +637,3 @@ export const MessagingProvider = ({ children }) => {
 export const useMessaging = () => useContext(MessagingContext);
 
 export default MessagingContext;
-
-//create messagingcontext

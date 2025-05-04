@@ -392,6 +392,8 @@ async function sendSMSNotification(recipient, senderName, messageContent) {
 
 // Add these new functions to your messageController.js file
 
+// controllers/messageController.js - Fixed deleteMessage function
+
 // Delete a message
 exports.deleteMessage = asyncHandler(async (req, res) => {
   const messageId = req.params.id;
@@ -417,8 +419,8 @@ exports.deleteMessage = asyncHandler(async (req, res) => {
   // Check if this is the last message in the conversation
   const isLastMessage = conversation.lastMessage === message.content;
   
-  // Delete the message
-  await message.remove();
+  // Delete the message - using deleteOne instead of remove() which is deprecated
+  await Message.deleteOne({ _id: messageId });
   
   // If this was the last message, update the conversation
   if (isLastMessage) {
@@ -445,75 +447,10 @@ exports.deleteMessage = asyncHandler(async (req, res) => {
   // Notify the conversation participants about the deletion
   if (io) {
     io.to(`conversation:${conversation._id}`).emit('message-deleted', {
-      messageId,
-      conversationId: conversation._id
+      messageId: messageId.toString(), // Convert to string to ensure consistent format
+      conversationId: conversation._id.toString()
     });
   }
   
   res.json({ message: 'Message deleted successfully' });
-});
-
-// Update a message
-exports.updateMessage = asyncHandler(async (req, res) => {
-  const messageId = req.params.id;
-  const { content } = req.body;
-  
-  if (!content || !content.trim()) {
-    return res.status(400).json({ message: 'Message content cannot be empty' });
-  }
-  
-  // Find the message
-  const message = await Message.findById(messageId);
-  
-  if (!message) {
-    return res.status(404).json({ message: 'Message not found' });
-  }
-  
-  // Verify the user is the sender of the message
-  if (message.sender.toString() !== req.user.id) {
-    return res.status(403).json({ message: 'Not authorized to update this message' });
-  }
-  
-  // Update the message
-  message.content = content.trim();
-  message.isEdited = true;
-  message.editedAt = Date.now();
-  
-  await message.save();
-  
-  // Find the conversation to update last message info if needed
-  const conversation = await Conversation.findById(message.conversationId);
-  if (!conversation) {
-    return res.status(404).json({ message: 'Conversation not found' });
-  }
-  
-  // Check if this is the last message in the conversation
-  const isLastMessage = await Message.findOne({ 
-    conversationId: conversation._id 
-  }).sort({ createdAt: -1 });
-  
-  if (isLastMessage && isLastMessage._id.toString() === message._id.toString()) {
-    conversation.lastMessage = content.trim();
-    await conversation.save();
-  }
-  
-  // Get the socket io instance
-  const io = req.app.get('io');
-  
-  // Notify the conversation participants about the update
-  if (io) {
-    io.to(`conversation:${conversation._id}`).emit('message-updated', {
-      message: {
-        ...message.toObject(),
-        sender: req.user.id
-      },
-      conversationId: conversation._id
-    });
-  }
-  
-  // Populate sender info before responding
-  const populatedMessage = await Message.findById(message._id)
-    .populate('sender', 'name role profilePicture');
-  
-  res.json(populatedMessage);
 });

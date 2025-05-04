@@ -4,6 +4,7 @@ import { useMessaging } from '../../context/MessagingContext';
 import { format } from 'date-fns';
 import { FaPaperPlane, FaPaperclip, FaEllipsisV } from 'react-icons/fa';
 import { getCurrentUser } from '../../api/auth';
+import MessageItem from './MessageItem';
 
 const ConversationView = ({ conversation, messageInputRef }) => {
   const { 
@@ -104,29 +105,6 @@ const ConversationView = ({ conversation, messageInputRef }) => {
     );
     
     return otherParticipant ? otherParticipant.role : '';
-  };
-  
-  // Format message time
-  const formatMessageTime = (timestamp) => {
-    try {
-      const date = new Date(timestamp);
-      const now = new Date();
-      
-      // If today, show time only
-      if (date.toDateString() === now.toDateString()) {
-        return format(date, 'h:mm a');
-      }
-      
-      // If this week, show day and time
-      if (now.getTime() - date.getTime() < 7 * 24 * 60 * 60 * 1000) {
-        return format(date, 'E h:mm a');
-      }
-      
-      // Otherwise, show date
-      return format(date, 'MMM d, yyyy h:mm a');
-    } catch (err) {
-      return '';
-    }
   };
   
   // Handle scroll events to show/hide scroll button
@@ -295,14 +273,17 @@ const ConversationView = ({ conversation, messageInputRef }) => {
             )}
           </div>
         </div>
-        <button className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100">
+        <button 
+          className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+          aria-label="Conversation options"
+        >
           <FaEllipsisV />
         </button>
       </div>
       
       {/* Message list - IMPORTANT: This div controls scrolling */}
       <div 
-        className="flex-1 p-4 overflow-y-auto bg-gray-50 min-h-0 max-h-[calc(100vh-250px)]"
+        className="flex-1 p-4 overflow-y-auto bg-gray-50 min-h-0 max-h-[calc(100vh-250px)] message-container"
         ref={messageListRef}
         onScroll={handleScroll}
         style={{ 
@@ -334,7 +315,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
         {showScrollButton && (
           <button
             onClick={scrollToBottom}
-            className="fixed bottom-20 right-8 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-10"
+            className="fixed bottom-20 right-8 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-10 scroll-button"
             aria-label="Scroll to bottom"
           >
             <svg 
@@ -350,7 +331,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
         
         {/* Messages grouped by date */}
         {messageGroups.map((group, groupIndex) => (
-          <div key={groupIndex} className="mb-6">
+          <div key={groupIndex} className="mb-6 message-group">
             {/* Date divider */}
             <div className="flex justify-center mb-4">
               <div className="px-3 py-1 bg-gray-200 text-xs text-gray-600 rounded-full">
@@ -368,39 +349,12 @@ const ConversationView = ({ conversation, messageInputRef }) => {
                  group.messages[messageIndex - 1].sender._id !== message.sender._id);
               
               return (
-                <div
+                <MessageItem
                   key={message._id || messageIndex}
-                  className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}
-                >
-                  <div className={`max-w-[75%]`}>
-                    {/* Sender info */}
-                    {showSenderInfo && !isCurrentUser && message.sender && (
-                      <div className="text-xs text-gray-500 mb-1 ml-1">
-                        {message.sender.name}
-                      </div>
-                    )}
-                    
-                    {/* Message content */}
-                    <div
-                      className={`p-3 rounded-lg ${
-                        isCurrentUser
-                          ? 'bg-blue-600 text-white rounded-br-none'
-                          : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
-                      }`}
-                    >
-                      <p>{message.content}</p>
-                    </div>
-                    
-                    {/* Timestamp */}
-                    <div
-                      className={`text-xs mt-1 ${
-                        isCurrentUser ? 'text-right text-gray-400' : 'text-gray-500'
-                      }`}
-                    >
-                      {formatMessageTime(message.createdAt)}
-                    </div>
-                  </div>
-                </div>
+                  message={message}
+                  isCurrentUser={isCurrentUser}
+                  showSenderInfo={showSenderInfo}
+                />
               );
             })}
           </div>
@@ -427,7 +381,7 @@ const ConversationView = ({ conversation, messageInputRef }) => {
       </div>
       
       {/* Message input */}
-      <div className="p-4 border-t bg-white flex-shrink-0">
+      <div className="p-4 border-t bg-white flex-shrink-0 message-input-container">
         <form onSubmit={handleSubmit} className="flex items-center space-x-2">
           <button
             type="button"

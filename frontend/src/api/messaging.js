@@ -236,7 +236,7 @@ export const getPetOwners = async () => {
 };
 
 //create api
-// src/api/messaging.js - Add these functions to your API file
+// src/api/messaging.js - Fixed deleteMessage function
 
 // Delete a message
 export const deleteMessage = async (messageId) => {
@@ -246,6 +246,8 @@ export const deleteMessage = async (messageId) => {
       throw { message: 'Authentication required' };
     }
 
+    console.log(`API: Sending delete request for message ${messageId}`);
+    
     const response = await axios.delete(
       `${API_URL}/messages/${messageId}`,
       {
@@ -255,8 +257,10 @@ export const deleteMessage = async (messageId) => {
       }
     );
     
+    console.log('API: Delete response received:', response.data);
     return response.data;
   } catch (error) {
+    console.error('API: Error deleting message:', error);
     throw error.response?.data || { message: 'Failed to delete message' };
   }
 };
