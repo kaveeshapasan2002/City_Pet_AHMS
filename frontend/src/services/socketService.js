@@ -145,6 +145,34 @@ export const onUserStatusChange = (callback) => {
   };
 };
 
+export const onMessageDeleted = (callback) => {
+  const socket = getSocket();
+  if (socket) {
+    socket.on('message-deleted', callback);
+  }
+  return () => {
+    if (socket) {
+      socket.off('message-deleted', callback);
+    }
+  };
+};
+
+// Listen for message updated events
+export const onMessageUpdated = (callback) => {
+  const socket = getSocket();
+  if (socket) {
+    socket.on('message-updated', callback);
+  }
+  return () => {
+    if (socket) {
+      socket.off('message-updated', callback);
+    }
+  };
+};
+
+
+
+
 export default {
   initializeSocket,
   getSocket,
@@ -157,5 +185,8 @@ export default {
   onMessageNotification,
   onUserTyping,
   onMessagesRead,
-  onUserStatusChange
+  onUserStatusChange,
+
+  onMessageDeleted,
+  onMessageUpdated
 };
