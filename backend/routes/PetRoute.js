@@ -17,6 +17,9 @@ router.put("/:id",PetController.updatePets);
 
 router.delete("/:id",PetController.deletePets);
 
+router.get("/bycontact/:contact", PetController.getByContact);
+
+
 
 
 

@@ -97,7 +97,24 @@ const deletePets=async(req,res,next)=>{
 }
 
 
+// Get pets by contact number
+const getByContact = async (req, res, next) => {
+    const contact = req.params.contact;
 
+    let pets;
+    try {
+        pets = await Pet.find({ contact: contact });
+    } catch (err) {
+        console.log(err);
+    }
+    
+    // When no pets found for this contact
+    if (!pets || pets.length === 0) {
+        return res.status(404).json({ message: "No pets found for this contact number" });
+    }
+    
+    return res.status(200).json({ pets });
+};
 
 
 
@@ -113,5 +130,5 @@ exports.addPets=addPets;
 exports.getById=getById;
 exports.updatePets=updatePets;
 exports.deletePets=deletePets;
-
+exports.getByContact = getByContact;
 
