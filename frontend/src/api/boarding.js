@@ -138,3 +138,25 @@ export const getBookingById = async (bookingId) => {
   }
 };
 
+
+// Delete a booking permanently
+export const deleteBooking = async (bookingId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+    
+    // Updated URL to match your route pattern
+    const response = await axios.delete(`${API_URL}/${bookingId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Delete error:', error); // For debugging
+    throw error.response?.data || { message: 'Failed to delete booking' };
+  }
+};

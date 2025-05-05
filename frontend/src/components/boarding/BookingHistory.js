@@ -1,17 +1,22 @@
 // src/components/boarding/BookingHistory.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserBookings, cancelBooking } from '../../api/boarding';
+import { getUserBookings, cancelBooking, deleteBooking } from '../../api/boarding';
 import Alert from '../common/Alert';
+import {useReactToPrint} from "react-to-print";
+
 
 const BookingHistory = ({ refresh }) => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);  
-  const [loading, setLoading] = useState(true);   //const[variable, function]= useState(initial value)
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  // State to track which booking ID is selected for printing
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
-
+  // Create a mapping of refs for each booking
+  const componentRefs = useRef({});
   
   useEffect(() => {
     fetchBookings();
@@ -29,6 +34,22 @@ const BookingHistory = ({ refresh }) => {
       setLoading(false);
     }
   };
+
+  // This hook must be at the component level, not inside a function
+  const handlePrint = useReactToPrint({
+    content: () => componentRefs.current[selectedBookingId],
+    documentTitle: "User's Report",
+    onAfterPrint: () => alert("User's Report successfully downloaded!")
+  });
+
+  // Function to set up which booking to print, then trigger print
+  const printBooking = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    // Use setTimeout to ensure state is updated before printing
+    setTimeout(() => {
+      handlePrint();
+    }, 0);
+  };
   
   const handleCancelBooking = async (bookingId) => {
     if (!window.confirm('Are you sure you want to cancel this booking?')) return;
@@ -44,7 +65,7 @@ const BookingHistory = ({ refresh }) => {
     }
   };
 
-  //navigate to update booking page
+  // Navigate to update booking page
   const handleUpdateBooking = (bookingId) => {
     navigate(`/update-booking/${bookingId}`);
   };
@@ -73,7 +94,6 @@ const BookingHistory = ({ refresh }) => {
     }
   };
 
-  
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6">Your Bookings</h2>
@@ -108,55 +128,66 @@ const BookingHistory = ({ refresh }) => {
                   Booked on {formatDate(booking.createdAt)}
                 </div>
               </div>
-              
-              <div className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Boarding Type</p>
-                    <p className="font-medium">{booking.boardingType}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Dates</p>
-                    <p className="font-medium">
-                      {formatDate(booking.checkInDate)} to {formatDate(booking.checkOutDate)}
-                    </p>
-                  </div>
-                  {booking.additionalServices && (
+               <div 
+                 ref={el => componentRefs.current[booking._id] = el} 
+                 className="print-section"
+               >
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-gray-500">Additional Services</p>
-                      <p className="font-medium">{booking.additionalServices}</p>
+                      <p className="text-sm text-gray-500">Boarding Type</p>
+                      <p className="font-medium">{booking.boardingType}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Dates</p>
+                      <p className="font-medium">
+                        {formatDate(booking.checkInDate)} to {formatDate(booking.checkOutDate)}
+                      </p>
+                    </div>
+                    {booking.additionalServices && (
+                      <div>
+                        <p className="text-sm text-gray-500">Additional Services</p>
+                        <p className="font-medium">{booking.additionalServices}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm text-gray-500">Total Price</p>
+                      <p className="font-medium">${booking.totalPrice.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  
+                  {booking.specialNotes && (
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-500">Special Notes</p>
+                      <p className="mt-1 text-gray-700">{booking.specialNotes}</p>
                     </div>
                   )}
-                  <div>
-                    <p className="text-sm text-gray-500">Total Price</p>
-                    <p className="font-medium">${booking.totalPrice.toFixed(2)}</p>
-                  </div>
                 </div>
                 
-                {booking.specialNotes && (
-                  <div className="mt-4">
-                    <p className="text-sm text-gray-500">Special Notes</p>
-                    <p className="mt-1 text-gray-700">{booking.specialNotes}</p>
+                {booking.status === 'Pending' && (
+                  <div className="mt-4 flex justify-end space-x-2 p-4">
+                    <button
+                      onClick={() => handleUpdateBooking(booking._id)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      Update Booking
+                    </button>
+
+                    <button
+                      onClick={() => handleCancelBooking(booking._id)}
+                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 ml-2" 
+                    >
+                      Cancel Booking
+                    </button>
+
+                    <button
+                      onClick={() => printBooking(booking._id)}
+                      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 ml-2" 
+                    >
+                      Download Report
+                    </button>
                   </div>
                 )}
-                
-{booking.status === 'Pending' && (
-  <div className="mt-4 flex justify-end space-x-2"> {/* Add space-x-2 for spacing */}
-    <button
-      onClick={() => handleUpdateBooking(booking._id)}
-      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-    >
-      Update Booking
-    </button>
-
-    <button
-      onClick={() => handleCancelBooking(booking._id)}
-      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 ml-2" 
-    >
-      Cancel Booking
-    </button>
-  </div>
-)}
               </div>
             </div>
           ))}
@@ -166,6 +197,4 @@ const BookingHistory = ({ refresh }) => {
   );
 };
        
-
-
 export default BookingHistory;

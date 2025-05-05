@@ -60,6 +60,9 @@ const UpdateBookingForm = () => {
     setFormData({ ...formData, boardingType: type });
   };
   
+
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdateLoading(true);
@@ -278,7 +281,7 @@ const UpdateBookingForm = () => {
                   className="w-1/2 py-3 text-lg bg-gray-500 hover:bg-gray-600" 
                   onClick={() => navigate('/pet-boarding')}
                 >
-                  Cancel
+                  Delete
                 </Button>
                 <Button 
                   type="submit" 
