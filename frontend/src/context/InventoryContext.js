@@ -1,6 +1,7 @@
 // frontend/src/context/InventoryContext.js
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import inventoryService from '../services/inventoryService';
+import { toast } from 'react-toastify';
 
 const InventoryContext = createContext();
 
@@ -26,6 +27,9 @@ export const InventoryProvider = ({ children }) => {
     search: '',
     lowStock: false
   });
+  const [lowStockItems, setLowStockItems] = useState([]);
+  const [reorderLoading, setReorderLoading] = useState(false);
+  const [reorderResult, setReorderResult] = useState(null);
 
   // Get all inventory items
   const fetchItems = useCallback(async (page = 1, limit = 10, filterParams = filters) => {
@@ -110,6 +114,45 @@ export const InventoryProvider = ({ children }) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   }, []);
 
+  // Get low stock items
+  const fetchLowStockItems = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await inventoryService.getLowStockItems();
+      setLowStockItems(data.items);
+      setLoading(false);
+      return data.items;
+    } catch (err) {
+      setError(err.toString());
+      setLoading(false);
+      throw err;
+    }
+  }, []);
+
+  // Process auto reorder
+  const processAutoReorder = useCallback(async () => {
+    setReorderLoading(true);
+    setError(null);
+    try {
+      const result = await inventoryService.processAutoReorder();
+      setReorderResult(result);
+      setReorderLoading(false);
+      
+      // Show success toast notification
+      toast.success(`Successfully processed ${result.itemsProcessed} low stock items and sent ${result.emailsSent} supplier emails.`);
+      
+      return result;
+    } catch (err) {
+      setError(err.toString());
+      setReorderLoading(false);
+      
+      // Show error toast notification
+      toast.error(`Error processing auto reorder: ${err.toString()}`);
+      
+      throw err;
+    }
+  }, []);
 
   return (
     <InventoryContext.Provider
@@ -121,13 +164,17 @@ export const InventoryProvider = ({ children }) => {
         loading,
         error,
         filters,
+        lowStockItems,
+        reorderLoading,
+        reorderResult,
         fetchItems,
         fetchItemById,
         createItem,
         updateItem,
         deleteItem,
         updateFilters,
-       
+        fetchLowStockItems,
+        processAutoReorder
       }}
     >
       {children}
