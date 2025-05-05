@@ -388,3 +388,69 @@ async function sendSMSNotification(recipient, senderName, messageContent) {
     console.error('Error sending SMS notification:', error);
   }
 }
+
+
+// Add these new functions to your messageController.js file
+
+// controllers/messageController.js - Fixed deleteMessage function
+
+// Delete a message
+exports.deleteMessage = asyncHandler(async (req, res) => {
+  const messageId = req.params.id;
+  
+  // Find the message
+  const message = await Message.findById(messageId);
+  
+  if (!message) {
+    return res.status(404).json({ message: 'Message not found' });
+  }
+  
+  // Verify the user is the sender of the message
+  if (message.sender.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'Not authorized to delete this message' });
+  }
+  
+  // Find the conversation to update last message info if needed
+  const conversation = await Conversation.findById(message.conversationId);
+  if (!conversation) {
+    return res.status(404).json({ message: 'Conversation not found' });
+  }
+  
+  // Check if this is the last message in the conversation
+  const isLastMessage = conversation.lastMessage === message.content;
+  
+  // Delete the message - using deleteOne instead of remove() which is deprecated
+  await Message.deleteOne({ _id: messageId });
+  
+  // If this was the last message, update the conversation
+  if (isLastMessage) {
+    // Find the new last message
+    const newLastMessage = await Message.findOne({ 
+      conversationId: conversation._id 
+    }).sort({ createdAt: -1 });
+    
+    if (newLastMessage) {
+      conversation.lastMessage = newLastMessage.content;
+      conversation.lastMessageTime = newLastMessage.createdAt;
+    } else {
+      // No messages left
+      conversation.lastMessage = '';
+      conversation.lastMessageTime = conversation.createdAt;
+    }
+    
+    await conversation.save();
+  }
+  
+  // Get the socket io instance
+  const io = req.app.get('io');
+  
+  // Notify the conversation participants about the deletion
+  if (io) {
+    io.to(`conversation:${conversation._id}`).emit('message-deleted', {
+      messageId: messageId.toString(), // Convert to string to ensure consistent format
+      conversationId: conversation._id.toString()
+    });
+  }
+  
+  res.json({ message: 'Message deleted successfully' });
+});

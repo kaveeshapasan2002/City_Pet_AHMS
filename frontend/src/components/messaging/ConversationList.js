@@ -25,7 +25,10 @@ const ConversationList = ({ onSelectConversation }) => {
 
   // Filter conversations based on search term
   useEffect(() => {
-    if (!conversations) return;
+    if (!conversations) {
+      setFilteredConversations([]);
+      return;
+    }
     
     if (!searchTerm.trim()) {
       setFilteredConversations(conversations);
@@ -35,8 +38,8 @@ const ConversationList = ({ onSelectConversation }) => {
     const searchTermLower = searchTerm.toLowerCase();
     const filtered = conversations.filter(conv => {
       // Search in participant names and last message
-      return conv.participants.some(participant => 
-        participant.name.toLowerCase().includes(searchTermLower)
+      return conv.participants && conv.participants.some(participant => 
+        participant && participant.name && participant.name.toLowerCase().includes(searchTermLower)
       ) || (conv.lastMessage && conv.lastMessage.toLowerCase().includes(searchTermLower));
     });
     
@@ -55,9 +58,10 @@ const ConversationList = ({ onSelectConversation }) => {
   };
 
   // Get other participant's name (assumes 2 participants)
-  // Get other participant's name (assumes 2 participants)
-const getOtherParticipantName = (conversation) => {
-    if (!conversation || !conversation.participants) return 'Unknown';
+  const getOtherParticipantName = (conversation) => {
+    if (!conversation || !conversation.participants || !Array.isArray(conversation.participants)) {
+      return 'Unknown';
+    }
     
     // Get current user ID
     const currentUser = getCurrentUser();
@@ -65,31 +69,41 @@ const getOtherParticipantName = (conversation) => {
     
     // Find participant that is not the current user
     const otherParticipant = conversation.participants.find(
-      p => p._id !== currentUserId
+      p => p && p._id && p._id !== currentUserId
     );
     
-    return otherParticipant ? otherParticipant.name : 'Unknown';
+    return otherParticipant && otherParticipant.name ? otherParticipant.name : 'Unknown';
   };
 
   // Get other participant's role
   const getOtherParticipantRole = (conversation) => {
-    if (!conversation || !conversation.participants) return '';
+    if (!conversation || !conversation.participants || !Array.isArray(conversation.participants)) {
+      return '';
+    }
+    
+    const currentUser = getCurrentUser();
+    const currentUserId = currentUser ? currentUser._id : '';
     
     // Find participant that is not the current user
     const otherParticipant = conversation.participants.find(
-      p => p._id !== localStorage.getItem('userId')
+      p => p && p._id && p._id !== currentUserId
     );
     
-    return otherParticipant ? otherParticipant.role : '';
+    return otherParticipant && otherParticipant.role ? otherParticipant.role : '';
   };
 
   // Get profile picture
   const getProfilePicture = (conversation) => {
-    if (!conversation || !conversation.participants) return null;
+    if (!conversation || !conversation.participants || !Array.isArray(conversation.participants)) {
+      return null;
+    }
+    
+    const currentUser = getCurrentUser();
+    const currentUserId = currentUser ? currentUser._id : '';
     
     // Find participant that is not the current user
     const otherParticipant = conversation.participants.find(
-      p => p._id !== localStorage.getItem('userId')
+      p => p && p._id && p._id !== currentUserId
     );
     
     return otherParticipant && otherParticipant.profilePicture
@@ -104,7 +118,7 @@ const getOtherParticipantName = (conversation) => {
     }
   };
 
-  if (loading && conversations.length === 0) {
+  if (loading && (!conversations || conversations.length === 0)) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
@@ -112,7 +126,7 @@ const getOtherParticipantName = (conversation) => {
     );
   }
 
-  if (error && conversations.length === 0) {
+  if (error && (!conversations || conversations.length === 0)) {
     return (
       <div className="bg-red-50 text-red-700 p-4 rounded-md">
         <p>Error loading conversations: {error}</p>
@@ -144,69 +158,77 @@ const getOtherParticipantName = (conversation) => {
       
       {/* Conversations list */}
       <div className="divide-y divide-gray-200 max-h-[calc(100vh-250px)] overflow-y-auto">
-        {filteredConversations.length === 0 ? (
+        {!filteredConversations || filteredConversations.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             {searchTerm ? 'No conversations match your search' : 'No conversations yet'}
           </div>
         ) : (
-          filteredConversations.map(conversation => (
-            <div
-              key={conversation._id}
-              className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
-                activeConversation && activeConversation._id === conversation._id
-                  ? 'bg-blue-50 border-l-4 border-blue-500'
-                  : ''
-              }`}
-              onClick={() => handleSelectConversation(conversation)}
-            >
-              <div className="flex items-center space-x-3">
-                {/* Profile picture */}
-                <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative">
-                  {getProfilePicture(conversation) ? (
-                    <img
-                      src={getProfilePicture(conversation)}
-                      alt={getOtherParticipantName(conversation)}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 text-xl font-semibold">
-                      {getOtherParticipantName(conversation).charAt(0).toUpperCase()}
+          filteredConversations.map(conversation => {
+            if (!conversation) return null;
+            
+            const otherParticipantName = getOtherParticipantName(conversation);
+            const firstLetter = otherParticipantName && typeof otherParticipantName === 'string' ? 
+              otherParticipantName.charAt(0).toUpperCase() : '?';
+            
+            return (
+              <div
+                key={conversation._id || Math.random().toString()}
+                className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
+                  activeConversation && activeConversation._id === conversation._id
+                    ? 'bg-blue-50 border-l-4 border-blue-500'
+                    : ''
+                }`}
+                onClick={() => handleSelectConversation(conversation)}
+              >
+                <div className="flex items-center space-x-3">
+                  {/* Profile picture */}
+                  <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative">
+                    {getProfilePicture(conversation) ? (
+                      <img
+                        src={getProfilePicture(conversation)}
+                        alt={otherParticipantName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 text-xl font-semibold">
+                        {firstLetter}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Conversation info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold text-gray-900 truncate">
+                        {otherParticipantName}
+                      </h3>
+                      <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                        {formatTime(conversation.lastMessageTime)}
+                      </span>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 truncate">
+                      {getOtherParticipantRole(conversation) && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mr-2">
+                          {getOtherParticipantRole(conversation)}
+                        </span>
+                      )}
+                      {conversation.lastMessage || 'No messages yet'}
+                    </p>
+                  </div>
+                  
+                  {/* Unread indicator */}
+                  {unreadCounts && conversation._id && unreadCounts[conversation._id] > 0 && (
+                    <div className="flex-shrink-0 ml-2">
+                      <span className="flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-semibold rounded-full">
+                        {unreadCounts[conversation._id]}
+                      </span>
                     </div>
                   )}
                 </div>
-                
-                {/* Conversation info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-gray-900 truncate">
-                      {getOtherParticipantName(conversation)}
-                    </h3>
-                    <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                      {formatTime(conversation.lastMessageTime)}
-                    </span>
-                  </div>
-                  
-                  <p className="text-sm text-gray-600 truncate">
-                    {getOtherParticipantRole(conversation) && (
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full mr-2">
-                        {getOtherParticipantRole(conversation)}
-                      </span>
-                    )}
-                    {conversation.lastMessage || 'No messages yet'}
-                  </p>
-                </div>
-                
-                {/* Unread indicator */}
-                {unreadCounts[conversation._id] > 0 && (
-                  <div className="flex-shrink-0 ml-2">
-                    <span className="flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-semibold rounded-full">
-                      {unreadCounts[conversation._id]}
-                    </span>
-                  </div>
-                )}
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
@@ -214,7 +236,3 @@ const getOtherParticipantName = (conversation) => {
 };
 
 export default ConversationList;
-
-//create conversationlist component
-
-//update
