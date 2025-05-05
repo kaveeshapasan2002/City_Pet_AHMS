@@ -217,47 +217,7 @@ export const updateBookingStatus = async (bookingId, status) => {
     
     return response.data;
   } catch (error) {
-    throw error.response?.data || new Error('Failed to update booking status');
+    throw error.response?.data || { message: 'Failed to update booking status' };
   }
 };
-
-// Get user statistics by role
-export const getUserStats = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
-    const response = await axios.get(`${API_URL}/user-stats`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || new Error('Failed to fetch user statistics');
-  }
-};
-
-// Delete booking
-export const deleteBooking = async (bookingId) => {
-  try {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      throw new Error('Not authenticated');
-    }
-    
-    const response = await axios.delete('/api/boarding/' + bookingId, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.message || 'Failed to delete booking');
-  }
-};
+  
