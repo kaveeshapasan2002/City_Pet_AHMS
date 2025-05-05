@@ -130,7 +130,7 @@ app.use("/appointments", router);
 // Boarding routes
 app.use("/api/boarding", require("./routes/boardingRoutes"));
 
-// Supplier routes - added from the second file
+// Supplier routes
 app.use("/api/suppliers", require("./routes/supplierRoutes"));
 
 // Purchase request routes
@@ -149,7 +149,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/inventory", require("./routes/inventoryRoutes"));
 
-// Messaging Routes - consolidated to use the same route file
+// Messaging Routes
 app.use("/api/conversations", require("./routes/messageRoutes"));
 app.use("/api", require("./routes/messageRoutes"));
 app.use("/api/notifications", require("./routes/messageRoutes"));
@@ -178,7 +178,7 @@ if (process.env.NODE_ENV === "production") {
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`.yellow.bold);
+  
+  // Log email configuration
+  console.log(`Email configuration: ${process.env.EMAIL_USER ? 'Loaded' : 'Missing'}`);
 });
-
-
-
