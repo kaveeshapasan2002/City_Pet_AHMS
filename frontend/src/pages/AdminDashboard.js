@@ -152,6 +152,7 @@ import AddUserForm from '../components/admin/AddUserForm';
 import SecurityLogs from '../components/admin/SecurityLogs';
 import BoardingManagement from '../components/admin/BoardingManagement';
 import PaymentList from '../components/admin/PaymentList';
+import UserStatsSection from '../components/admin/UserStatsSection';
 
 const AppointmentManagement = () => {
   const [activeTab, setActiveTab] = useState('appointments');
@@ -235,6 +236,10 @@ const AppointmentManagement = () => {
           {/* Main Content */}
           <div className="flex-1">
             <div className="space-y-6">
+              {/* User Statistics Section */}
+              <UserStatsSection />
+
+              {/* Main Content Area */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-fade-in">
                 {activeTab === 'appointments' && <AppointmentList />}
                 {activeTab === 'users' && (
@@ -255,4 +260,5 @@ const AppointmentManagement = () => {
   );
 };
 
-export default AppointmentManagement;
+export default AdminDashboard;
+//updated admin dashboard js with user counts

@@ -98,13 +98,35 @@ export const getInventoryStats = async () => {
   }
 };
 
+// Get low stock items
+export const getLowStockItems = async () => {
+  try {
+    const response = await axiosInstance.get(`${API_URL}/low-stock`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || 'Error fetching low stock items';
+  }
+};
+
+// Process auto reorder for low stock items
+export const processAutoReorder = async () => {
+  try {
+    const response = await axiosInstance.post(`${API_URL}/auto-reorder`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || 'Error processing auto reorder';
+  }
+};
+
 const inventoryService = {
   getInventoryItems,
   getInventoryItemById,
   createInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
-  getInventoryStats
+  getInventoryStats,
+  getLowStockItems,
+  processAutoReorder
 };
 
 export default inventoryService;
