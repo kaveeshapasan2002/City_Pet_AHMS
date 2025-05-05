@@ -17,7 +17,7 @@ function Appointmentdetails() {
         const fetchRecords = async () => {
             await axios
                 .get(`http://localhost:5001/appointments`)
-                .then((res) => setAppoinment(res.data.Appointments))  // Updated to match backend response
+                .then((res) => setAppoinment(res.data.Appointments))  
                 .catch((err) => console.log("Error fetching records:", err));
         };
         fetchRecords();
@@ -45,7 +45,7 @@ function Appointmentdetails() {
                 <th className="py-2 px-4 border">Contact</th>
                 <th className="py-2 px-4 border">NIC</th>
                 <th className="py-2 px-4 border">Gmail</th>
-                <th className="py-2 px-4 border">Pet ID</th>
+                <th className="py-2 px-4 border">Pet name</th>
                 <th className="py-2 px-4 border">Appointment Type</th>
                 <th className="py-2 px-4 border">Actions</th>
               </tr>

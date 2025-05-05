@@ -21,11 +21,11 @@ const getAllAppointment=async(req,res,next)=>{
 };
 ///data insert
 const addAppointments=async(req,res,next)=>{
-    const {name,contact,nic,gmail,petID,appointmentType}=req.body;
+    const {contact,petID,name,nic,gmail,appointmentType}=req.body;
     let Appointments;
 
     try{
-        Appointments=new Appointment ({name,contact,nic,gmail,petID,appointmentType});
+        Appointments=new Appointment ({contact,petID,name,nic,gmail,appointmentType});
         await Appointments.save();
     }catch(err){
         console.log(err);

@@ -127,6 +127,7 @@ app.use("/medies", router2);
 app.use("/appointments", router);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
 // Boarding routes
 app.use("/api/boarding", require("./routes/boardingRoutes"));
 

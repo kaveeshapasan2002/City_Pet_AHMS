@@ -97,25 +97,16 @@ const deletePets=async(req,res,next)=>{
 }
 
 
-// Get pets by contact number
-const getByContact = async (req, res, next) => {
-    const contact = req.params.contact;
-
-    let pets;
+// In petController.js
+const getByContact = async (req, res) => {
     try {
-        pets = await Pet.find({ contact: contact });
-    } catch (err) {
-        console.log(err);
+      const pets = await Pet.find({ contact: req.params.contact });
+      res.status(200).json({ pets });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
     }
-    
-    // When no pets found for this contact
-    if (!pets || pets.length === 0) {
-        return res.status(404).json({ message: "No pets found for this contact number" });
-    }
-    
-    return res.status(200).json({ pets });
-};
-
+  };
+  
 
 
 
