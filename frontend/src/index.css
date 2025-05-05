@@ -157,3 +157,62 @@ code {
     transform: rotate(360deg);
   }
 }
+
+
+
+/* Add these styles to your CSS file */
+
+/* Ensure proper scrolling on all devices */
+.message-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - 250px);
+  min-height: 300px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .message-container {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Ensure proper spacing in message groups */
+.message-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Improve scroll button visibility */
+.scroll-button {
+  position: fixed;
+  bottom: 5rem;
+  right: 2rem;
+  padding: 0.75rem;
+  background-color: rgba(59, 130, 246, 0.9);
+  color: white;
+  border-radius: 9999px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  transition: all 0.2s ease;
+}
+
+.scroll-button:hover {
+  background-color: rgba(37, 99, 235, 1);
+  transform: scale(1.05);
+}
+
+/* Ensure message input stays at bottom */
+.message-input-container {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  z-index: 10;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Fix iOS and Safari-specific scrolling issues */
+@supports (-webkit-touch-callout: none) {
+  .message-container {
+    height: -webkit-fill-available;
+  }
+}

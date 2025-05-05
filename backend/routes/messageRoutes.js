@@ -1,4 +1,4 @@
-// routes/messageRoutes.js
+// routes/messageRoutes.js - Fixed version with proper route handlers
 const express = require('express');
 const router = express.Router();
 const messageController = require('../controllers/messageController');
@@ -17,6 +17,19 @@ router.put('/conversations/:id/archive', messageController.archiveConversation);
 // Message routes
 router.get('/messages/:conversationId', messageController.getMessages);
 router.post('/messages', messageController.sendMessage);
+
+// Make sure these controller functions exist before adding the routes
+if (messageController.updateMessage) {
+  router.put('/messages/:id', messageController.updateMessage);
+} else {
+  console.error('Warning: messageController.updateMessage is not defined');
+}
+
+if (messageController.deleteMessage) {
+  router.delete('/messages/:id', messageController.deleteMessage);
+} else {
+  console.error('Warning: messageController.deleteMessage is not defined');
+}
 
 // Notification routes
 router.get('/notifications', messageController.getNotifications);
