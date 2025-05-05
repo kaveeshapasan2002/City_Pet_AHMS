@@ -130,6 +130,66 @@ const sendOtpEmail = async (email, otp, name = "User", purpose = "verification")
     return sendEmail(email, subject, text, html);
 };
 
+/**
+ * Send appointment status notification email
+ * 
+ * @param {string} email - Recipient email address
+ * @param {string} name - User's name
+ * @param {object} appointment - Appointment details
+ * @param {string} status - New appointment status
+ * @returns {Promise} - Resolves when email is sent
+ */
+const sendAppointmentStatusEmail = async (email, name, appointment, status) => {
+    const subject = `Your Appointment is ${status} - Pet Hospital`;
+    
+    const text = `
+Hello ${name},
+
+Your appointment has been ${status}.
+
+Appointment Details:
+- Pet ID: ${appointment.petID}
+- Type: ${appointment.appointmentType}
+- Date: ${new Date(appointment.createdAt).toLocaleDateString()}
+
+Thank you for choosing Pet Hospital.
+
+Regards,
+Pet Hospital Team
+    `;
+    
+    const html = `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <div style="background-color: #3b82f6; padding: 20px; text-align: center; color: white;">
+    <h1>Pet Hospital</h1>
+  </div>
+  <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
+    <p>Hello ${name},</p>
+    <h2 style="color: ${status === 'Confirmed' ? '#10b981' : '#ef4444'}">
+      Appointment ${status}
+    </h2>
+    <div style="margin: 20px 0; padding: 15px; background-color: #f3f4f6;">
+      <p><strong>Pet ID:</strong> ${appointment.petID}</p>
+      <p><strong>Type:</strong> ${appointment.appointmentType}</p>
+      <p><strong>Date:</strong> ${new Date(appointment.createdAt).toLocaleDateString()}</p>
+    </div>
+    <p>Thank you for choosing Pet Hospital.</p>
+    <p>Regards,<br>Pet Hospital Team</p>
+  </div>
+</div>
+    `;
+
+    return sendEmail(email, subject, text, html);
+};
+
+
+module.exports = {
+    sendEmail,
+    sendOtpEmail,
+    sendAppointmentStatusEmail
+};
+
+
 // Export both functions
 module.exports = {
     sendEmail,

@@ -25,7 +25,12 @@ const AppointmentSchema=new Schema({
     appointmentType:{
         type:String,
         required:true,
-    }
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Confirmed', 'Rejected'],
+        default: 'Pending'
+      }
 
 });
 module.exports=mongoose.model(

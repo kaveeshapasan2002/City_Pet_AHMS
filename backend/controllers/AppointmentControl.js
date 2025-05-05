@@ -1,5 +1,5 @@
 const Appointment=require("../models/AppointmentModel");
-
+const { sendAppointmentStatusEmail } = require('../utils/emailService');
 ///Display part
 const getAllAppointment=async(req,res,next)=>{
     
@@ -55,7 +55,7 @@ const getById=async(req,res,next)=>{
         return res.status(200).json({Appointments});
 }
 
-//update details
+// //update details
 const updateAppointments=async(req,res,next)=>{
     const nic=req.params.nic;
      const {name,contact,gmail,petID,appointmentType}=req.body;
@@ -63,7 +63,7 @@ const updateAppointments=async(req,res,next)=>{
     let Appointments;
 
     try{
-        Appointments=await Appointment.updateOne({ nic: nic },
+        Appointments=await Appointment.findOneAndUpdate({ nic: nic },
             {name:name,contact:contact,gmail:gmail,petID:petID,appointmentType:appointmentType});
             Appointments=await Appointments.save(); 
     }catch(err){
@@ -76,6 +76,14 @@ const updateAppointments=async(req,res,next)=>{
         return res.status(200).json({Appointments});
 
 };
+
+  
+
+
+
+  
+
+
 ///delete detsils
 const deleteAppointments=async(req,res,next)=>{
     const nic=req.params.nic;
@@ -93,10 +101,52 @@ const deleteAppointments=async(req,res,next)=>{
         return res.status(200).json({Appointments});
 }
 
+const updateStatus = async (req, res) => {
+    try {
+      const { nic } = req.params;
+      const { status } = req.body;
+  
+      // Validate status input
+      if (!["Pending", "Confirmed", "Rejected"].includes(status)) {
+        return res.status(400).json({ message: "Invalid status value" });
+      }
+  
+      // 1. Find the appointment by NIC
+      const appointment = await Appointment.findOne({ nic: nic });
+  
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+  
+      // 2. Update only the status field
+      appointment.status = status;
+  
+      // 3. Save the updated document
+      const updatedAppointment = await appointment.save();
+  
+      // Optional: Send confirmation email
+      await sendAppointmentStatusEmail(
+        updatedAppointment.gmail,
+        updatedAppointment.name,
+        updatedAppointment,
+        status
+      );
+  
+      res.json(updatedAppointment);
+      
+    } catch (err) {
+      console.error("Backend Error:", err);
+      res.status(500).json({ message: "Failed to update status" });
+    }
+  };
+  
+  
+  
 
 
 
 
+  exports.updateStatus = updateStatus;
 exports.getAllAppointment=getAllAppointment;
 exports.addAppointments=addAppointments;
 exports.getById=getById;
