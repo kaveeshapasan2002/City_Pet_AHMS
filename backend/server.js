@@ -5,6 +5,7 @@ const colors = require("colors");
 const cors = require("cors");
 const path = require("path");
 const mongoose = require("mongoose");
+
 const http = require("http");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
@@ -12,6 +13,7 @@ const User = require("./models/User");
 const router1 = require("./routes/PetRoute");
 const router2 = require("./routes/MediRoute");
 const router = require("./routes/AppointmentRoute");
+
 
 // Load environment variables
 dotenv.config();
