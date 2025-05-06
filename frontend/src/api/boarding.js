@@ -147,7 +147,6 @@ export const deleteBooking = async (bookingId) => {
       throw { message: 'Authentication required' };
     }
     
-    // Updated URL to match your route pattern
     const response = await axios.delete(`${API_URL}/${bookingId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -156,7 +155,7 @@ export const deleteBooking = async (bookingId) => {
     
     return response.data;
   } catch (error) {
-    console.error('Delete error:', error); // For debugging
+    console.error('Delete error:', error);
     throw error.response?.data || { message: 'Failed to delete booking' };
   }
 };

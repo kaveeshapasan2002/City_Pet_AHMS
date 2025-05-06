@@ -230,11 +230,12 @@ export const deleteBooking = async (bookingId) => {
       throw new Error('Not authenticated');
     }
     
-    const response = await axios.delete(`/api/boarding/${bookingId}`, {
+    const response = await axios.delete(`http://localhost:5001/api/boarding/${bookingId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+
     
     return response.data;
   } catch (error) {
