@@ -135,6 +135,8 @@ app.use("/api/suppliers", require("./routes/supplierRoutes"));
 
 // Purchase request routes
 app.use('/api/purchase-requests', require('./routes/purchaseRequestRoutes'));
+app.use("/api/invoices", require("./routes/invoiceRoutes"));
+app.use("/api/services", require("./routes/serviceRoutes"));
 
 // Set security headers
 app.use((req, res, next) => {
