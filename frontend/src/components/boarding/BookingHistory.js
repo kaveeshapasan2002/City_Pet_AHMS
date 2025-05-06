@@ -1,17 +1,20 @@
 // src/components/boarding/BookingHistory.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserBookings, cancelBooking } from '../../api/boarding';
 import Alert from '../common/Alert';
+import { useReactToPrint } from 'react-to-print';
 
 const BookingHistory = ({ refresh }) => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);  
-  const [loading, setLoading] = useState(true);   //const[variable, function]= useState(initial value)
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
-
-
+  
+  // Create single ref for printing
+  const printRef = useRef(null);
+  const [printingBookingId, setPrintingBookingId] = useState(null);
   
   useEffect(() => {
     fetchBookings();
@@ -29,6 +32,26 @@ const BookingHistory = ({ refresh }) => {
       setLoading(false);
     }
   };
+
+  // Set up print handler
+  const handlePrint = useReactToPrint({
+    // Using contentRef instead of content
+    contentRef: printRef,
+    documentTitle: "Boarding_Report",
+    onAfterPrint: () => {
+      alert("Booking report successfully downloaded!");
+      setPrintingBookingId(null);
+    }
+  });
+  
+  // Function to handle printing a specific booking
+  const printBooking = (bookingId) => {
+    setPrintingBookingId(bookingId);
+    // Delay slightly to ensure state updates before printing
+    setTimeout(() => {
+      handlePrint();
+    }, 100);
+  };
   
   const handleCancelBooking = async (bookingId) => {
     if (!window.confirm('Are you sure you want to cancel this booking?')) return;
@@ -44,7 +67,7 @@ const BookingHistory = ({ refresh }) => {
     }
   };
 
-  //navigate to update booking page
+  // Navigate to update booking page
   const handleUpdateBooking = (bookingId) => {
     navigate(`/update-booking/${bookingId}`);
   };
@@ -73,7 +96,9 @@ const BookingHistory = ({ refresh }) => {
     }
   };
 
-  
+  // Find booking to print
+  const bookingToPrint = bookings.find(b => b._id === printingBookingId);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6">Your Bookings</h2>
@@ -139,33 +164,127 @@ const BookingHistory = ({ refresh }) => {
                     <p className="mt-1 text-gray-700">{booking.specialNotes}</p>
                   </div>
                 )}
-                
-                {booking.status === 'Pending' && (
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      onClick={() =>  handleUpdateBooking(booking._id)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Update Booking
-                    </button>
-
-                    <button
-                      onClick={() => handleCancelBooking(booking._id)}
-                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                    >
-                      Cancel Booking
-                      </button>
-                  </div>
-                )}
               </div>
+              
+              {booking.status === 'Pending' && (
+                <div className="mt-4 flex justify-end space-x-2 p-4">
+                  <button
+                    onClick={() => handleUpdateBooking(booking._id)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Update Booking
+                  </button>
+
+                  <button
+                    onClick={() => handleCancelBooking(booking._id)}
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" 
+                  >
+                    Cancel Booking
+                  </button>
+
+                  <button
+                    onClick={() => printBooking(booking._id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" 
+                  >
+                    Download Report
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
+      
+      {/* Hidden printable component */}
+      <div style={{ display: 'none' }}>
+        {bookingToPrint && (
+          <div ref={printRef} className="p-8">
+            <div className="print-content">
+              <h2 className="text-2xl font-bold mb-6 text-center">Booking Report</h2>
+              <div className="border-b pb-4 mb-4">
+                <p className="text-lg font-bold">{bookingToPrint.petName}</p>
+                <p className="text-sm text-gray-500">Status: {bookingToPrint.status}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                  <p className="text-sm text-gray-500">Boarding Type</p>
+                  <p className="font-medium">{bookingToPrint.boardingType}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Booking ID</p>
+                  <p className="font-medium">{bookingToPrint._id}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Check-in Date</p>
+                  <p className="font-medium">{formatDate(bookingToPrint.checkInDate)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Check-out Date</p>
+                  <p className="font-medium">{formatDate(bookingToPrint.checkOutDate)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Total Price</p>
+                  <p className="font-medium">${bookingToPrint.totalPrice.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Booking Date</p>
+                  <p className="font-medium">{formatDate(bookingToPrint.createdAt)}</p>
+                </div>
+              </div>
+              
+              {bookingToPrint.additionalServices && (
+                <div className="mb-6">
+                  <p className="text-sm text-gray-500">Additional Services</p>
+                  <p className="font-medium">{bookingToPrint.additionalServices}</p>
+                </div>
+              )}
+              
+              {bookingToPrint.specialNotes && (
+                <div className="mb-6">
+                  <p className="text-sm text-gray-500">Special Notes</p>
+                  <p className="mt-1 text-gray-700">{bookingToPrint.specialNotes}</p>
+                </div>
+              )}
+              
+              <div className="border-t pt-4 mt-8 text-center text-sm text-gray-500">
+                <p>This is a computer generated report. No signature required.</p>
+                <p>Generated on {new Date().toLocaleDateString()}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Print styles */}
+      <style>
+        {`
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            .print-content, .print-content * {
+              visibility: visible;
+            }
+            .print-content {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              padding: 40px;
+            }
+            button {
+              display: none !important;
+            }
+            @page {
+              size: auto;
+              margin: 20mm;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
        
-
-
 export default BookingHistory;

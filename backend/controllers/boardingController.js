@@ -145,6 +145,30 @@ exports.updateBookingStatus = async (req, res) => {
     }
 };
 
+// @desc    Delete booking
+exports.deleteBoarding = async (req, res) => {
+    try {
+      const booking = await Boarding.findById(req.params.id);
+      
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+      
+      // Check if the user is authorized to delete this booking
+      if (req.user.role !== 'Admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+      
+      // Permanently delete the booking from the database
+      await Boarding.findByIdAndDelete(req.params.id);
+      
+      res.json({ message: 'Booking permanently deleted' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  };
+
 // @desc    Get all bookings (Admin only)
 exports.getAllBookings = async (req, res) => {
     try {
@@ -158,3 +182,4 @@ exports.getAllBookings = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+

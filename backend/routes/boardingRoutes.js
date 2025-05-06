@@ -14,6 +14,7 @@ router.get('/:id', boardingController.getBoardingById);
 router.put('/:id', boardingController.updateBoarding);
 router.delete('/:id', boardingController.cancelBoarding);
 router.put('/:id/status', boardingController.updateBookingStatus);
+router.delete('/:id', boardingController.deleteBoarding);
 router.get('/admin/bookings', boardingController.getAllBookings);
 
 module.exports = router;
