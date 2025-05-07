@@ -1,4 +1,5 @@
 // routes/chatbotRoutes.js
+//route for chatbot 
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
