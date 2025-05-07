@@ -14,7 +14,6 @@ const router1 = require("./routes/PetRoute");
 const router2 = require("./routes/MediRoute");
 const router = require("./routes/AppointmentRoute");
 
-
 // Load environment variables
 dotenv.config();
 
@@ -105,6 +104,71 @@ io.on('connection', (socket) => {
     });
   });
   
+  // Handle chatbot messages via socket for real-time interaction
+  socket.on('chatbot-message', async (data) => {
+    try {
+      const { message, userId, sessionId } = data;
+      
+      // Log the incoming message for analytics
+      console.log(`Chatbot message from ${userId || 'anonymous'}: ${message}`);
+      
+      // Process message (mock implementation - the real implementation would call the processing logic)
+      const startTime = Date.now();
+      
+      let response;
+      try {
+        // Call the chatbot service
+        const ChatbotService = require('./services/chatbotService');
+        response = await ChatbotService.processMessage(message, userId, sessionId);
+      } catch (error) {
+        console.error('Error processing chatbot message:', error);
+        response = {
+          response: "I'm sorry, I'm having trouble processing your message right now. Please try again or contact our hospital directly.",
+          error: true
+        };
+      }
+      
+      // Calculate response time
+      const responseTime = Date.now() - startTime;
+      
+      // Send response back to client
+      socket.emit('chatbot-response', {
+        ...response,
+        responseTime
+      });
+      
+    } catch (error) {
+      console.error('Socket chatbot error:', error);
+      socket.emit('chatbot-response', {
+        response: "I'm sorry, there was an error processing your message.",
+        error: true
+      });
+    }
+  });
+  
+  // Handle chat feedback
+  socket.on('chatbot-feedback', async (data) => {
+    try {
+      const { messageId, rating, comment } = data;
+      
+      // Update the chat log with feedback
+      const ChatLog = mongoose.model('ChatLog');
+      await ChatLog.findByIdAndUpdate(messageId, {
+        feedbackRating: rating,
+        feedbackComment: comment
+      });
+      
+      socket.emit('chatbot-feedback-received', { success: true });
+      
+    } catch (error) {
+      console.error('Error saving chatbot feedback:', error);
+      socket.emit('chatbot-feedback-received', { 
+        success: false,
+        error: 'Failed to save feedback'
+      });
+    }
+  });
+  
   // Handle disconnection
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.user ? socket.user.name : 'Unknown'}`);
@@ -116,6 +180,16 @@ app.set('io', io);
 
 // Connect to MongoDB
 connectDB();
+
+// Initialize the chatbot models - MOVED BEFORE ROUTES
+console.log("Loading chatbot models...");
+require('./models/ChatLog');
+require('./models/FAQ');
+
+// Check DeepSeek API key
+if (!process.env.DEEPSEEK_API_KEY) {
+  console.warn('WARNING: DEEPSEEK_API_KEY is not set. AI chatbot will use fallback responses only.'.yellow);
+}
 
 // Middleware
 app.use(express.json());
@@ -135,6 +209,8 @@ app.use("/api/suppliers", require("./routes/supplierRoutes"));
 
 // Purchase request routes
 app.use('/api/purchase-requests', require('./routes/purchaseRequestRoutes'));
+app.use("/api/invoices", require("./routes/invoiceRoutes"));
+app.use("/api/services", require("./routes/serviceRoutes"));
 
 // Set security headers
 app.use((req, res, next) => {
@@ -156,6 +232,13 @@ app.use("/api/notifications", require("./routes/messageRoutes"));
 
 // User directory routes for messaging
 app.use("/api/users", require("./routes/userDirectoryRoutes"));
+
+// Chatbot Routes
+console.log("Setting up chatbot routes...");
+app.use("/api/chatbot", require("./routes/chatbotRoutes"));
+app.use("/api/admin/chatbot", require("./routes/chatbotAdminRoutes"));
+app.use("/api/faqs", require("./routes/faqRoutes"));
+console.log("Chatbot routes set up!");
 
 // Error handling middleware
 app.use((err, req, res, next) => {
