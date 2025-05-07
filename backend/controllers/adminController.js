@@ -2,6 +2,9 @@
 
 const User = require("../models/User");
 const Boarding = require("../models/Boarding");
+const dailyRecordController = require('../controllers/dailyRecordController');
+
+
 // Import any other models you might need
 
 // @route   GET /api/admin/user-stats
