@@ -72,6 +72,11 @@ const BookingHistory = ({ refresh }) => {
     navigate(`/update-booking/${bookingId}`);
   };
   
+  // Add this function to navigate to daily records
+  const handleViewRecords = (bookingId) => {
+    navigate(`/boarding/${bookingId}/records`);
+  };
+  
   // Format date for display
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -166,30 +171,45 @@ const BookingHistory = ({ refresh }) => {
                 )}
               </div>
               
-              {booking.status === 'Pending' && (
-                <div className="mt-4 flex justify-end space-x-2 p-4">
-                  <button
-                    onClick={() => handleUpdateBooking(booking._id)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Update Booking
-                  </button>
+              <div className="p-4">
+                {booking.status === 'Pending' && (
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={() => handleUpdateBooking(booking._id)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      Update Booking
+                    </button>
 
-                  <button
-                    onClick={() => handleCancelBooking(booking._id)}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" 
-                  >
-                    Cancel Booking
-                  </button>
-
+                    <button
+                      onClick={() => handleCancelBooking(booking._id)}
+                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" 
+                    >
+                      Cancel Booking
+                    </button>
+                  </div>
+                )}
+                
+                {/* Button row for printing and viewing records */}
+                <div className="flex justify-end space-x-2 mt-2">
                   <button
                     onClick={() => printBooking(booking._id)}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" 
+                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700" 
                   >
                     Download Report
                   </button>
+                  
+                  {/* Daily Records button for confirmed, checked-in, or checked-out bookings */}
+                  {(booking.status === 'Confirmed' || booking.status === 'Checked-in' || booking.status === 'Checked-out') && (
+                    <button
+                      onClick={() => handleViewRecords(booking._id)}
+                      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                      View Daily Records
+                    </button>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
@@ -259,7 +279,7 @@ const BookingHistory = ({ refresh }) => {
       {/* Print styles */}
       <style>
         {`
-          @media print {
+          @media print {  
             body * {
               visibility: hidden;
             }

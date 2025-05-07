@@ -4,8 +4,13 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require("../middlewares/adminMiddleware");
 const emailService = require("../utils/emailService");
 const adminController = require("../controllers/adminController");
+const dailyRecordController = require('../controllers/dailyRecordController');
+
 
 const router = express.Router();
+
+////////pet boarding
+router.post('/boarding/:id/records', authMiddleware, dailyRecordController.addDailyRecord);
 
 // Apply auth middleware to all routes
 router.use(authMiddleware);

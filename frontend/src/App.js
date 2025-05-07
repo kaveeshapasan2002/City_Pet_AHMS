@@ -24,6 +24,9 @@ import Messaging from './pages/Messaging';
 import PetHospitalChatbot from './components/PetHospitalChatbot'; // Import the chatbot component
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+//////////////////////////////////////////////////
+import DailyRecordsForm from './components/admin/DailyRecordsForm';
+import DailyRecordsView from './components/boarding/DailyRecordsView';
 
 // Password Reset Routes
 import ForgotPassword from './pages/ForgotPassword';
@@ -125,6 +128,18 @@ function App() {
                         <UpdateBookingForm />
                       </ProtectedRoute>
                     } />
+
+                    <Route path="/admin/boarding/:bookingId/daily-records" element={
+                      <ProtectedRoute>
+                      <DailyRecordsForm />
+                      </ProtectedRoute>
+                      } />
+                    
+                    <Route path="/boarding/:bookingId/records" element={
+                      <ProtectedRoute>
+                      <DailyRecordsView />
+                      </ProtectedRoute>
+                      } />
                     
                     {/* Messaging Routes */}
                     <Route path="/messages" element={
