@@ -1,4 +1,6 @@
 // services/chatbotService.js
+//chatbot service for processing mesages and generating responses
+//this file contains the main logic for the chatbot
 const dotenv = require('dotenv');
 dotenv.config(); // Load environment variables from .env
 
