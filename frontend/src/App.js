@@ -21,6 +21,7 @@ import PetBoarding from './pages/PetBoarding';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import UpdateBookingForm from './components/boarding/UpdateBookingForm';
 import Messaging from './pages/Messaging';
+import PetHospitalChatbot from './components/PetHospitalChatbot'; // Import the chatbot component
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -238,6 +239,10 @@ function App() {
                   </Routes>
                 </main>
                 <Footer />
+                
+                {/* Add chatbot component here - it will be available on all pages */}
+                <PetHospitalChatbot />
+                
                 <ToastContainer position="bottom-right" />
               </div>
             </Router>

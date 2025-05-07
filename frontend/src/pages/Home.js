@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { FaRobot, FaComments, FaHeartbeat } from 'react-icons/fa';
 
 const Home = () => {
-  const { isAuth } = useAuth();
+  const { isAuth } = useAuth();  //if the user is authenticated
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -67,6 +68,57 @@ const Home = () => {
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-r from-blue-300 to-blue-500 rounded-full opacity-30 transform translate-x-1/2 translate-y-1/2"></div>
       </section>
 
+      {/* Chatbot Highlight Section */}
+      <section className="container mx-auto px-4 py-16 bg-blue-50 rounded-3xl my-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="md:w-1/2">
+            <h2 className="text-3xl font-bold text-blue-600 mb-4 flex items-center">
+              <FaRobot className="mr-3 text-4xl" /> 24/7 AI Assistant
+            </h2>
+            <p className="text-lg text-gray-700 mb-6">
+              Need help right away? Our AI chatbot is ready to assist you anytime, day or night. Get instant answers about pet care, emergency guidance, appointment scheduling, and more!
+            </p>
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <FaHeartbeat className="text-red-500 mt-1 mr-3 text-xl" />
+                <p className="text-gray-700">
+                  <span className="font-semibold">Emergency Support:</span> Describe your pet's symptoms and get immediate first-aid guidance.
+                </p>
+              </div>
+              <div className="flex items-start">
+                <FaComments className="text-green-500 mt-1 mr-3 text-xl" />
+                <p className="text-gray-700">
+                  <span className="font-semibold">Quick Answers:</span> Get information about our services, hours, appointment scheduling, and pet care tips.
+                </p>
+              </div>
+            </div>
+            <p className="mt-6 text-blue-600 font-medium">
+              Look for the chat icon in the bottom-right corner to start a conversation!
+            </p>
+          </div>
+
+          <div className="md:w-1/2 bg-white p-6 rounded-2xl shadow-lg border border-blue-100">
+            <div className="bg-blue-600 text-white p-3 rounded-t-lg flex items-center">
+              <FaRobot className="mr-2" />
+              <p className="font-medium">PetCare Assistant</p>
+            </div>
+            <div className="p-4 border border-gray-200 rounded-b-lg min-h-[200px] flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="bg-blue-100 text-blue-800 p-3 rounded-lg rounded-tl-none inline-block max-w-[80%]">
+                  Hello! I'm your PetCare AI Assistant. How can I help you today?
+                </div>
+                <div className="bg-gray-100 text-gray-800 p-3 rounded-lg rounded-tr-none inline-block max-w-[80%] ml-auto">
+                  My dog is scratching a lot. What should I do?
+                </div>
+                <div className="bg-blue-100 text-blue-800 p-3 rounded-lg rounded-tl-none inline-block max-w-[80%]">
+                  Excessive scratching could indicate allergies, dry skin, or parasites like fleas. Try checking your dog's skin for redness or parasites. A gentle oatmeal bath might provide temporary relief. If the scratching persists for more than a few days, it's best to schedule a vet appointment.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* About Us Section */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center animate-slide-up">
@@ -74,7 +126,7 @@ const Home = () => {
         </h2>
         <div className="max-w-3xl mx-auto bg-white/70 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-gray-100 animate-fade-in">
           <p className="text-gray-600 text-lg text-center leading-relaxed">
-            At CityPet, we’re passionate about your pets’ well-being. Our expert veterinarians and caring staff provide top-notch services, from routine check-ups to emergency care, ensuring your furry companions live their happiest, healthiest lives.
+            At CityPet, we're passionate about your pets' well-being. Our expert veterinarians and caring staff provide top-notch services, from routine check-ups to emergency care, ensuring your furry companions live their happiest, healthiest lives.
           </p>
         </div>
       </section>
@@ -98,7 +150,7 @@ const Home = () => {
               title: 'Emergency Care',
               description: 'Round-the-clock emergency services for urgent needs.',
             },
-          ].map((service, index) => (
+          ].map((service, index) => (    //map() is used to loop through an array and return a new array of JSX elements.
             <div
               key={service.title}
               className="bg-white/70 backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 animate-slide-up"
