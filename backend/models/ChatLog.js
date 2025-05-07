@@ -1,4 +1,5 @@
 // models/ChatLog.js
+//model for chatlogs
 const mongoose = require('mongoose');
 
 const chatLogSchema = new mongoose.Schema(
