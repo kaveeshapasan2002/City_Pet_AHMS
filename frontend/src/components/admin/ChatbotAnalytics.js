@@ -1,3 +1,6 @@
+//component to display chatbot analytics and logs
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
