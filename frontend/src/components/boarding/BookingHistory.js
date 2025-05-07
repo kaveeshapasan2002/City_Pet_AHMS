@@ -279,7 +279,7 @@ const BookingHistory = ({ refresh }) => {
       {/* Print styles */}
       <style>
         {`
-          @media print {
+          @media print {  
             body * {
               visibility: hidden;
             }
