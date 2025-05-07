@@ -1,4 +1,5 @@
 // routes/chatbotAdminRoutes.js
+//route for chatbot in admindashboard.
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
