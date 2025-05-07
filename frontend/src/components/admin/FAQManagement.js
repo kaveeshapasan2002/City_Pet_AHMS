@@ -1,3 +1,5 @@
+//component for managing faqs in the admin panel
+
 // components/admin/FAQManagement.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
