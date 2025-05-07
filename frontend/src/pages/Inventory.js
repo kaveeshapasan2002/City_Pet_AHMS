@@ -5,6 +5,7 @@ import { useInventory } from '../context/InventoryContext';
 import InventoryStats from '../components/inventory/InventoryStats';
 import InventoryTable from '../components/inventory/InventoryTable';
 import InventoryFilter from '../components/inventory/InventoryFilter';
+import InventoryAutoReorder from '../components/inventory/InventoryAutoReorder';
 import AddItemModal from '../components/inventory/AddItemModal';
 import Spinner from '../components/common/Spinner';
 import InAlert from '../components/common/InAlert';
@@ -23,6 +24,7 @@ const Inventory = () => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
+  const [showAutoReorder, setShowAutoReorder] = useState(false);
 
   useEffect(() => {
     fetchItems(pagination.page, pagination.limit, filters);
@@ -46,6 +48,10 @@ const Inventory = () => {
 
   const toggleViewMode = () => {
     setViewMode(viewMode === 'table' ? 'cards' : 'table');
+  };
+
+  const toggleAutoReorder = () => {
+    setShowAutoReorder(!showAutoReorder);
   };
 
   if (loading && items.length === 0) {
@@ -88,6 +94,24 @@ const Inventory = () => {
       {error && <InAlert type="error" message={error} />}
 
       <InventoryStats stats={stats} />
+
+      {/* Auto Reorder Toggle Button */}
+      {stats.lowStockItems > 0 && (
+        <div className="mb-6">
+          <button
+            onClick={toggleAutoReorder}
+            className="flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            {showAutoReorder ? 'Hide Auto Reorder' : `Auto Inventory Reorder (${stats.lowStockItems} items)`}
+          </button>
+        </div>
+      )}
+
+      {/* Auto Reorder Component */}
+      {showAutoReorder && <InventoryAutoReorder />}
 
       <div className="mb-6">
         <InventoryFilter 

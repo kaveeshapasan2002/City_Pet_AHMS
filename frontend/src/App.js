@@ -42,6 +42,13 @@ import Addappointment from './components/animalRecord/AddAppointment/Addappointm
 import Appointmentdetails from './components/animalRecord/AppointmentDetails/Appointmentdetails';
 import UpdateAppointment from './components/animalRecord/UpdateAppointment/UpdateAppointment';
 
+//Invoice Imports
+import InvoiceList from './components/financial/InvoiceList';
+import InvoiceForm from './components/financial/InvoiceForm';
+import InvoiceDetail from './components/financial/InvoiceDetail';
+import ServiceList from './components/financial/ServiceList';
+import InventoryPurchases from './pages/InventoryPurchases'; // Import the new page
+
 // Route guard component for protected routes
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { isAuth, user, loading } = useAuth();
@@ -170,6 +177,54 @@ function App() {
                         </ProtectedRoute>
                       } 
                     />
+                    <Route 
+  path="/financial-management/invoices" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceList />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/invoices/create" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceForm />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/invoices/:id" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceDetail />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/invoices/:id/edit" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceForm />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/services" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian']}>
+      <ServiceList />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/inventory-purchases" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian']}>
+      <InventoryPurchases />
+    </ProtectedRoute>
+  } 
+/>
 
                     {/* Animal Record Routes */}
                     <Route path="/animal-records" element={

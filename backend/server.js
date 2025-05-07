@@ -209,6 +209,8 @@ app.use("/api/suppliers", require("./routes/supplierRoutes"));
 
 // Purchase request routes
 app.use('/api/purchase-requests', require('./routes/purchaseRequestRoutes'));
+app.use("/api/invoices", require("./routes/invoiceRoutes"));
+app.use("/api/services", require("./routes/serviceRoutes"));
 
 // Set security headers
 app.use((req, res, next) => {
@@ -223,7 +225,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/inventory", require("./routes/inventoryRoutes"));
 
-// Messaging Routes - consolidated to use the same route file
+// Messaging Routes
 app.use("/api/conversations", require("./routes/messageRoutes"));
 app.use("/api", require("./routes/messageRoutes"));
 app.use("/api/notifications", require("./routes/messageRoutes"));
@@ -259,4 +261,7 @@ if (process.env.NODE_ENV === "production") {
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`.yellow.bold);
+  
+  // Log email configuration
+  console.log(`Email configuration: ${process.env.EMAIL_USER ? 'Loaded' : 'Missing'}`);
 });
