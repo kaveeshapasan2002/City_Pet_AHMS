@@ -1,3 +1,4 @@
+//component to create a chatbot for a pet hospital
 // PetHospitalChatbot.js
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
