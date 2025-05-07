@@ -243,6 +243,31 @@ export const deleteBooking = async (bookingId) => {
   }
 };
 
+/////////////////////////////////////////////////////////////
+// Add a daily record for a booking
+export const addDailyRecord = async (bookingId, recordData) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+    
+    const response = await axios.post(`http://localhost:5001/api/admin/boarding/${bookingId}/records`, 
+      recordData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || new Error('Failed to add daily record');
+  }
+};
+
 // Get user statistics by role
 export const getUserStats = async () => {
   try {

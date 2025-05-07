@@ -159,3 +159,24 @@ export const deleteBooking = async (bookingId) => {
     throw error.response?.data || { message: 'Failed to delete booking' };
   }
 };
+
+///////////////////////////////////////////
+// Get daily records for a booking
+export const getDailyRecords = async (bookingId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+    
+    const response = await axios.get(`http://localhost:5001/api/boarding/${bookingId}/records`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch daily records' };
+  }
+};
