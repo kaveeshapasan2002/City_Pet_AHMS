@@ -1,5 +1,5 @@
 // controllers/faqController.js
-//backend logic for handling faqs
+//backend logic for handling faq
 
 const FAQ = require('../models/FAQ');
 

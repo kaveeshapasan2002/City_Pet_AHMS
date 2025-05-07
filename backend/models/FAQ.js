@@ -1,4 +1,5 @@
 // models/FAQ.js
+//model for store faq
 const mongoose = require('mongoose');
 
 const faqSchema = new mongoose.Schema(
