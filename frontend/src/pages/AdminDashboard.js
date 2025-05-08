@@ -154,7 +154,7 @@ import BoardingManagement from '../components/admin/BoardingManagement';
 import PaymentList from '../components/admin/PaymentList';
 import UserStatsSection from '../components/admin/UserStatsSection';
 
-const AppointmentManagement = () => {
+const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('appointments');
 
   // Sidebar navigation items

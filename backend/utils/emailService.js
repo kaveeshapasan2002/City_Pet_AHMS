@@ -130,68 +130,94 @@ const sendOtpEmail = async (email, otp, name = "User", purpose = "verification")
     return sendEmail(email, subject, text, html);
 };
 
-/**
- * Send appointment status notification email
- * 
- * @param {string} email - Recipient email address
- * @param {string} name - User's name
- * @param {object} appointment - Appointment details
- * @param {string} status - New appointment status
- * @returns {Promise} - Resolves when email is sent
- */
+
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
 const sendAppointmentStatusEmail = async (email, name, appointment, status) => {
-    const subject = `Your Appointment is ${status} - Pet Hospital`;
-    
-    const text = `
-Hello ${name},
-
-Your appointment has been ${status}.
-
-Appointment Details:
-- Pet ID: ${appointment.petID}
-- Type: ${appointment.appointmentType}
-- Date: ${new Date(appointment.createdAt).toLocaleDateString()}
-
-Thank you for choosing Pet Hospital.
-
-Regards,
-Pet Hospital Team
-    `;
-    
+    const subject = `Your Appointment is ${status}`;
+  
     const html = `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-  <div style="background-color: #3b82f6; padding: 20px; text-align: center; color: white;">
-    <h1>Pet Hospital</h1>
-  </div>
-  <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
-    <p>Hello ${name},</p>
-    <h2 style="color: ${status === 'Confirmed' ? '#10b981' : '#ef4444'}">
-      Appointment ${status}
-    </h2>
-    <div style="margin: 20px 0; padding: 15px; background-color: #f3f4f6;">
-      <p><strong>Pet ID:</strong> ${appointment.petID}</p>
-      <p><strong>Type:</strong> ${appointment.appointmentType}</p>
-      <p><strong>Date:</strong> ${new Date(appointment.createdAt).toLocaleDateString()}</p>
-    </div>
-    <p>Thank you for choosing Pet Hospital.</p>
-    <p>Regards,<br>Pet Hospital Team</p>
-  </div>
-</div>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Appointment ${status}</title>
+    </head>
+    <body style="margin:0; padding:0; background:#f6f6f6;">
+      <table width="100%" bgcolor="#f6f6f6" cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif;">
+        <tr>
+          <td align="center">
+            <table width="600" style="margin:40px auto; background:#fff; border-radius:8px; box-shadow:0 2px 8px #e0e0e0;">
+              <tr>
+                <td style="padding:32px 32px 16px 32px; text-align:center;">
+                  <h2 style="color:#2563eb; margin-bottom:8px;">City Pet Hospital</h2>
+                  <h3 style="color:#333; margin:0;">Appointment ${status}</h3>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 32px 24px 32px;">
+                  <p style="color:#111; font-size:16px; margin-bottom:20px;">
+                    Hello <strong>${name}</strong>,
+                  </p>
+                  <p style="font-size:15px; color:#222;">
+                    Your appointment for <b>${appointment.appointmentType}</b> has been 
+                    <span style="color:${status === 'Confirmed' ? '#16a34a' : '#dc2626'}; font-weight:bold;">${status}</span>.
+                  </p>
+                  <table style="margin:20px 0; width:100%; font-size:14px; color:#444;">
+                    <tr>
+                      <td style="padding:6px 0;"><strong>Pet ID:</strong></td>
+                      <td>${appointment.petID}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 0;"><strong>Date:</strong></td>
+                      <td>${new Date(appointment.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                    <!-- Add more rows if you have more details -->
+                  </table>
+                  <p style="font-size:14px; color:#555; margin-top:24px;">
+                    If you have any questions, please contact us at <a href="mailto:citypet@example.com" style="color:#2563eb;">citypet@example.com</a>.
+                  </p>
+                  <p style="font-size:14px; color:#888; margin-top:24px; border-top:1px solid #eee; padding-top:16px;">
+                    Thank you,<br />
+                    <span style="color:#2563eb;">City Pet Hospital Team</span>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
     `;
+  
+    const text = `Hello ${name},\n\nYour appointment for ${appointment.appointmentType} has been ${status}.\n\nThank you.`;
+  
+    return transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject,
+      text,
+      html
+    });
+ 
 
-    return sendEmail(email, subject, text, html);
 };
 
 
-module.exports = {
-    sendEmail,
-    sendOtpEmail,
-    sendAppointmentStatusEmail
-};
+
 
 
 // Export both functions
 module.exports = {
     sendEmail,
-    sendOtpEmail
+    sendOtpEmail,
+    sendAppointmentStatusEmail
 };

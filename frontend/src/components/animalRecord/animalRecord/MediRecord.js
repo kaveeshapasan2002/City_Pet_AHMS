@@ -36,16 +36,7 @@ function MedicalRecord() {
         fetchRecords();
     }, [petid]);
     
-    // const deleteHandler = async (deleteIndex) => {
-    //     await axios
-    //         .delete(`http://localhost:5001/medies/${deleteIndex}`)
-    //         .then((res) => res.data)
-    //         .then(() => {
-    //             setMedies((prevMedies) => prevMedies.filter((medi) => medi.index !== deleteIndex));
-    //             history(`/medicalrecords/${index}`); 
-    //         })
-    //         .catch((err) => console.log("Error deleting record:", err));
-    // };
+
     const deleteHandler = async (deleteIndex) => {
         await axios
             .delete(`http://localhost:5001/medies/${deleteIndex}`)
@@ -57,38 +48,6 @@ function MedicalRecord() {
             .catch((err) => console.log("Error deleting record:", err));
     };
     
-
-// const downloadPDF = () => {
-//     const doc = new jsPDF();
-    
-//     doc.setFont("helvetica");
-//     doc.setFontSize(16);
-//     doc.text("Medical Report", 10, 10);
-    
-//     doc.setFontSize(12);
-//     doc.text(`Pet ID: ${petid}`, 10, 20);
-
-//     let yPosition = 30;
-//     doc.text("Medical Records:", 10, yPosition);
-    
-//     Medies.forEach((medi, index) => {
-//         yPosition += 10;
-//         doc.text(`Index: ${medi.index}`, 10, yPosition);
-//         yPosition += 5;
-//         doc.text(`Visit Date: ${medi.visitDate}`, 10, yPosition);
-//         yPosition += 5;
-//         doc.text(`Reason: ${medi.reason}`, 10, yPosition);
-//         yPosition += 5;
-//         doc.text(`Prescription: ${medi.prescription}`, 10, yPosition);
-//         yPosition += 10;
-//         doc.text(`Medical History: ${medi.mediHistory}`, 10, yPosition);  
-//         yPosition += 10;
-//     });
-
-//     doc.save("Medical_Report.pdf");
-// };
-
-
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -246,7 +205,25 @@ const downloadPDF = () => {
                                 <td className="p-3 border border-gray-300">{Medi.vaccinationDate}</td>
                                 <td className="p-3 border border-gray-300">{Medi.visitDate}</td>
                                 <td className="p-3 border border-gray-300">{Medi.reason}</td>
-                                <td className="p-3 border border-gray-300">{Medi.prescription}</td>
+                                 <td className="p-3 border border-gray-300">{Medi.prescription}</td>
+                             {/* <td>
+                                {Medi.prescriptionFile ? (
+                                    <a
+                                    href={`http://localhost:5001/uploads/${Medi.prescriptionFile}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 underline"
+                                    >
+                                    View PDF
+                                    </a>
+                                ) : (
+                                    <span className="text-gray-400">No PDF</span>
+                                )}
+                                </td> */} 
+
+
+
+
                                 <td className="p-3 border border-gray-300">{Medi.mediHistory}</td>
                                 <td className="p-3 border border-gray-300 flex space-x-2">
                                     <Link to={`/updatemedi/${petid}/${Medi.index}`}>

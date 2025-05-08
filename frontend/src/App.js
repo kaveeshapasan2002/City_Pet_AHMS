@@ -40,6 +40,7 @@ import UpdateMedi from './components/animalRecord/UpdatePet/UpdateMedi';
 import Addappointment from './components/animalRecord/AddAppointment/Addappointment';
 import Appointmentdetails from './components/animalRecord/AppointmentDetails/Appointmentdetails';
 import UpdateAppointment from './components/animalRecord/UpdateAppointment/UpdateAppointment';
+import ViewAppointments from './components/animalRecord/AppointmentDetails/ViewAppointment';
 
 // Route guard component for protected routes
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -203,7 +204,7 @@ function App() {
                         <Addappointment />
                       </ProtectedRoute>
                     } />
-                    <Route path="/appointmentdetails/:nic" element={
+                    <Route path="/appointmentdetails/:id" element={
                       <ProtectedRoute>
                         <UpdateAppointment />
                       </ProtectedRoute>
@@ -225,6 +226,12 @@ function App() {
                         <UpdateMedi />
                       </ProtectedRoute>
                     } />
+                      <Route path="/viewappointments" element={
+                      <ProtectedRoute>
+                        <ViewAppointments />
+                      </ProtectedRoute>
+                    } />
+
 
                     {/* Payment Success Route */}
                     <Route 
