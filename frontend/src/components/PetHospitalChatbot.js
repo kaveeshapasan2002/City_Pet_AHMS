@@ -9,8 +9,8 @@ import { TiMessages } from 'react-icons/ti';
 // Hospital information as a backup for when the API fails
 const hospitalInfo = {
   name: 'PetCare Animal Hospital',
-  address: '1234 Pet Care Lane, Animalville, AV 12345',
-  phone: '(555) 123-4567',
+  address: ' No:137/1 කඩුවෙල පාර, 10150',
+  phone: '0754086545',
   emergencyPhone: '(555) 911-PETS',
   hours: {
     weekdays: '8:00 AM - 8:00 PM',

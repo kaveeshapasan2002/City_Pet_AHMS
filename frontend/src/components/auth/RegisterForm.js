@@ -66,7 +66,7 @@ const Register = () => {
     if (/[0-9]/.test(passwordValue)) score++;
     if (/[^A-Za-z0-9]/.test(passwordValue)) score++;
 
-    const labels = ["", "Weak", "Fair", "Good", "Strong", "Very Strong"];
+    const labels = ["", "Weak", "Fair", "Good", "Strong", "Very Strong"]; //Maps the score to a label (e.g., score 3 → "Good") and updates the passwordStrength state.
     
     setPasswordStrength({ 
       score, 
@@ -114,7 +114,8 @@ const Register = () => {
     return true;
   };
 
-  // Handle phone change
+  // Handle phone change     // Handles changes to the phone number input.Updates the phonenumber state and validates the input.
+
   const handlePhoneChange = (e) => {
     const value = e.target.value;
     setPhonenumber(value);
