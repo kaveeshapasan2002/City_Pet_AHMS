@@ -22,7 +22,7 @@ function Appointmentdetails() {
 
 
   const handleDelete = async (appointment) => {
-    if (!window.confirm(`Are you sure you want to delete the appointment for ${appointment.name}?`)) {
+    if (!window.confirm(`Are you sure you want to delete the appointment ?`)) {
       return;
     }
     try {
@@ -81,9 +81,10 @@ function Appointmentdetails() {
 
                     </div>
                   </td>
-                  <td className="py-2 px-4 border">
+                  <td className="py-2 px-4 border flex gap-2">
                   <Link to={`/appointmentdetails/${app._id}`}>
                   <button className='bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition'>Update</button>
+            
                 </Link>
                 <button
                   className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition ml-2"

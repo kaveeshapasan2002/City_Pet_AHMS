@@ -71,20 +71,20 @@ const PetMedicalRecords = () => {
   const [medicalRecords, setMedicalRecords] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Use the correct contact field from your user/auth system
+ 
   const userContact = user?.phonenumber;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch pets for this user
+    
         const petsResponse = await axios.get(`http://localhost:5001/pets/bycontact/${userContact}`);
         setPets(petsResponse.data.pets || []);
 
-        // Fetch medical records for each pet using either pet.petid or pet.id
+        
         const records = {};
         for (const pet of petsResponse.data.pets || []) {
-          const petKey = pet.petid || pet.id; // Use whichever exists
+          const petKey = pet.petid || pet.id; 
           if (!petKey) continue;
           try {
             const mediResponse = await axios.get(`http://localhost:5001/medies/${petKey}`);

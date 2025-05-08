@@ -114,7 +114,7 @@ function AddAppointment() {
               name="nic"
               value={formData.nic}
               onChange={e => setFormData({ ...formData, nic: e.target.value })}
-              pattern="\d{9}[vV]|\d{12}"
+              pattern="\d{9}[v]|[V]|\d{12}"
               title="NIC must be 9 digits followed by 'V' or 12 digits"
               className="w-full px-4 py-2 rounded-lg border border-blue-200 focus:ring-2 focus:ring-blue-300"
               required

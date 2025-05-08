@@ -28,17 +28,6 @@ function AddMedi() {
 }, [petid]);
  
 
-  // const [inputs,setInputs]=useState({
-   
-  //   petid: petid || "", 
-  //   vaccinationState:"",
-  //   vaccinationDate:"",
-  //   visitDate:"",
-  //   reason:"",
-  //   prescription:"",
-  //   mediHistory:""
-
-  // }); 
   const [inputs, setInputs] = useState({
     vaccinationState: "",
     vaccinationDate: "",
@@ -76,34 +65,6 @@ function AddMedi() {
     };
   
 
-  // const sendRequest=async()=>{
-  //   await axios.post("http://localhost:5001/medies",{
-  //     petid:String(inputs.petid),
-  //     vaccinationState:String(inputs.vaccinationState),
-  //     vaccinationDate: inputs.vaccinationState === "Yes" ? String(inputs.vaccinationDate) : null, 
-  //     visitDate:String(inputs.visitDate),
-  //     reason:String(inputs.reason),
-  //     prescription:String(inputs.prescription),
-  //     mediHistory:String(inputs.mediHistory),
-     
-  
-  //   }).then(res=>res.data.Medi);
-  // }
-
-
-  // const sendRequest = async () => {
-  //   await axios.post("http://localhost:5001/medies", {
-  //     petid: String(petid), 
-  //     vaccinationState: String(inputs.vaccinationState),
-  //     vaccinationDate: inputs.vaccinationState === "Yes" 
-  //       ? String(inputs.vaccinationDate) 
-  //       : null,
-  //     visitDate: String(inputs.visitDate),
-  //     reason: String(inputs.reason),
-  //     prescription: String(inputs.prescription),
-  //     mediHistory: String(inputs.mediHistory)
-  //   }).then(res => res.data.Medi);
-  // }
   const sendRequest = async () => {
   const formData = new FormData();
   formData.append('petid', petid);

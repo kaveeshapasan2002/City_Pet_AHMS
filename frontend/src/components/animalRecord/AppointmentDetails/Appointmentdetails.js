@@ -68,7 +68,7 @@ function Appointmentdetails() {
                   <td className="py-2 px-4 border">{appointment.gmail}</td>
                   <td className="py-2 px-4 border">{appointment.petID}</td>
                   <td className="py-2 px-4 border">{appointment.appointmentType}</td>
-                  <td className="py-2 px-4 border">
+                  <td className="py-2 px-4 border flex gap-2">
                     <Link to={`/appointmentdetails/${appointment._id}`}>
                       <button className='bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition'>Update</button>
                     </Link>

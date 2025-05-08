@@ -18,7 +18,7 @@ const AppointmentSchema=new Schema({
         type: String,
         required: [true, "NIC is required"],
         minlength: [5, "NIC must be at least 5 characters"],
-        maxlength: [20, "NIC cannot exceed 20 characters"],
+        maxlength: [12, "NIC cannot exceed 20 characters"],
         trim: true
       },
       gmail: {
@@ -38,9 +38,7 @@ const AppointmentSchema=new Schema({
       appointmentType: {
         type: String,
         required: [true, "Appointment type is required"],
-        enum: {
-          values: ["Vaccination", "Emergency", "General Checkup", "Surgery", "Dental Care"],
-        }
+
       },
     status: {
         type: String,

@@ -46,11 +46,11 @@ const getById=async(req,res,next)=>{
 
     let pet;
     try{
-        pet = await Pet.findOne({ id: id }); ////editing 
+        pet = await Pet.findOne({ id: id }); 
     }catch(err){
         console.log(err);
     }
-        ///when user is not availale
+     
         if(!pet){
             return res.status(404).send({message:"unable to find users"});
         }
@@ -72,7 +72,7 @@ const updatePets=async(req,res,next)=>{
     }catch(err){
         console.log(err);
     }
-        ///when user is not update
+        ///when not update
         if(!pets){
             return res.status(404).send({message:"unable to Update users"});
         }
@@ -89,7 +89,7 @@ const deletePets=async(req,res,next)=>{
     }catch(err){
         console.log(err);
     }
-        ///when user is not delete
+        ///when not delete
         if(!pet){
             return res.status(404).send({message:"unable to Delete users"});
         }
@@ -97,7 +97,7 @@ const deletePets=async(req,res,next)=>{
 }
 
 
-// In petController.js
+//grt by contact
 const getByContact = async (req, res) => {
     try {
       const pets = await Pet.find({ contact: req.params.contact });
