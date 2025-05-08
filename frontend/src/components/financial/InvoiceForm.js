@@ -5,6 +5,7 @@ import { createInvoice, updateInvoice, getInvoiceById, getAllServices } from '..
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
+import PhoneSearch from '../common/PhoneSearch'; // Import the new component
 
 const InvoiceForm = () => {
   const { id } = useParams();
@@ -43,6 +44,51 @@ const InvoiceForm = () => {
     notes: ''
   });
   
+   // Handle when client is found via phone search
+   const handleClientFound = (client) => {
+    if (client) {
+      // Fill client details
+      setFormData(prev => ({
+        ...prev,
+        clientId: client._id,
+        clientName: client.name,
+        clientEmail: client.email || '',
+        clientContact: client.phonenumber
+      }));
+      setClientFieldsReadOnly(true);
+    } else {
+      // No client found, clear any existing client data and allow manual entry
+      setFormData(prev => ({
+        ...prev,
+        clientId: '',
+        clientName: '',
+        clientEmail: ''
+      }));
+      setClientFieldsReadOnly(false);
+    }
+  };
+  
+  // Handle when pets are found via phone search
+  const handlePetsFound = (pets) => {
+    if (pets.length > 0) {
+      // If there's just one pet, auto-select it
+      if (pets.length === 1) {
+        const pet = pets[0];
+        setFormData(prev => ({
+          ...prev,
+          patientId: pet.id,
+          patientName: pet.name
+        }));
+      }
+      
+      // Reorder pet options to show matching pets first
+      const reorderedPets = [
+        ...pets,
+        ...petOptions.filter(pet => !pets.some(mp => mp.id === pet.id))
+      ];
+      setPetOptions(reorderedPets);
+    }
+  };
   // Fetch pets and services on component mount
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -62,65 +108,15 @@ const InvoiceForm = () => {
         
         console.log("Pet data received:", petsResponse.data);
         
-        // Try to fetch pet owners (users with "Pet Owner" role)
-        try {
-          const usersResponse = await axios.get('http://localhost:5001/api/users', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            params: {
-              role: 'Pet Owner'
-            }
-          });
-          
-          const petOwners = usersResponse.data.users || [];
-          
-          // Format pet options with owner matching by contact number
-          if (petsResponse.data && petsResponse.data.pets) {
-            setPetOptions(petsResponse.data.pets.map(pet => {
-              // Try to find a matching pet owner by phone number
-              const matchingOwner = petOwners.find(owner => 
-                owner.phonenumber === pet.contact.toString()
-              );
-              
-              return {
-                id: pet.id,
-                name: pet.name,
-                contact: pet.contact,
-                owner: matchingOwner ? {
-                  id: matchingOwner._id,
-                  name: matchingOwner.name,
-                  contact: matchingOwner.phonenumber,
-                  email: matchingOwner.email
-                } : {
-                  id: '',
-                  name: '',
-                  contact: pet.contact.toString(),
-                  email: ''
-                },
-                species: pet.species,
-                breed: pet.breed
-              };
-            }));
-          }
-        } catch (error) {
-          console.error('Failed to fetch users:', error);
-          // Still format pet options even if user fetch fails
-          if (petsResponse.data && petsResponse.data.pets) {
-            setPetOptions(petsResponse.data.pets.map(pet => ({
-              id: pet.id,
-              name: pet.name,
-              contact: pet.contact,
-              owner: {
-                id: '',
-                name: '',
-                contact: pet.contact.toString(),
-                email: ''
-              },
-              species: pet.species,
-              breed: pet.breed
-            })));
-          }
+        if (petsResponse.data && petsResponse.data.pets) {
+          // Format pet options - no need to fetch owners here
+          setPetOptions(petsResponse.data.pets.map(pet => ({
+            id: pet.id,
+            name: pet.name,
+            contact: pet.contact,
+            species: pet.species,
+            breed: pet.breed
+          })));
         }
         
         // If in edit mode, fetch invoice data
@@ -128,6 +124,11 @@ const InvoiceForm = () => {
           const invoiceResponse = await getInvoiceById(id);
           if (invoiceResponse.invoice) {
             setFormData(invoiceResponse.invoice);
+            
+            // If client fields exist, set them as read-only
+            if (invoiceResponse.invoice.clientId) {
+              setClientFieldsReadOnly(true);
+            }
           }
         }
         
@@ -169,57 +170,90 @@ const InvoiceForm = () => {
   }, [formData.items, formData.taxRate, formData.discountAmount]);
   
   // Handle pet selection
-// Handle pet selection
 const handlePetSelect = async (e) => {
-    const petId = e.target.value;
-    const selectedPet = petOptions.find(pet => pet.id === petId);
+  const petId = e.target.value;
+  const selectedPet = petOptions.find(pet => pet.id === petId);
+  
+  if (selectedPet) {
+    // Set pet information first
+    setFormData({
+      ...formData,
+      patientId: selectedPet.id,
+      patientName: selectedPet.name,
+      clientContact: selectedPet.contact.toString(),
+    });
     
-    if (selectedPet) {
-      // Set pet information first
-      setFormData({
-        ...formData,
-        patientId: selectedPet.id,
-        patientName: selectedPet.name,
-        clientContact: selectedPet.contact.toString(),
-      });
+    // Try to find a matching user by phone number using the new endpoint
+    try {
+      // Format the phone number for query - convert to string and handle possible formats
+      const petContactStr = selectedPet.contact.toString();
       
-      // Try to find a matching user by phone number
-      try {
-        const response = await axios.get('http://localhost:5001/api/users', {
+      // Try multiple phone number formats
+      const possiblePhoneFormats = [
+        petContactStr,                    // Original format (e.g. 767856921)
+        `0${petContactStr}`,              // With leading zero (e.g. 0767856921)
+        petContactStr.replace(/^0+/, '')  // Without leading zeros (if any exist)
+      ];
+      
+      console.log(`Searching for pet owner with phone numbers:`, possiblePhoneFormats);
+      
+      // Try each phone format until we find a match
+      let foundUser = null;
+      
+      for (const phoneFormat of possiblePhoneFormats) {
+        if (foundUser) break; // Skip if we already found a user
+        
+        const response = await axios.get('http://localhost:5001/api/invoice-users/petowners', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
           params: {
-            phonenumber: selectedPet.contact.toString()
+            phonenumber: phoneFormat
           }
         });
         
+        console.log(`Search response for number ${phoneFormat}:`, response.data);
+        
         if (response.data.users && response.data.users.length > 0) {
-          const matchingUser = response.data.users[0];
-          // We found a matching user, update client information
-          setFormData(prev => ({
-            ...prev,
-            clientId: matchingUser._id,
-            clientName: matchingUser.name,
-            clientEmail: matchingUser.email || '',
-          }));
-          setClientFieldsReadOnly(true);
-        } else {
-          // No matching user found, enable manual client info entry
-          setFormData(prev => ({
-            ...prev,
-            clientId: '',
-            clientName: '',
-            clientEmail: '',
-          }));
-          setClientFieldsReadOnly(false);
+          foundUser = response.data.users[0];
         }
-      } catch (error) {
-        console.error('Failed to find matching user:', error);
+      }
+      
+      if (foundUser) {
+        console.log("Matching pet owner found:", foundUser);
+        
+        // We found a matching user, update client information
+        setFormData(prev => ({
+          ...prev,
+          clientId: foundUser._id,
+          clientName: foundUser.name,
+          clientEmail: foundUser.email || '',
+        }));
+        setClientFieldsReadOnly(true);
+      } else {
+        console.log("No matching pet owner found after trying multiple formats. Manual entry required.");
+        // No matching user found, enable manual client info entry
+        setFormData(prev => ({
+          ...prev,
+          clientId: '',
+          clientName: '',
+          clientEmail: '',
+        }));
         setClientFieldsReadOnly(false);
       }
+    } catch (error) {
+      console.error('Failed to find matching pet owner:', error);
+      // Continue with manual entry if API call fails
+      setFormData(prev => ({
+        ...prev,
+        clientId: '',
+        clientName: '',
+        clientEmail: '',
+      }));
+      setClientFieldsReadOnly(false);
     }
-  };
+  }
+};
   
   // Handle item changes
   const handleItemChange = (index, field, value) => {
@@ -372,6 +406,14 @@ const handlePetSelect = async (e) => {
       </h1>
       
       <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6">
+        {/* Phone Search Component - Only show in create mode */}
+        {!isEditMode && (
+          <PhoneSearch 
+            onClientFound={handleClientFound}
+            onPetsFound={handlePetsFound}
+            petOptions={petOptions}
+          />
+        )}
         {/* Patient and Client Information */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-4">Patient & Client Information</h2>

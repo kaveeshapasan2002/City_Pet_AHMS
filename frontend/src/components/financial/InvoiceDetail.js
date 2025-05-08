@@ -1,20 +1,24 @@
 // src/components/financial/InvoiceDetail.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getInvoiceById, recordPayment } from '../../api/invoice';
+import { getInvoiceById, recordPayment, sendInvoiceEmail } from '../../services/invoiceService';
 import { toast } from 'react-toastify';
-import PaymentModal from './PaymentModal'; // We'll create this next
+import PaymentModal from './PaymentModal';
+import EmailConfirmation from '../common/EmailConfirmation';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const InvoiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const invoiceRef = useRef(null);
   
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-
-  //mail
-  
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
   
   useEffect(() => {
     const fetchInvoice = async () => {
@@ -24,7 +28,16 @@ const InvoiceDetail = () => {
         setInvoice(response.invoice);
       } catch (error) {
         console.error('Failed to fetch invoice:', error);
-        toast.error('Failed to load invoice. Please try again.');
+        
+        // Handle specific error cases
+        if (error.message === 'No token, authorization denied' || 
+            error.message === 'Token is not valid') {
+          toast.error('Authentication error. Please log in again.');
+          // Optionally: Redirect to login page
+          // navigate('/login');
+        } else {
+          toast.error('Failed to load invoice. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
@@ -35,6 +48,86 @@ const InvoiceDetail = () => {
   
   const handlePrintInvoice = () => {
     window.print();
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!invoiceRef.current) return;
+    
+    try {
+      setGeneratingPdf(true);
+      
+      // Notify the user that PDF generation has started
+      toast.info('Generating PDF, please wait...');
+      
+      // Get the invoice element
+      const element = invoiceRef.current;
+      const originalWidth = element.offsetWidth;
+      const originalHeight = element.offsetHeight;
+      
+      // Calculate dimensions to fit on A4 paper
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      // Create canvas from the element
+      const canvas = await html2canvas(element, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Calculate the ratio to fit within PDF page
+      const aspectRatio = originalWidth / originalHeight;
+      let imgWidth = pdfWidth;
+      let imgHeight = imgWidth / aspectRatio;
+      
+      // If height exceeds PDF page height, adjust accordingly
+      if (imgHeight > pdfHeight) {
+        imgHeight = pdfHeight;
+        imgWidth = imgHeight * aspectRatio;
+      }
+      
+      // Add image to PDF
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      // Save the PDF
+      pdf.save(`Invoice-${invoice.invoiceNumber}.pdf`);
+      
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+  
+  const handleSendEmail = async () => {
+    try {
+      setSendingEmail(true);
+      await sendInvoiceEmail(id);
+      setShowEmailConfirmation(true);
+      toast.success(`Invoice has been sent to ${invoice.clientEmail}`);
+    } catch (error) {
+      console.error('Failed to send invoice email:', error);
+      
+      // Handle specific error cases
+      if (error.message === 'No token, authorization denied' || 
+          error.message === 'Token is not valid') {
+        toast.error('Authentication error. Please log in again.');
+        // Optionally: Redirect to login page
+        // navigate('/login');
+      } else if (error.message === 'Not authorized to email this invoice') {
+        toast.error('You do not have permission to email this invoice.');
+      } else {
+        toast.error('Failed to send invoice email. Please try again.');
+      }
+    } finally {
+      setSendingEmail(false);
+    }
   };
   
   const handleRecordPayment = async (paymentData) => {
@@ -86,7 +179,6 @@ const InvoiceDetail = () => {
     return (
       <div className="container mx-auto px-4 py-6">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        // src/components/financial/InvoiceDetail.js (continued)
           Invoice not found. It may have been deleted or you don't have permission to view it.
         </div>
         <div className="mt-4">
@@ -113,7 +205,7 @@ const InvoiceDetail = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Invoice #{invoice.invoiceNumber}</h1>
+        <h1 className="text-2xl font-bold">{invoice.invoiceNumber}</h1>
         
         <div className="flex space-x-2 print:hidden">
           <button
@@ -128,6 +220,114 @@ const InvoiceDetail = () => {
             className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded transition"
           >
             Print
+          </button>
+          
+          <button
+            onClick={handleDownloadPdf}
+            disabled={generatingPdf}
+            className={`${
+              generatingPdf 
+                ? 'bg-purple-300 cursor-not-allowed' 
+                : 'bg-purple-600 hover:bg-purple-700'
+            } text-white px-3 py-1 rounded transition flex items-center`}
+          >
+            {generatingPdf ? (
+              <>
+                <svg 
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24"
+                >
+                  <circle 
+                    className="opacity-25" 
+                    cx="12" 
+                    cy="12" 
+                    r="10" 
+                    stroke="currentColor" 
+                    strokeWidth="4"
+                  ></circle>
+                  <path 
+                    className="opacity-75" 
+                    fill="currentColor" 
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <svg 
+                  className="w-4 h-4 mr-1" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  ></path>
+                </svg>
+                Download PDF
+              </>
+            )}
+          </button>
+          
+          <button
+            onClick={handleSendEmail}
+            disabled={sendingEmail}
+            className={`${
+              sendingEmail 
+                ? 'bg-blue-300 cursor-not-allowed' 
+                : 'bg-blue-500 hover:bg-blue-600'
+            } text-white px-3 py-1 rounded transition flex items-center`}
+          >
+            {sendingEmail ? (
+              <>
+                <svg 
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24"
+                >
+                  <circle 
+                    className="opacity-25" 
+                    cx="12" 
+                    cy="12" 
+                    r="10" 
+                    stroke="currentColor" 
+                    strokeWidth="4"
+                  ></circle>
+                  <path 
+                    className="opacity-75" 
+                    fill="currentColor" 
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Sending...
+              </>
+            ) : (
+              <>
+                <svg 
+                  className="w-4 h-4 mr-1" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24" 
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  ></path>
+                </svg>
+                Send Email
+              </>
+            )}
           </button>
           
           {invoice.paymentStatus !== 'Paid' && (
@@ -152,13 +352,13 @@ const InvoiceDetail = () => {
         </div>
       </div>
       
-      {/* Invoice Content */}
-      <div className="bg-white shadow rounded-lg overflow-hidden print:shadow-none">
+      {/* Invoice Content - Add ref for PDF generation */}
+      <div ref={invoiceRef} className="bg-white shadow rounded-lg overflow-hidden print:shadow-none">
         {/* Invoice Header */}
         <div className="p-6 border-b">
           <div className="flex justify-between">
             <div>
-              <h2 className="font-bold text-lg mb-1"> City Animal Hospital</h2>
+              <h2 className="font-bold text-lg mb-1"> City Pet Hospital</h2>
               <p className="text-sm text-gray-600">123 Main Street</p>
               <p className="text-sm text-gray-600">Colombo, Sri Lanka</p>
               <p className="text-sm text-gray-600">+94 11 2345678</p>
@@ -325,6 +525,14 @@ const InvoiceDetail = () => {
           remainingBalance={remainingBalance}
           onClose={() => setShowPaymentModal(false)}
           onSubmit={handleRecordPayment}
+        />
+      )}
+      
+      {/* Email Confirmation Modal */}
+      {showEmailConfirmation && (
+        <EmailConfirmation 
+          email={invoice.clientEmail}
+          onClose={() => setShowEmailConfirmation(false)}
         />
       )}
     </div>

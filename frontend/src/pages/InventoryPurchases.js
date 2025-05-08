@@ -5,6 +5,7 @@ import { useInventory } from '../context/InventoryContext';
 import { usePurchaseRequest } from '../context/PurchaseRequestContext';
 import LowStockRecommendations from '../components/financial/LowStockRecommendations';
 import PurchasePaymentModal from '../components/financial/PurchasePaymentModal';
+import PaymentList from '../components/admin/PaymentList';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
@@ -169,6 +170,11 @@ const InventoryPurchases = () => {
           </div>
         )}
       </div>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Payment List</h2>
+        <PaymentList />
+      </div>
+      
 
       {/* Payment Modal */}
       {selectedApprovedRequest && (

@@ -11,6 +11,7 @@ const {
   getClientInvoices,
   getPetInvoices
 } = require("../controllers/invoiceController");
+const { emailInvoice } = require("../controllers/invoiceEmailController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require("../middlewares/adminMiddleware");
 
@@ -40,5 +41,8 @@ router.get("/client/:clientId", getClientInvoices);
 
 // Get pet invoice history
 router.get("/pet/:petId", getPetInvoices);
+
+// Send invoice via email
+router.post("/:id/email", emailInvoice);
 
 module.exports = router;
