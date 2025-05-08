@@ -1,6 +1,5 @@
 //component to display chatbot analytics and logs
-
-
+//can report generate csv & pdf format.
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
@@ -14,7 +13,8 @@ import {
   PieChart, Pie, Cell
 } from 'recharts';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+// Remove the autotable import as we're not using it
+// import 'jspdf-autotable';
 
 // Configure Axios base URL
 axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
@@ -212,12 +212,12 @@ const ChatbotAnalytics = () => {
     }
   };
   
-  // Function to export data as PDF
+  // Function to export data as PDF - Using manual table rendering
   const exportToPDF = () => {
     setIsExporting(true);
     
     try {
-      // Initialize jsPDF
+      // Simple approach with direct jsPDF instance
       const doc = new jsPDF();
       
       // Add title and hospital logo
@@ -298,17 +298,97 @@ const ChatbotAnalytics = () => {
         doc.text(intentText, 20, 75);
       }
       
-      // Set up the table data
-      const tableColumn = ["Date/Time", "User", "Intent", "Emergency", "Message", "Rating"];
-      const tableRows = [];
+      // Set up basic table without autoTable
+      const startY = 85;
+      const cellPadding = 4;
+      const fontSize = 8;
+      const lineHeight = 6;
       
-      // Add data to rows (limited to prevent overly large PDFs)
+      // Set up columns
+      const columns = [
+        { header: "Date/Time", width: 30 },
+        { header: "User", width: 20 },
+        { header: "Intent", width: 25 },
+        { header: "Emergency", width: 20 },
+        { header: "Message", width: 65 },
+        { header: "Rating", width: 15 }
+      ];
+      
+      // Calculate positions
+      let xOffset = 14; // Left margin
+      let currentY = startY;
+      
+      // Draw table header
+      doc.setFillColor(0, 102, 204);
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'bold');
+      
+      // Draw header background
+      doc.rect(xOffset, currentY, columns.reduce((sum, col) => sum + col.width, 0), lineHeight * 1.5, 'F');
+      
+      // Draw header text
+      columns.forEach(column => {
+        doc.text(column.header, xOffset + cellPadding, currentY + lineHeight);
+        xOffset += column.width;
+      });
+      
+      // Reset for table body
+      currentY += lineHeight * 1.5;
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
+      
+      // Draw table rows (limited to prevent overly large PDFs)
       const maxRowsPerPage = 25;
       const maxPages = 10;
       const limitedLogs = filteredLogs.slice(0, maxRowsPerPage * maxPages);
       
+      let rowCount = 0;
+      let pageCount = 1;
+      
       limitedLogs.forEach(log => {
-        const tableRow = [
+        // Check if we need a new page
+        if (currentY > doc.internal.pageSize.height - 20) {
+          doc.addPage();
+          pageCount++;
+          
+          // Reset Y position
+          currentY = 20;
+          
+          // Add header to new page
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100);
+          doc.text('PetCare Animal Hospital - Chatbot Logs', 14, 10);
+          doc.text(`Page ${pageCount}`, 14, doc.internal.pageSize.height - 10);
+          doc.text(`Generated: ${new Date().toLocaleString()}`, doc.internal.pageSize.width - 60, doc.internal.pageSize.height - 10);
+          
+          // Redraw header
+          xOffset = 14;
+          doc.setFillColor(0, 102, 204);
+          doc.setTextColor(255, 255, 255);
+          doc.setFont(undefined, 'bold');
+          
+          doc.rect(xOffset, currentY, columns.reduce((sum, col) => sum + col.width, 0), lineHeight * 1.5, 'F');
+          
+          columns.forEach(column => {
+            doc.text(column.header, xOffset + cellPadding, currentY + lineHeight);
+            xOffset += column.width;
+          });
+          
+          currentY += lineHeight * 1.5;
+          doc.setFont(undefined, 'normal');
+          doc.setTextColor(0, 0, 0);
+        }
+        
+        // Draw alternating row background
+        doc.setFillColor(rowCount % 2 === 0 ? 255 : 240);
+        doc.rect(14, currentY, columns.reduce((sum, col) => sum + col.width, 0), lineHeight * 1.5, 'F');
+        
+        // Draw row data
+        xOffset = 14;
+        
+        // Format data for each column
+        const rowData = [
           new Date(log.createdAt).toLocaleString(),
           log.userId ? log.userId.substring(0, 8) : 'Anonymous',
           log.intent.replace(/_/g, ' '),
@@ -316,60 +396,83 @@ const ChatbotAnalytics = () => {
           log.userMessage.length > 40 ? `${log.userMessage.substring(0, 40)}...` : log.userMessage,
           log.feedbackRating ? `${log.feedbackRating}/5` : 'N/A'
         ];
-        tableRows.push(tableRow);
-      });
-      
-      // Generate the table
-      doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 85,
-        styles: { fontSize: 8, cellPadding: 2 },
-        columnStyles: {
-          0: { cellWidth: 30 }, // Date/Time
-          1: { cellWidth: 20 }, // User
-          2: { cellWidth: 25 }, // Intent
-          3: { cellWidth: 20 }, // Emergency
-          4: { cellWidth: 65 }, // Message
-          5: { cellWidth: 15 }  // Rating
-        },
-        headStyles: {
-          fillColor: [0, 102, 204],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold'
-        },
-        alternateRowStyles: {
-          fillColor: [240, 240, 240]
-        },
-        didDrawPage: function(data) {
-          // Add header to each page
-          doc.setFontSize(8);
-          doc.setTextColor(100, 100, 100);
-          doc.text('PetCare Animal Hospital - Chatbot Logs', data.settings.margin.left, 10);
-          
-          // Add page number
-          doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
-          
-          // Add generation date on each page
-          doc.text(`Generated: ${new Date().toLocaleString()}`, doc.internal.pageSize.width - 60, doc.internal.pageSize.height - 10);
-        }
+        
+        // Draw each cell
+        columns.forEach((column, index) => {
+          doc.text(rowData[index], xOffset + cellPadding, currentY + lineHeight);
+          xOffset += column.width;
+        });
+        
+        currentY += lineHeight * 1.5;
+        rowCount++;
       });
       
       // Add note if logs were limited
       if (filteredLogs.length > limitedLogs.length) {
-        const currentY = doc.previousAutoTable.finalY + 10;
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Note: Only showing ${limitedLogs.length} of ${filteredLogs.length} total logs. Export to CSV for complete data.`, 14, currentY);
+        doc.text(`Note: Only showing ${limitedLogs.length} of ${filteredLogs.length} total logs. Export to CSV for complete data.`, 14, currentY + 10);
       }
       
       // Save the PDF
       doc.save(`petcare-chatbot-logs-${new Date().toISOString().split('T')[0]}.pdf`);
+      setIsExporting(false);
     } catch (error) {
       console.error('Error exporting to PDF:', error);
       alert('Failed to export data to PDF. Please try again.');
-    } finally {
       setIsExporting(false);
+    }
+  };
+  
+  // Simple version of single chat PDF export that doesn't use autoTable
+  const exportSingleChatPDF = (selectedChat) => {
+    try {
+      const doc = new jsPDF();
+      
+      // Add title
+      doc.setFontSize(16);
+      doc.setTextColor(0, 102, 204);
+      doc.text('PetCare Animal Hospital', 105, 20, { align: 'center' });
+      doc.text('Chatbot Conversation Details', 105, 30, { align: 'center' });
+      
+      // Add metadata
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Conversation Details', 14, 45);
+      
+      // Add details
+      doc.setFontSize(10);
+      doc.text(`Date/Time: ${formatDate(selectedChat.createdAt)}`, 20, 55);
+      doc.text(`User ID: ${selectedChat.userId || 'Anonymous'}`, 20, 60);
+      doc.text(`Intent: ${selectedChat.intent.replace(/_/g, ' ')}`, 20, 65);
+      doc.text(`Emergency Level: ${selectedChat.emergencyLevel}`, 20, 70);
+      doc.text(`Response Time: ${selectedChat.responseTime ? `${selectedChat.responseTime}ms` : 'N/A'}`, 20, 75);
+      doc.text(`User Feedback: ${selectedChat.feedbackRating ? `${selectedChat.feedbackRating}/5` : 'None'}`, 20, 80);
+      
+      // Add user message
+      doc.setFontSize(12);
+      doc.text('User Message:', 14, 90);
+      
+      doc.setFontSize(10);
+      const userMessageLines = doc.splitTextToSize(selectedChat.userMessage, 180);
+      doc.text(userMessageLines, 14, 95);
+      
+      // Calculate position for bot response
+      let yPos = 95 + (userMessageLines.length * 5) + 10;
+      
+      // Add bot response
+      doc.setFontSize(12);
+      doc.text('Bot Response:', 14, yPos);
+      
+      doc.setFontSize(10);
+      const botResponseLines = doc.splitTextToSize(selectedChat.botResponse, 180);
+      doc.text(botResponseLines, 14, yPos + 5);
+      
+      // Save PDF
+      doc.save(`petcare-chat-${selectedChat._id}.pdf`);
+    } catch (error) {
+      console.error('Error exporting single chat to PDF:', error);
+      alert('Failed to export conversation to PDF. Please try again.');
     }
   };
   
@@ -836,52 +939,7 @@ const ChatbotAnalytics = () => {
               
               <div className="mt-6 text-right">
                 <button
-                  onClick={() => {
-                    // Generate single chat PDF
-                    const doc = new jsPDF();
-                    
-                    // Add title
-                    doc.setFontSize(16);
-                    doc.setTextColor(0, 102, 204);
-                    doc.text('PetCare Animal Hospital', 105, 20, { align: 'center' });
-                    doc.text('Chatbot Conversation Details', 105, 30, { align: 'center' });
-                    
-                    // Add metadata
-                    doc.setFontSize(12);
-                    doc.setTextColor(0, 0, 0);
-                    doc.text('Conversation Details', 14, 45);
-                    
-                    // Add details
-                    doc.setFontSize(10);
-                    doc.text(`Date/Time: ${formatDate(selectedChat.createdAt)}`, 20, 55);
-                    doc.text(`User ID: ${selectedChat.userId || 'Anonymous'}`, 20, 60);
-                    doc.text(`Intent: ${selectedChat.intent.replace(/_/g, ' ')}`, 20, 65);
-                    doc.text(`Emergency Level: ${selectedChat.emergencyLevel}`, 20, 70);
-                    doc.text(`Response Time: ${selectedChat.responseTime ? `${selectedChat.responseTime}ms` : 'N/A'}`, 20, 75);
-                    doc.text(`User Feedback: ${selectedChat.feedbackRating ? `${selectedChat.feedbackRating}/5` : 'None'}`, 20, 80);
-                    
-                    // Add user message
-                    doc.setFontSize(12);
-                    doc.text('User Message:', 14, 90);
-                    
-                    doc.setFontSize(10);
-                    const userMessageLines = doc.splitTextToSize(selectedChat.userMessage, 180);
-                    doc.text(userMessageLines, 14, 95);
-                    
-                    // Calculate position for bot response
-                    let yPos = 95 + (userMessageLines.length * 5) + 10;
-                    
-                    // Add bot response
-                    doc.setFontSize(12);
-                    doc.text('Bot Response:', 14, yPos);
-                    
-                    doc.setFontSize(10);
-                    const botResponseLines = doc.splitTextToSize(selectedChat.botResponse, 180);
-                    doc.text(botResponseLines, 14, yPos + 5);
-                    
-                    // Save PDF
-                    doc.save(`petcare-chat-${selectedChat._id}.pdf`);
-                  }}
+                  onClick={() => exportSingleChatPDF(selectedChat)}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center text-sm ml-auto"
                 >
                   <FaFilePdf className="mr-2" /> Export This Conversation as PDF

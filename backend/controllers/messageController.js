@@ -454,3 +454,69 @@ exports.deleteMessage = asyncHandler(async (req, res) => {
   
   res.json({ message: 'Message deleted successfully' });
 });
+
+// Update a message
+exports.updateMessage = asyncHandler(async (req, res) => {
+  const messageId = req.params.id;
+  const { content } = req.body;
+  
+  // Validate input
+  if (!content || !content.trim()) {
+    return res.status(400).json({ message: 'Message content cannot be empty' });
+  }
+  
+  // Find the message
+  const message = await Message.findById(messageId);
+  
+  if (!message) {
+    return res.status(404).json({ message: 'Message not found' });
+  }
+  
+  // Verify the user is the sender of the message
+  if (message.sender.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'Not authorized to update this message' });
+  }
+  
+  // Update the message
+  message.content = content;
+  message.isEdited = true;
+  message.editedAt = new Date();
+  
+  await message.save();
+  
+  // Find the conversation to update last message info if needed
+  const conversation = await Conversation.findById(message.conversationId);
+  if (!conversation) {
+    return res.status(404).json({ message: 'Conversation not found' });
+  }
+  
+  // Check if this is the last message in the conversation
+  if (conversation.lastMessage === message.content) {
+    // Update the conversation's last message
+    conversation.lastMessage = content;
+    await conversation.save();
+  }
+  
+  // Get the socket io instance
+  const io = req.app.get('io');
+  
+  // Notify the conversation participants about the update
+  if (io) {
+    io.to(`conversation:${conversation._id}`).emit('message-updated', {
+      message: {
+        _id: message._id,
+        content: message.content,
+        isEdited: message.isEdited,
+        editedAt: message.editedAt,
+        createdAt: message.createdAt
+      },
+      conversationId: conversation._id.toString()
+    });
+  }
+  
+  // Return the updated message
+  const updatedMessage = await Message.findById(message._id)
+    .populate('sender', 'name role profilePicture');
+  
+  res.json(updatedMessage);
+});
