@@ -21,8 +21,12 @@ import PetBoarding from './pages/PetBoarding';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import UpdateBookingForm from './components/boarding/UpdateBookingForm';
 import Messaging from './pages/Messaging';
+import PetHospitalChatbot from './components/PetHospitalChatbot'; // Import the chatbot component
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+//////////////////////////////////////////////////
+import DailyRecordsForm from './components/admin/DailyRecordsForm';
+import DailyRecordsView from './components/boarding/DailyRecordsView';
 
 // Password Reset Routes
 import ForgotPassword from './pages/ForgotPassword';
@@ -41,6 +45,13 @@ import Addappointment from './components/animalRecord/AddAppointment/Addappointm
 import Appointmentdetails from './components/animalRecord/AppointmentDetails/Appointmentdetails';
 import UpdateAppointment from './components/animalRecord/UpdateAppointment/UpdateAppointment';
 import ViewAppointments from './components/animalRecord/AppointmentDetails/ViewAppointment';
+
+//Invoice Imports
+import InvoiceList from './components/financial/InvoiceList';
+import InvoiceForm from './components/financial/InvoiceForm';
+import InvoiceDetail from './components/financial/InvoiceDetail';
+import ServiceList from './components/financial/ServiceList';
+import InventoryPurchases from './pages/InventoryPurchases'; // Import the new page
 
 // Route guard component for protected routes
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -118,6 +129,18 @@ function App() {
                         <UpdateBookingForm />
                       </ProtectedRoute>
                     } />
+
+                    <Route path="/admin/boarding/:bookingId/daily-records" element={
+                      <ProtectedRoute>
+                      <DailyRecordsForm />
+                      </ProtectedRoute>
+                      } />
+                    
+                    <Route path="/boarding/:bookingId/records" element={
+                      <ProtectedRoute>
+                      <DailyRecordsView />
+                      </ProtectedRoute>
+                      } />
                     
                     {/* Messaging Routes */}
                     <Route path="/messages" element={
@@ -170,6 +193,54 @@ function App() {
                         </ProtectedRoute>
                       } 
                     />
+                    <Route 
+  path="/financial-management/invoices" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceList />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/invoices/create" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceForm />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/invoices/:id" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceDetail />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/invoices/:id/edit" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian', 'Receptionist']}>
+      <InvoiceForm />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/services" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian']}>
+      <ServiceList />
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/financial-management/inventory-purchases" 
+  element={
+    <ProtectedRoute roles={['Admin', 'Veterinarian']}>
+      <InventoryPurchases />
+    </ProtectedRoute>
+  } 
+/>
 
                     {/* Animal Record Routes */}
                     <Route path="/animal-records" element={
@@ -245,6 +316,10 @@ function App() {
                   </Routes>
                 </main>
                 <Footer />
+                
+                {/* Add chatbot component here - it will be available on all pages */}
+                <PetHospitalChatbot />
+                
                 <ToastContainer position="bottom-right" />
               </div>
             </Router>

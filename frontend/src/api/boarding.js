@@ -138,3 +138,45 @@ export const getBookingById = async (bookingId) => {
   }
 };
 
+
+// Delete a booking permanently
+export const deleteBooking = async (bookingId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+    
+    const response = await axios.delete(`${API_URL}/${bookingId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Delete error:', error);
+    throw error.response?.data || { message: 'Failed to delete booking' };
+  }
+};
+
+///////////////////////////////////////////
+// Get daily records for a booking
+export const getDailyRecords = async (bookingId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw { message: 'Authentication required' };
+    }
+    
+    const response = await axios.get(`http://localhost:5001/api/boarding/${bookingId}/records`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch daily records' };
+  }
+};

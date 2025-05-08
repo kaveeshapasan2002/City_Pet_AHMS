@@ -140,10 +140,7 @@
 // export default AdminDashboard;
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  FaHome, FaUsers, FaShieldAlt, FaPaw, FaMoneyBillWave,
-  FaBox, FaDollarSign, FaCalendarAlt
-} from 'react-icons/fa';
+
 
 // Import your management/table components
 import AppointmentList from '../components/admin/ViewAppo';
@@ -153,6 +150,15 @@ import SecurityLogs from '../components/admin/SecurityLogs';
 import BoardingManagement from '../components/admin/BoardingManagement';
 import PaymentList from '../components/admin/PaymentList';
 import UserStatsSection from '../components/admin/UserStatsSection';
+import ChatbotAnalytics from '../components/admin/ChatbotAnalytics';
+import FAQManagement from '../components/admin/FAQManagement';
+
+// Import icons from react-icons
+import { 
+  FaHome, FaUsers, FaShieldAlt, FaPaw, FaMoneyBillWave, 
+  FaBox, FaDollarSign, FaCalendarAlt, FaCog, FaChartBar, 
+  FaRobot, FaQuestionCircle
+} from 'react-icons/fa';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('appointments');
@@ -165,6 +171,8 @@ const AdminDashboard = () => {
     { id: 'security', label: 'Security Logs', icon: <FaShieldAlt className="mr-2" /> },
     { id: 'appointments', label: 'Appointment Management', icon: <FaCalendarAlt className="mr-2" /> },
 
+    { id: 'chatbot-analytics', label: 'Chatbot Analytics', icon: <FaRobot className="mr-2" /> },
+    { id: 'faq-management', label: 'FAQ Management', icon: <FaQuestionCircle className="mr-2" /> },
   ];
 
   const staticLinks = [
@@ -251,6 +259,8 @@ const AdminDashboard = () => {
                 {activeTab === 'boarding' && <BoardingManagement />}
                 {activeTab === 'payment-list' && <PaymentList />}
                 {activeTab === 'security' && <SecurityLogs />}
+                {activeTab === 'chatbot-analytics' && <ChatbotAnalytics />}
+                {activeTab === 'faq-management' && <FAQManagement />}
               </div>
             </div>
           </div>
@@ -261,4 +271,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-//updated admin dashboard js with user counts

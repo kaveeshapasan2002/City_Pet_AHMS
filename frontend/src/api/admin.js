@@ -230,15 +230,41 @@ export const deleteBooking = async (bookingId) => {
       throw new Error('Not authenticated');
     }
     
-    const response = await axios.delete(`/api/boarding/${bookingId}`, {
+    const response = await axios.delete(`http://localhost:5001/api/boarding/${bookingId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+
     
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to delete booking');
+  }
+};
+
+/////////////////////////////////////////////////////////////
+// Add a daily record for a booking
+export const addDailyRecord = async (bookingId, recordData) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+    
+    const response = await axios.post(`http://localhost:5001/api/admin/boarding/${bookingId}/records`, 
+      recordData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || new Error('Failed to add daily record');
   }
 };
 
@@ -261,3 +287,4 @@ export const getUserStats = async () => {
     throw error.response?.data || new Error('Failed to fetch user statistics');
   }
 };
+

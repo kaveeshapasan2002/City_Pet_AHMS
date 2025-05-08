@@ -53,6 +53,7 @@ const BoardingManagement = () => {
     }
   };
 
+
   // Function to open delete confirmation modal
   const confirmDelete = (booking) => {
     setBookingToDelete(booking);
