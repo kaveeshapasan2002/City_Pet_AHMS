@@ -22,7 +22,7 @@ const Header = () => {
             {[
               { to: '/', label: 'Home' },
               { to: '/about', label: 'About' },
-              { to: '/staff', label: 'Our Staff' },
+              
               { to: '/services', label: 'Services' },
               { to: '/contact', label: 'Contact' },
             ].map((item, index) => (

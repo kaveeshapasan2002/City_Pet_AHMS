@@ -23,6 +23,9 @@ import UpdateBookingForm from './components/boarding/UpdateBookingForm';
 import Messaging from './pages/Messaging';
 import PetHospitalChatbot from './components/PetHospitalChatbot'; // Import the chatbot component
 import { ToastContainer } from 'react-toastify';
+import About from './pages/About';
+import Services from './pages/Services';
+import Contact from './pages/Contact';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Password Reset Routes
@@ -102,7 +105,9 @@ function App() {
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
-                    
+                      <Route path="/about" element={<About />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/contact" element={<Contact />} />
                     {/* Protected Routes */}
                     <Route path="/dashboard" element={
                       <ProtectedRoute>
