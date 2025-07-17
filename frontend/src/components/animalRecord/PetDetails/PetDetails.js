@@ -57,7 +57,7 @@ const handleSearch=()=>{
       </button>
     </div>
 
-    {/* when not any pet found this is trigger */}
+    
     {noResult && (
       <p className="text-red-500 text-center font-semibold">No pets found.</p>
     )}
