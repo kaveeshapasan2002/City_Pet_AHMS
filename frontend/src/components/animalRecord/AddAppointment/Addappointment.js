@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 function Addappointment() {
     const history=useNavigate();
     const [inputs,setInputs]=useState({
@@ -28,7 +30,7 @@ function Addappointment() {
       sendRequest().then(()=>history('/appointmentdetails'))
     }
     const sendRequest=async()=>{
-      await axios.post("http://localhost:5001/appointments",{
+      await axios.post(`${API_BASE_URL}/appointments`,{
        
         name:String(inputs.name),
         contact:Number(inputs.contact),

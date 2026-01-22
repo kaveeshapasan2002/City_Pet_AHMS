@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 
 
 function Pet(props) {
@@ -22,7 +24,7 @@ const deleteHandler = async () => {
 
 const deleteHandler = async () => {
     try {
-        const response = await axios.delete(`http://localhost:5001/pets/${id}`);
+        const response = await axios.delete(`${API_BASE_URL}/pets/${id}`);
         
         if (response.status === 200) {
             console.log("Pet deleted successfully!");

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 function UpdateAppointment() {
     const [inputs,setInputs]=useState({
         name:"",
@@ -18,7 +20,7 @@ function UpdateAppointment() {
     useEffect(()=>{
         const fetchHandler=async()=>{
             await axios
-            .get(`http://localhost:5001/appointments/${nic}`)
+            .get(`${API_BASE_URL}/appointments/${nic}`)
             .then((res)=>res.data)
             .then((data)=>setInputs(data.Appointments));
            
@@ -27,7 +29,7 @@ function UpdateAppointment() {
     },[nic]);  
 
     const sendRequest=async()=>{
-        await axios.put(`http://localhost:5001/appointments/${nic}`,{ 
+        await axios.put(`${API_BASE_URL}/appointments/${nic}`,{ 
         name:String(inputs.name),
         contact:Number(inputs.contact),
         gmail:String(inputs.gmail),

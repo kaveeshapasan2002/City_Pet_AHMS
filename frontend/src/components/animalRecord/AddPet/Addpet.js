@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 
 
 
@@ -36,7 +38,7 @@ const handleSubmit=(e)=>{
   sendRequest().then(()=>history('/petdetails'))
 }
 const sendRequest=async()=>{
-  await axios.post("http://Localhost:5001/pets",{
+  await axios.post(`${API_BASE_URL}/pets`,{
     id:String(inputs.id),
     name:String(inputs.name),
     age:Number(inputs.age),

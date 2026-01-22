@@ -1,7 +1,8 @@
 // src/api/admin.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api/admin';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const API_URL = `${API_BASE_URL}/api/admin`;
 
 // Get all users with optional filtering
 export const getUsers = async (filters = {}) => {
@@ -230,7 +231,7 @@ export const deleteBooking = async (bookingId) => {
       throw new Error('Not authenticated');
     }
     
-    const response = await axios.delete(`http://localhost:5001/api/boarding/${bookingId}`, {
+    const response = await axios.delete(`${API_BASE_URL}/api/boarding/${bookingId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -252,7 +253,7 @@ export const addDailyRecord = async (bookingId, recordData) => {
       throw new Error('Authentication required');
     }
     
-    const response = await axios.post(`http://localhost:5001/api/admin/boarding/${bookingId}/records`, 
+    const response = await axios.post(`${API_BASE_URL}/api/admin/boarding/${bookingId}/records`, 
       recordData,
       {
         headers: {

@@ -6,6 +6,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 const InvoiceForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -54,7 +56,7 @@ const InvoiceForm = () => {
         setServices(servicesResponse.services || []);
         
         // Fetch pets using correct API endpoint
-        const petsResponse = await axios.get('http://localhost:5001/pets', {
+        const petsResponse = await axios.get(`${API_BASE_URL}/pets`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -64,7 +66,7 @@ const InvoiceForm = () => {
         
         // Try to fetch pet owners (users with "Pet Owner" role)
         try {
-          const usersResponse = await axios.get('http://localhost:5001/api/users', {
+          const usersResponse = await axios.get(`${API_BASE_URL}/api/users`, {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
@@ -185,7 +187,7 @@ const handlePetSelect = async (e) => {
       
       // Try to find a matching user by phone number
       try {
-        const response = await axios.get('http://localhost:5001/api/users', {
+        const response = await axios.get(`${API_BASE_URL}/api/users`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },

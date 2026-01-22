@@ -52,9 +52,17 @@ router.post("/register", async (req, res) => {
         await user.save();
 
         // Send OTP via email using the updated email service
-        await sendOtpEmail(email, otp, name);
-
-        res.status(201).json({ message: "OTP sent to email. Please verify your account." });
+        try {
+            await sendOtpEmail(email, otp, name);
+            res.status(201).json({ message: "OTP sent to email. Please verify your account." });
+        } catch (emailError) {
+            console.error("Failed to send OTP email:", emailError.message);
+            // Registration successful even if email fails
+            res.status(201).json({ 
+                message: "Registration successful! Email service unavailable. Please contact support to verify your account.",
+                warning: "Email not sent - email service configuration issue"
+            });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server Error" });
@@ -245,7 +253,14 @@ router.post("/forgot-password", async (req, res) => {
             res.status(200).json({ message: "Password reset OTP sent to your email" });
         } catch (emailError) {
             console.error("Email sending error:", emailError);
-            res.status(500).json({ message: "Failed to send reset email" });
+            // Since email service is not working, return OTP in response (DEVELOPMENT ONLY)
+            console.log(`⚠️  OTP for ${email}: ${otp}`);
+            res.status(200).json({ 
+                message: "Email service unavailable. OTP logged to server console.",
+                warning: "Please check server logs for OTP or contact support",
+                // Remove this in production:
+                devOtp: otp
+            });
         }
     } catch (error) {
         console.error(error);

@@ -26,7 +26,9 @@ const server = http.createServer(app);
 // Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: process.env.FRONTEND_URL 
+      ? [process.env.FRONTEND_URL, "http://localhost:3000", "http://localhost:3001"]
+      : ["http://localhost:3000", "http://localhost:3001"],
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -194,7 +196,18 @@ if (!process.env.DEEPSEEK_API_KEY) {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }));
+
+// CORS configuration for development and production
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? [process.env.FRONTEND_URL, "http://localhost:3000", "http://localhost:3001"]
+  : ["http://localhost:3000", "http://localhost:3001"];
+
+app.use(cors({ 
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 // Animal Record routes
 app.use("/pets", router1);

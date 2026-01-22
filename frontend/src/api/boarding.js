@@ -3,7 +3,8 @@
 // src/api/boarding.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api/boarding';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const API_URL = `${API_BASE_URL}/api/boarding`;
 
 // Create a new boarding booking
 export const createBooking = async (bookingData) => {
@@ -169,7 +170,7 @@ export const getDailyRecords = async (bookingId) => {
       throw { message: 'Authentication required' };
     }
     
-    const response = await axios.get(`http://localhost:5001/api/boarding/${bookingId}/records`, {
+    const response = await axios.get(`${API_BASE_URL}/api/boarding/${bookingId}/records`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

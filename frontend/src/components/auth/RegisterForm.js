@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 const Register = () => {
   const [name, setName] = useState(""); 
   const [email, setEmail] = useState("");
@@ -144,7 +146,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5001/api/auth/register", {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
         name,
         email,
         password,

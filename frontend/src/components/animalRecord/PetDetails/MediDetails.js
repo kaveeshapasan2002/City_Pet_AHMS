@@ -3,7 +3,8 @@ import axios from "axios";
 import Medi from '../Pet/medi';
 
 
-const URL="http://localhost:5001/medies";
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const URL=`${API_BASE_URL}/medies`;
 
 const fetchHandler=async ()=>{
   return await axios.get(URL).then((res)=>res.data);

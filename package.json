@@ -1,8 +1,36 @@
 {
+  "name": "pet-hospital-management-system",
+  "version": "1.0.0",
+  "description": "Full-stack Pet Hospital Management System with React, Node.js, Express, and MongoDB",
+  "scripts": {
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm start",
+    "build": "cd frontend && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR-USERNAME/pet-hospital-system.git"
+  },
+  "keywords": [
+    "pet-hospital",
+    "veterinary",
+    "mern-stack",
+    "react",
+    "nodejs",
+    "mongodb",
+    "socket.io"
+  ],
+  "author": "Kaveesha Athukorala",
+  "license": "MIT",
   "dependencies": {
     "install": "^0.13.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "react-to-print": "^3.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
