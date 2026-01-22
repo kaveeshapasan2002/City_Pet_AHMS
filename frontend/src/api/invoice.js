@@ -1,7 +1,8 @@
 // src/api/invoice.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const API_URL = `${API_BASE_URL}/api`;
 
 // Create axios instance with authorization header
 const createAuthHeader = () => {

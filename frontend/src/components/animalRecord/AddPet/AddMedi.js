@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useNavigate, } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 
 function AddMedi() {
   const navigate=useNavigate();
@@ -42,7 +44,7 @@ function AddMedi() {
   
 
   const sendRequest=async()=>{
-    await axios.post("http://localhost:5001/medies",{
+    await axios.post(`${API_BASE_URL}/medies`,{
       petid:String(inputs.petid),
       vaccinationState:String(inputs.vaccinationState),
       vaccinationDate: inputs.vaccinationState === "Yes" ? String(inputs.vaccinationDate) : null, 

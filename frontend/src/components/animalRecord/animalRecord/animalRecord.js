@@ -7,7 +7,8 @@ import axios from 'axios';
 import { useState } from 'react';
 
 
-const URL = `http://localhost:5001/pets`;
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const URL = `${API_BASE_URL}/pets`;
 
 const fetchHandler = async () => {
   return await axios.get(URL).then((res) => res.data);

@@ -21,7 +21,7 @@ const hospitalInfo = {
 
 // Create an axios instance with default settings
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5001', // Make sure this matches your backend URL
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5001', // Make sure this matches your backend URL
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json'

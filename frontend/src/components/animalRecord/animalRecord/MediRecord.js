@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 
 import jsPDF from 'jspdf'
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 
 
 
@@ -26,7 +28,7 @@ function MedicalRecord() {
     
         const fetchRecords = async () => {
             try {
-                const res = await axios.get(`http://localhost:5001/medies/${petid}`);
+                const res = await axios.get(`${API_BASE_URL}/medies/${petid}`);
                 console.log("Fetched Medies:", res.data); 
                 setMedies(res.data.Medies || res.data); 
             } catch (err) {
@@ -38,7 +40,7 @@ function MedicalRecord() {
     
     const deleteHandler = async (deleteIndex) => {
         await axios
-            .delete(`http://localhost:5001/medies/${deleteIndex}`)
+            .delete(`${API_BASE_URL}/medies/${deleteIndex}`)
             .then((res) => res.data)
             .then(() => {
                 setMedies((prevMedies) => prevMedies.filter((medi) => medi.index !== deleteIndex));

@@ -96,11 +96,7 @@ const Dashboard = () => {
               <h3 className="text-2xl font-semibold text-gray-800 animate-slide-up">
                 Pet Care Services
               </h3>
-              <img
-                src="https://images.unsplash.com/photo-1601758064955-6c1e4a4d2e0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
-                alt="Pet Care"
-                className="w-12 h-12 rounded-full border-2 border-blue-200"
-              />
+             
             </div>
 
             {/* Pet Image and Call to Action */}

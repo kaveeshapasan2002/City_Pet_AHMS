@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 function UpdateMedi() {
   
   
@@ -25,7 +27,7 @@ const{petid}=useParams()
   useEffect(()=>{
     const fetchHandler=async()=>{
         await axios
-        .get(`http://localhost:5001/medies/index/${index}`)
+        .get(`${API_BASE_URL}/medies/index/${index}`)
         .then((res)=>res.data)
         .then((data)=>setInputs(data.Medies));
        
@@ -34,7 +36,7 @@ const{petid}=useParams()
 },[index]);
 
 const sendRequest=async()=>{
-    await axios.put(`http://localhost:5001/medies/${index}`,{
+    await axios.put(`${API_BASE_URL}/medies/${index}`,{
       index: Number(inputs.index),
       vaccinationState:String(inputs.vaccinationState),
       vaccinationDate: inputs.vaccinationState === "Yes" ? Date(inputs.vaccinationDate) : null, 

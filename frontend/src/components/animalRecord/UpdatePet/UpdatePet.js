@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 function UpdatePet() {
 const [inputs,setInputs]=useState ({
   id: "", 
@@ -21,7 +23,7 @@ const {id} = useParams();
 useEffect(()=>{
     const fetchHandler=async()=>{
         await axios
-        .get(`http://Localhost:5001/pets/${id}`)
+        .get(`${API_BASE_URL}/pets/${id}`)
         .then((res)=>res.data)
         .then((data)=>setInputs(data.pet));
        
@@ -30,7 +32,7 @@ useEffect(()=>{
 },[id]);
 
 const sendRequest=async()=>{
-    await axios.put(`http://localhost:5001/pets/${id}`,{
+    await axios.put(`${API_BASE_URL}/pets/${id}`,{
       name:String(inputs.name),
       age:Number(inputs.age),
       breed:String(inputs.breed),

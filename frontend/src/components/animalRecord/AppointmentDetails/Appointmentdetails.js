@@ -4,6 +4,8 @@ import { useState,useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate,useParams } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 
 
 
@@ -16,7 +18,7 @@ function Appointmentdetails() {
       useEffect(() => {
         const fetchRecords = async () => {
             await axios
-                .get(`http://localhost:5001/appointments`)
+                .get(`${API_BASE_URL}/appointments`)
                 .then((res) => setAppoinment(res.data.Appointments))  // Updated to match backend response
                 .catch((err) => console.log("Error fetching records:", err));
         };
@@ -25,7 +27,7 @@ function Appointmentdetails() {
 
     const deleteHandler = async (nic) => {
         await axios
-            .delete(`http://localhost:5001/appointments/${nic}`)
+            .delete(`${API_BASE_URL}/appointments/${nic}`)
             .then((res) => res.data)
             .then(() => {
                 setAppoinment((prevAppointments) => prevAppointments.filter((appointment) => appointment.nic !== nic));

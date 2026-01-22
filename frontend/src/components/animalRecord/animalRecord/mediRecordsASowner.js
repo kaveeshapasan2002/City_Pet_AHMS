@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 
 import jsPDF from 'jspdf'
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 
 
 
@@ -36,7 +38,7 @@ function MedicalRecordAsOwner() {
     
         const fetchRecords = async () => {
             try {
-                const res = await axios.get(`http://localhost:5001/medies/${petid}`);
+                const res = await axios.get(`${API_BASE_URL}/medies/${petid}`);
                 console.log("Fetched Medies:", res.data); // Log the full response to see the structure
                 setMedies(res.data.Medies || res.data); // Adjust if needed
             } catch (err) {

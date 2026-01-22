@@ -3,7 +3,8 @@
 const isDev = process.env.NODE_ENV === 'development';
 
 // The correct API URL based on your backend code
-const API_URL = 'http://localhost:5001/api/suppliers';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const API_URL = `${API_BASE_URL}/api/suppliers`;
 
 // Log API endpoint in development
 if (isDev) {
